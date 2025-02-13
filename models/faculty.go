@@ -1,15 +1,13 @@
 package models
 
-import (
-    "gorm.io/gorm"
-)
+import "uni_app/database"
 
 type Faculty struct {
-    gorm.Model
-    UniversityID uint
-    University   Uni   `gorm:"foreignKey:UniversityID"`
-    Name         string
-    Description  string
-    BossID       uint
-    Boss         User  `gorm:"foreignKey:BossID"`
+	database.Model
+	UniversityID database.PID
+	University   Uni `gorm:"foreignKey:UniversityID"`
+	Name         string
+	Description  string
+	BossID       uint
+	Boss         User `gorm:"foreignKey:BossID"`
 }

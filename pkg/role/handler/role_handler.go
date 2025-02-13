@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
+	"uni_app/database"
 	"uni_app/models"
 	usecases "uni_app/pkg/role/usecase"
+	"uni_app/utils/ctxHelper"
 
 	"github.com/labstack/echo/v4"
 )
@@ -35,11 +36,15 @@ func (h *RoleHandler) CreateRole(c echo.Context) error {
 }
 
 func (h *RoleHandler) GetRoleByID(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	role, err := h.usecase.GetRoleByID(uint(id))
+
+	role, err := h.usecase.GetRoleByID(ID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -47,15 +52,19 @@ func (h *RoleHandler) GetRoleByID(c echo.Context) error {
 }
 
 func (h *RoleHandler) UpdateRole(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
+
 	var role models.Role
 	if err := c.Bind(&role); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	role.ID = uint(id)
+	role.ID = ID
 	if err := h.usecase.UpdateRole(&role); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -63,11 +72,15 @@ func (h *RoleHandler) UpdateRole(c echo.Context) error {
 }
 
 func (h *RoleHandler) DeleteRole(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	if err := h.usecase.DeleteRole(uint(id)); err != nil {
+
+	if err := h.usecase.DeleteRole(ID); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Role deleted"})

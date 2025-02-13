@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"uni_app/database"
 	"uni_app/models"
 
 	"gorm.io/gorm"
@@ -8,9 +9,9 @@ import (
 
 type FacultyRepository interface {
 	Create(faculty *models.Faculty) error
-	GetByID(id uint) (*models.Faculty, error)
+	GetByID(ID database.PID) (*models.Faculty, error)
 	Update(faculty *models.Faculty) error
-	Delete(id uint) error
+	Delete(ID database.PID) error
 	GetAll() ([]models.Faculty, error)
 }
 
@@ -26,9 +27,9 @@ func (r *facultyRepository) Create(faculty *models.Faculty) error {
 	return r.db.Create(faculty).Error
 }
 
-func (r *facultyRepository) GetByID(id uint) (*models.Faculty, error) {
+func (r *facultyRepository) GetByID(ID database.PID) (*models.Faculty, error) {
 	var faculty models.Faculty
-	if err := r.db.First(&faculty, id).Error; err != nil {
+	if err := r.db.First(&faculty, ID).Error; err != nil {
 		return nil, err
 	}
 	return &faculty, nil
@@ -38,8 +39,8 @@ func (r *facultyRepository) Update(faculty *models.Faculty) error {
 	return r.db.Save(faculty).Error
 }
 
-func (r *facultyRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Faculty{}, id).Error
+func (r *facultyRepository) Delete(ID database.PID) error {
+	return r.db.Delete(&models.Faculty{}, ID).Error
 }
 
 func (r *facultyRepository) GetAll() ([]models.Faculty, error) {

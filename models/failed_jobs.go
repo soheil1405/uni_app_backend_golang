@@ -2,12 +2,11 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
+	"uni_app/database"
 )
 
 type FailedJob struct {
-	gorm.Model
+	database.Model
 	UUID       string    `gorm:"unique;not null"`
 	Connection string    `gorm:"not null"`
 	Queue      string    `gorm:"not null"`

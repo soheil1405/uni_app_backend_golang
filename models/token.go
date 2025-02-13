@@ -2,12 +2,11 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
+	"uni_app/database"
 )
 
 type PersonalAccessToken struct {
-	gorm.Model
+	database.Model
 	TokenableID   uint
 	TokenableType string
 	Name          string `gorm:"not null"`

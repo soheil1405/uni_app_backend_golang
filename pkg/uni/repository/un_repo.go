@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"uni_app/database"
 	"uni_app/models"
 
 	"gorm.io/gorm"
@@ -8,9 +9,9 @@ import (
 
 type UniRepository interface {
 	Create(uni *models.Uni) error
-	GetByID(id uint) (*models.Uni, error)
+	GetByID(ID database.PID) (*models.Uni, error)
 	Update(uni *models.Uni) error
-	Delete(id uint) error
+	Delete(ID database.PID) error
 	GetAll() ([]models.Uni, error)
 }
 
@@ -26,9 +27,9 @@ func (r *uniRepository) Create(uni *models.Uni) error {
 	return r.db.Create(uni).Error
 }
 
-func (r *uniRepository) GetByID(id uint) (*models.Uni, error) {
+func (r *uniRepository) GetByID(ID database.PID) (*models.Uni, error) {
 	var uni models.Uni
-	if err := r.db.First(&uni, id).Error; err != nil {
+	if err := r.db.First(&uni, ID).Error; err != nil {
 		return nil, err
 	}
 	return &uni, nil
@@ -38,8 +39,8 @@ func (r *uniRepository) Update(uni *models.Uni) error {
 	return r.db.Save(uni).Error
 }
 
-func (r *uniRepository) Delete(id uint) error {
-	return r.db.Delete(&models.Uni{}, id).Error
+func (r *uniRepository) Delete(ID database.PID) error {
+	return r.db.Delete(&models.Uni{}, ID).Error
 }
 
 func (r *uniRepository) GetAll() ([]models.Uni, error) {

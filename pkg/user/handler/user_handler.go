@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
+	"uni_app/database"
 	"uni_app/models"
 	usecases "uni_app/pkg/user/usecase"
+	"uni_app/utils/ctxHelper"
 
 	"github.com/labstack/echo/v4"
 )
@@ -35,11 +36,14 @@ func (h *UserHandler) CreateUser(c echo.Context) error {
 }
 
 func (h *UserHandler) GetUserByID(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	user, err := h.usecase.GetUserByID(uint(id))
+	user, err := h.usecase.GetUserByID(ID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -47,15 +51,18 @@ func (h *UserHandler) GetUserByID(c echo.Context) error {
 }
 
 func (h *UserHandler) UpdateUser(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err  error
+		ID   database.PID
+		user models.User
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	var user models.User
 	if err := c.Bind(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	user.ID = uint(id)
+	user.ID = ID
 	if err := h.usecase.UpdateUser(&user); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -63,11 +70,15 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 }
 
 func (h *UserHandler) DeleteUser(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	if err := h.usecase.DeleteUser(uint(id)); err != nil {
+
+	if err := h.usecase.DeleteUser(ID); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "User deleted"})

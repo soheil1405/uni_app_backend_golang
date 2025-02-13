@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
+	"uni_app/database"
 	"uni_app/models"
 	usecases "uni_app/pkg/faculty/usecase"
+	"uni_app/utils/ctxHelper"
 
 	"github.com/labstack/echo/v4"
 )
@@ -35,11 +36,15 @@ func (h *FacultyHandler) CreateFaculty(c echo.Context) error {
 }
 
 func (h *FacultyHandler) GetFacultyByID(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err     error
+		faculty *models.Faculty
+	)
+
+	if faculty.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	faculty, err := h.usecase.GetFacultyByID(uint(id))
+	faculty, err = h.usecase.GetFacultyByID(faculty.ID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -47,15 +52,19 @@ func (h *FacultyHandler) GetFacultyByID(c echo.Context) error {
 }
 
 func (h *FacultyHandler) UpdateFaculty(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
-	}
-	var faculty models.Faculty
+	var (
+		err     error
+		faculty models.Faculty
+	)
+
 	if err := c.Bind(&faculty); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	faculty.ID = uint(id)
+
+	if faculty.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
 	if err := h.usecase.UpdateFaculty(&faculty); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -63,11 +72,15 @@ func (h *FacultyHandler) UpdateFaculty(c echo.Context) error {
 }
 
 func (h *FacultyHandler) DeleteFaculty(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		id  database.PID
+	)
+	if id, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	if err := h.usecase.DeleteFaculty(uint(id)); err != nil {
+
+	if err := h.usecase.DeleteFaculty(id); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Faculty deleted"})

@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
+	"uni_app/database"
 	"uni_app/models"
 	usecases "uni_app/pkg/uni/usecase"
+	"uni_app/utils/ctxHelper"
 
 	"github.com/labstack/echo/v4"
 )
@@ -34,11 +35,15 @@ func (h *UniHandler) CreateUni(c echo.Context) error {
 }
 
 func (h *UniHandler) GetUniByID(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	uni, err := h.usecase.GetUniByID(uint(id))
+
+	uni, err := h.usecase.GetUniByID(ID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -46,15 +51,19 @@ func (h *UniHandler) GetUniByID(c echo.Context) error {
 }
 
 func (h *UniHandler) UpdateUni(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+		uni models.Uni
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	var uni models.Uni
+
 	if err := c.Bind(&uni); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	uni.ID = uint(id)
+	uni.ID = ID
 	if err := h.usecase.UpdateUni(&uni); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -62,11 +71,15 @@ func (h *UniHandler) UpdateUni(c echo.Context) error {
 }
 
 func (h *UniHandler) DeleteUni(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	if err := h.usecase.DeleteUni(uint(id)); err != nil {
+
+	if err := h.usecase.DeleteUni(ID); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Uni deleted"})

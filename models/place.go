@@ -1,14 +1,12 @@
 package models
 
-import (
-    "gorm.io/gorm"
-)
+import "uni_app/database"
 
 type Place struct {
-    gorm.Model
-    Name         string     `gorm:"not null"`
-    CityID       uint       `gorm:"foreignKey:ID"`
-    City         City       `gorm:"foreignKey:CityID"`
-    PlaceTypeID  uint       `gorm:"foreignKey:ID"`
-    PlaceType    PlaceType  `gorm:"foreignKey:PlaceTypeID"`
+	database.Model
+	Name        string       `gorm:"not null"`
+	CityID      uint         `gorm:"foreignKey:ID"`
+	City        City         `gorm:"foreignKey:CityID"`
+	PlaceTypeID database.PID `gorm:"foreignKey:ID"`
+	PlaceType   PlaceType    `gorm:"foreignKey:PlaceTypeID"`
 }

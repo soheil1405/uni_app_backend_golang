@@ -1,15 +1,16 @@
 package usecases
 
 import (
+	"uni_app/database"
 	"uni_app/models"
 	repositories "uni_app/pkg/uni/repository"
 )
 
 type UniUsecase interface {
 	CreateUni(uni *models.Uni) error
-	GetUniByID(id uint) (*models.Uni, error)
+	GetUniByID(ID database.PID) (*models.Uni, error)
 	UpdateUni(uni *models.Uni) error
-	DeleteUni(id uint) error
+	DeleteUni(ID database.PID) error
 	GetAllUnis() ([]models.Uni, error)
 }
 
@@ -25,16 +26,16 @@ func (u *uniUsecase) CreateUni(uni *models.Uni) error {
 	return u.repo.Create(uni)
 }
 
-func (u *uniUsecase) GetUniByID(id uint) (*models.Uni, error) {
-	return u.repo.GetByID(id)
+func (u *uniUsecase) GetUniByID(ID database.PID) (*models.Uni, error) {
+	return u.repo.GetByID(ID)
 }
 
 func (u *uniUsecase) UpdateUni(uni *models.Uni) error {
 	return u.repo.Update(uni)
 }
 
-func (u *uniUsecase) DeleteUni(id uint) error {
-	return u.repo.Delete(id)
+func (u *uniUsecase) DeleteUni(ID database.PID) error {
+	return u.repo.Delete(ID)
 }
 
 func (u *uniUsecase) GetAllUnis() ([]models.Uni, error) {

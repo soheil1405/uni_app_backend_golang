@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
+	"uni_app/database"
 	"uni_app/models"
 	usecases "uni_app/pkg/major/usecase"
+	"uni_app/utils/ctxHelper"
 
 	"github.com/labstack/echo/v4"
 )
@@ -35,11 +36,15 @@ func (h *MajorHandler) CreateMajor(c echo.Context) error {
 	return c.JSON(http.StatusCreated, major)
 }
 func (h *MajorHandler) GetMajorByID(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	major, err := h.usecase.GetMajorByID(uint(id))
+
+	major, err := h.usecase.GetMajorByID(ID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -47,15 +52,19 @@ func (h *MajorHandler) GetMajorByID(c echo.Context) error {
 }
 
 func (h *MajorHandler) UpdateMajor(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
+
 	var major models.Major
 	if err := c.Bind(&major); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	major.ID = uint(id)
+	major.ID = ID
 	if err := h.usecase.UpdateMajor(&major); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -63,11 +72,15 @@ func (h *MajorHandler) UpdateMajor(c echo.Context) error {
 }
 
 func (h *MajorHandler) DeleteMajor(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		err error
+		ID  database.PID
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	if err := h.usecase.DeleteMajor(uint(id)); err != nil {
+
+	if err := h.usecase.DeleteMajor(ID); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "Major deleted"})

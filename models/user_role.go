@@ -1,14 +1,12 @@
 package models
 
-import (
-    "gorm.io/gorm"
-)
+import "uni_app/database"
 
 type UserRole struct {
-    gorm.Model
-    UserID uint
-    User   User `gorm:"foreignKey:UserID"`
-    RoleID uint
-    Role   Role `gorm:"foreignKey:RoleID"`
-    Meta   string `gorm:"type:json"`
+	database.Model
+	UserID database.PID
+	User   User `gorm:"foreignKey:UserID"`
+	RoleID database.PID
+	Role   Role   `gorm:"foreignKey:RoleID"`
+	Meta   string `gorm:"type:json"`
 }

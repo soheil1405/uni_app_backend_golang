@@ -1,11 +1,9 @@
 package models
 
-import (
-    "gorm.io/gorm"
-)
+import "uni_app/database"
 
 type UniType struct {
-    gorm.Model
-    Type        string `gorm:"unique;not null"`
-    Description string `gorm:"type:text"`
+	database.Model
+	Type        string `gorm:"unique;not null"`
+	Description string `gorm:"type:text"`
 }

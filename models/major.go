@@ -1,12 +1,10 @@
 package models
 
-import (
-    "gorm.io/gorm"
-)
+import "uni_app/database"
 
 type Major struct {
-    gorm.Model
-    Name        string `gorm:"not null"`
-    Code        string `gorm:"unique;not null"`
-    Description string
+	database.Model
+	Name        string `gorm:"not null"`
+	Code        string `gorm:"unique;not null"`
+	Description string
 }

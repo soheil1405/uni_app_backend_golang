@@ -1,11 +1,9 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
+import "uni_app/database"
 
 type Role struct {
-	gorm.Model
+	database.Model
 	Meta        string `gorm:"type:json"`
 	Name        string `gorm:"unique;not null"`
 	Description string

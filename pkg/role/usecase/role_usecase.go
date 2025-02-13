@@ -1,15 +1,16 @@
 package usecases
 
 import (
+	"uni_app/database"
 	"uni_app/models"
 	repositories "uni_app/pkg/role/repository"
 )
 
 type RoleUsecase interface {
 	CreateRole(role *models.Role) error
-	GetRoleByID(id uint) (*models.Role, error)
+	GetRoleByID(ID database.PID) (*models.Role, error)
 	UpdateRole(role *models.Role) error
-	DeleteRole(id uint) error
+	DeleteRole(ID database.PID) error
 	GetAllRoles() ([]models.Role, error)
 }
 
@@ -25,16 +26,16 @@ func (u *roleUsecase) CreateRole(role *models.Role) error {
 	return u.repo.Create(role)
 }
 
-func (u *roleUsecase) GetRoleByID(id uint) (*models.Role, error) {
-	return u.repo.GetByID(id)
+func (u *roleUsecase) GetRoleByID(ID database.PID) (*models.Role, error) {
+	return u.repo.GetByID(ID)
 }
 
 func (u *roleUsecase) UpdateRole(role *models.Role) error {
 	return u.repo.Update(role)
 }
 
-func (u *roleUsecase) DeleteRole(id uint) error {
-	return u.repo.Delete(id)
+func (u *roleUsecase) DeleteRole(ID database.PID) error {
+	return u.repo.Delete(ID)
 }
 
 func (u *roleUsecase) GetAllRoles() ([]models.Role, error) {

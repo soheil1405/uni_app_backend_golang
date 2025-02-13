@@ -1,10 +1,8 @@
 package models
 
-import (
-    "gorm.io/gorm"
-)
+import "uni_app/database"
 
 type City struct {
-    gorm.Model
-    Name string `gorm:"not null"`
+	database.Model
+	Name string `gorm:"not null"`
 }

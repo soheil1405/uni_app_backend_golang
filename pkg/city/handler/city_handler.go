@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
+	"uni_app/database"
 	"uni_app/models"
 	usecases "uni_app/pkg/city/usecase"
+	"uni_app/utils/ctxHelper"
 
 	"github.com/labstack/echo/v4"
 )
@@ -36,27 +37,25 @@ func (h *CityHandler) CreateCity(c echo.Context) error {
 }
 
 func (h *CityHandler) GetCityByID(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+	var (
+		ID  database.PID
+		err error
+	)
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	city, err := h.usecase.GetCityByID(uint(id))
+	city, err := h.usecase.GetCityByID(ID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, city)
 }
 
-func (h *CityHandler) UpdateCity(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
-	}
+func (h *CityHandler) UpdateCity(c echo.Context) (err error) {
 	var city models.City
-	if err := c.Bind(&city); err != nil {
+	if city.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	city.ID = uint(id)
 	if err := h.usecase.UpdateCity(&city); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -64,11 +63,12 @@ func (h *CityHandler) UpdateCity(c echo.Context) error {
 }
 
 func (h *CityHandler) DeleteCity(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	ID, err := ctxHelper.GetIDFromContxt(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	if err := h.usecase.DeleteCity(uint(id)); err != nil {
+
+	if err := h.usecase.DeleteCity(ID); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, map[string]string{"message": "City deleted"})
