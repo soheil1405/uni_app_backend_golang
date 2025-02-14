@@ -7,7 +7,6 @@ import (
 
 type FailedJob struct {
 	database.Model
-	UUID       string    `gorm:"unique;not null"`
 	Connection string    `gorm:"not null"`
 	Queue      string    `gorm:"not null"`
 	Payload    string    `gorm:"type:longtext;not null"`

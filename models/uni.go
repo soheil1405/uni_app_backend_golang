@@ -5,6 +5,7 @@ import (
 	"uni_app/database"
 )
 
+type Unies []*Uni
 type Uni struct {
 	database.Model
 	Name            string
@@ -13,11 +14,12 @@ type Uni struct {
 	Email           *string
 	PhoneNumber1    *string
 	PhoneNumber2    *string
-	UniTypeID       uint
+	UniTypeID       database.PID
 	UniType         UniType `gorm:"foreignKey:UniTypeID"`
-	BossID          uint
+	BossID          database.PID
 	Boss            User `gorm:"foreignKey:BossID"`
-	CityID          uint
+	CityID          database.PID
 	City            City `gorm:"foreignKey:CityID"`
 	EstablishedYear *time.Time
+	Faculties       Faculties
 }

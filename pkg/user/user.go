@@ -10,11 +10,7 @@ import (
 )
 
 func Init(db *gorm.DB, e echo.Group) {
-
 	roleRepo := repositories.NewUserRepository(db)
-
 	roleUsecase := usecases.NewUserUsecase(roleRepo)
-
 	handlers.NewUserHandler(roleUsecase, e)
-
 }

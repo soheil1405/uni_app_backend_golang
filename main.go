@@ -2,7 +2,7 @@ package main
 
 import (
 	"uni_app/database"
-	"uni_app/pkg/uni"
+	"uni_app/pkg"
 
 	"github.com/labstack/echo/v4"
 )
@@ -14,8 +14,7 @@ func main() {
 
 	e := echo.Group("/api/v1")
 
-	uni.Init(db, *e)
+	pkg.InitPkgs(db, *e)
 
 	echo.Start(":8080")
-
 }

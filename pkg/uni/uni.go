@@ -10,11 +10,7 @@ import (
 )
 
 func Init(db *gorm.DB, e echo.Group) {
-
 	uniRepo := repositories.NewUniRepository(db)
-
 	uniUsecase := usecases.NewUniUsecase(uniRepo)
-
 	handlers.NewUniHandler(uniUsecase, e)
-
 }
