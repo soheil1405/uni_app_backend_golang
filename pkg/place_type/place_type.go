@@ -1,6 +1,7 @@
 package place_type
 
 import (
+	"uni_app/models"
 	handlers "uni_app/pkg/place_type/handler"
 	repositories "uni_app/pkg/place_type/repository"
 	usecases "uni_app/pkg/place_type/usecase"
@@ -9,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Init(db *gorm.DB, e echo.Group) {
+func Init(db *gorm.DB, e echo.Group, config *models.Config) {
 	uniRepo := repositories.NewPlaceTypeRepository(db)
 	uniUsecase := usecases.NewPlaceTypeUsecase(uniRepo)
 	handlers.NewPlaceTypeHandler(uniUsecase, e)

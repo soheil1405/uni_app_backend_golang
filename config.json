@@ -6,5 +6,7 @@
         "password": "postgres",
         "dbname": "local",
         "sslmode": "disable"
-    }
+    },
+    "api_version" :"/api/v1",
+    "port" :"8080"
 }

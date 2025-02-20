@@ -1,6 +1,7 @@
 package city
 
 import (
+	"uni_app/models"
 	handlers "uni_app/pkg/city/handler"
 	repositories "uni_app/pkg/city/repository"
 	usecases "uni_app/pkg/city/usecase"
@@ -9,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Init(db *gorm.DB, e echo.Group) {
+func Init(db *gorm.DB, e echo.Group, config *models.Config) {
 	uniRepo := repositories.NewCityRepository(db)
 	uniUsecase := usecases.NewCityUsecase(uniRepo)
 	handlers.NewCityHandler(uniUsecase, e)

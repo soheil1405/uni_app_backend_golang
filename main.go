@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"uni_app/database"
@@ -27,25 +28,26 @@ func loadConfig(path string) (*models.Config, error) {
 }
 
 func main() {
-	// Define and parse the flag
-	configPath := flag.String("-c", "config.json", "Path to the configuration file")
+	configPath := flag.String("c", "config.json", "Path to the configuration file")
 	flag.Parse()
-	// Load configuration
 	config, err := loadConfig(*configPath)
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)
 	}
-
-	echo := echo.New()
 
 	db, err := database.Connection(&config.Database)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	e := echo.Group("/api/v1")
+	echo := echo.New()
+	e := echo.Group(config.ApiVersion)
 
-	pkg.InitPkgs(db, *e)
+	pkg.InitPkgs(db, *e, config)
 
-	echo.Start(":8080")
+	for _, route := range echo.Routes() {
+		fmt.Printf("%s %s\n", route.Method, route.Path)
+	}
+
+	echo.Start(":" + config.Port)
 }

@@ -1,16 +1,17 @@
-package user
+package student
 
 import (
-	handlers "uni_app/pkg/user/handler"
-	repositories "uni_app/pkg/user/repository"
-	usecases "uni_app/pkg/user/usecase"
+	"uni_app/models"
+	handlers "uni_app/pkg/student/handler"
+	repositories "uni_app/pkg/student/repository"
+	usecases "uni_app/pkg/student/usecase"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
-func Init(db *gorm.DB, e echo.Group) {
-	roleRepo := repositories.NewUserRepository(db)
-	roleUsecase := usecases.NewUserUsecase(roleRepo)
-	handlers.NewUserHandler(roleUsecase, e)
+func Init(db *gorm.DB, e echo.Group, config *models.Config) {
+	roleRepo := repositories.NewStudentRepository(db)
+	roleUsecase := usecases.NewStudentUsecase(roleRepo)
+	handlers.NewStudentHandler(roleUsecase, e)
 }

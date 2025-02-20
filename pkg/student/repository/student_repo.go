@@ -19,7 +19,7 @@ type studentRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) StudentRepository {
+func NewStudentRepository(db *gorm.DB) StudentRepository {
 	return &studentRepository{db}
 }
 

@@ -14,7 +14,7 @@ type StudentHandler struct {
 	usecase usecases.StudentUsecase
 }
 
-func NewUserHandler(usecase usecases.StudentUsecase, e echo.Group) {
+func NewStudentHandler(usecase usecases.StudentUsecase, e echo.Group) {
 	studentHandler := &StudentHandler{usecase}
 	studentRoutes := e.Group("/students")
 	studentRoutes.GET("/", studentHandler.GetAllStudents)
