@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"uni_app/pkg/city"
-	"uni_app/pkg/faculty"
+	daneshkadeh "uni_app/pkg/daneshkadeh"
 	"uni_app/pkg/major"
 	"uni_app/pkg/major_chart"
 	"uni_app/pkg/place"
@@ -18,7 +18,7 @@ import (
 func InitPkgs(db *gorm.DB, e echo.Group) {
 	uni.Init(db, e)
 	city.Init(db, e)
-	faculty.Init(db, e)
+	daneshkadeh.Init(db, e)
 	major.Init(db, e)
 	major_chart.Init(db, e)
 	place.Init(db, e)

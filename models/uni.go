@@ -21,5 +21,5 @@ type Uni struct {
 	CityID          database.PID
 	City            City `gorm:"foreignKey:CityID"`
 	EstablishedYear *time.Time
-	Faculties       Faculties
+	DaneshKadeha    DaneshKadeha
 }

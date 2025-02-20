@@ -1,7 +1,8 @@
 package models
 
 import "uni_app/database"
-//جا ها
+
+// جا ها
 type Place struct {
 	database.Model
 	Name        string       `gorm:"not null"`

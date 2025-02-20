@@ -10,7 +10,7 @@ type UniMajor struct {
 	UniversityID database.PID
 	University   Uni `gorm:"foreignKey:UniversityID"`
 	FacultyID    database.PID
-	Faculty      Faculty `gorm:"foreignKey:FacultyID"`
+	Faculty      DaneshKadeha `gorm:"foreignKey:FacultyID"`
 	MajorID      database.PID
 	Major        Major `gorm:"foreignKey:MajorID"`
 }

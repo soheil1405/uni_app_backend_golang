@@ -2,15 +2,15 @@ package models
 
 import "uni_app/database"
 
-type Faculties []*Faculty
+type DaneshKadeha []*DaneshKadeha
 
 // دانشکده
-type Faculty struct {
+type DaneshKadeh struct {
 	database.Model
-	UniversityID database.PID
-	University   Uni `gorm:"foreignKey:UniversityID"`
 	Name         string
 	Description  string
-	BossID       database.PID
+	University   Uni `gorm:"foreignKey:UniversityID"`
+	UniversityID database.PID
 	Boss         User `gorm:"foreignKey:BossID"`
+	BossID       database.PID
 }

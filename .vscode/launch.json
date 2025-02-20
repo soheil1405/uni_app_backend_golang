@@ -1,0 +1,18 @@
+{
+    "version": "0.0.1",
+    "configurations": [
+      {
+        "name": "Launch Package",
+        "type": "go",
+        "request": "launch",
+        "mode": "auto",
+        "program": "${workspaceFolder}/main.go",
+        "args": [
+          "-c",
+          "config.json"
+        ],"env":{
+          "CACHE_DSN": "redis://redis-service:6379/0"
+        }
+      }
+    ]
+  }

@@ -9,6 +9,6 @@ type UserRole struct {
 	RoleID    database.PID
 	Role      Role `gorm:"foreignKey:RoleID"`
 	FacultyID database.PID
-	Faculty   Faculty
+	Faculty   DaneshKadeha
 	Meta      string `gorm:"type:json"`
 }

@@ -1,0 +1,10 @@
+{
+    "database":{
+        "host": "localhost",
+        "port": 11031,
+        "user": "sika_user",
+        "password": "postgres",
+        "dbname": "local",
+        "sslmode": "disable"
+    }
+}
