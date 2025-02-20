@@ -11,4 +11,5 @@ type Student struct {
 	Password      string       `json:"-,omitempty"`
 	MajorID       database.PID `json:"major_id,omitempty"`
 	DaneshKadehID database.PID `json:"daneshkadeh_id,omitempty"`
+	Roles         []Role       `gorm:"many2many:student_roles;" json:"roles,omitempty"`
 }

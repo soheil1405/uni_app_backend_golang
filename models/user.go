@@ -7,15 +7,16 @@ import (
 
 type User struct {
 	database.Model
-	UserName        string       `gorm:"unique;not null"`
-	FirstName       string       `gorm:"not null"`
-	LastName        string       `gorm:"not null"`
-	Number          string       `gorm:"unique;not null"`
-	NationalCode    *int         `gorm:"unique"`
-	NominatedByID   database.PID `gorm:"foreignKey:ID"`
-	NominatedBy     *User        `gorm:"foreignKey:NominatedByID"`
-	Email           string       `gorm:"unique;not null"`
-	EmailVerifiedAt *time.Time
-	Password        string `gorm:"not null"`
-	RememberToken   string
+	UserName        string       `gorm:"unique;not null" json:"user_name,omitempty"`
+	FirstName       string       `gorm:"not null" json:"first_name,omitempty"`
+	LastName        string       `gorm:"not null" json:"last_name,omitempty"`
+	Number          string       `gorm:"unique;not null" json:"number,omitempty"`
+	NationalCode    *int         `gorm:"unique" json:"national_code,omitempty"`
+	NominatedByID   database.PID `gorm:"foreignKey:ID" json:"nominated_by_id,omitempty"`
+	NominatedBy     *User        `gorm:"foreignKey:NominatedByID" json:"nominated_by,omitempty"`
+	Email           string       `gorm:"unique;not null" json:"email,omitempty"`
+	EmailVerifiedAt *time.Time   `json:"email_verified_at,omitempty"`
+	Password        string       `gorm:"not null" json:"password,omitempty"`
+	RememberToken   string       `json:"remember_token,omitempty"`
+	Roles           []Role       `gorm:"many2many:user_roles;" json:"roles,omitempty"`
 }
