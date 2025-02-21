@@ -1,4 +1,15 @@
 {
+    "service":{
+        "auth": {
+            "active": true,
+            "alg": "HS256",
+            "secret": "YmU4NGZhMTE2MDNkZjgwZWQzNGJhZGE3YzIwZTM0NTNkNWU4NGQ2NjUxYjZhZjRi",
+            "expire": 8760,
+            "audience": "aud",
+            "issuer": "issuer",
+            "subject": "subject"
+        }
+    },
     "database":{
         "host": "localhost",
         "port": 11031,
