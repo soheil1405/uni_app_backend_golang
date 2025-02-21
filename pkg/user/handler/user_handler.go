@@ -30,12 +30,38 @@ func NewUserHandler(usecase usecases.UserUsecase, e echo.Group) {
 }
 
 func (h *UserHandler) Login(ctx echo.Context) error {
-	var request models.LoginRequst
-	if err := ctx.Bind(&request); err != nil {
+	var (
+		request  models.UserLoginRequst
+		response *models.Token
+		err      error
+	)
+
+	if err = ctx.Bind(&request); err != nil {
 		return helper.Reply(ctx, http.StatusBadRequest, err, nil, nil)
 	}
 
-	return helper.Reply(ctx, http.StatusOK, nil, nil, nil)
+	if response, err = h.usecase.Login(ctx, &request); err != nil {
+		return helper.Reply(ctx, http.StatusBadRequest, err, nil, nil)
+	}
+
+	ctx.SetCookie(&http.Cookie{
+		Name:    "token",
+		Value:   response.TokenKey,
+		Path:    "/",
+		Expires: response.ExpireTime,
+		Secure:  false,
+	})
+
+	return helper.Reply(
+		ctx,
+		http.StatusOK,
+		nil,
+		map[string]interface{}{
+			"token":     response.TokenKey,
+			"token_new": response,
+		},
+		nil,
+	)
 }
 
 func (h *UserHandler) CreateUser(c echo.Context) error {

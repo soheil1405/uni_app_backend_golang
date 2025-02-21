@@ -1,12 +1,20 @@
 package usecases
 
 import (
+	"errors"
+	"time"
 	"uni_app/database"
 	"uni_app/models"
+	tokenRepository "uni_app/pkg/token/repository"
 	repositories "uni_app/pkg/user/repository"
+	"uni_app/utils/helpers"
+	"uni_app/utils/jwt"
+
+	"github.com/labstack/echo/v4"
 )
 
 type UserUsecase interface {
+	Login(ctx echo.Context, req *models.UserLoginRequst) (*models.Token, error)
 	CreateUser(user *models.User) error
 	GetUserByID(ID database.PID) (*models.User, error)
 	UpdateUser(user *models.User) error
@@ -15,11 +23,56 @@ type UserUsecase interface {
 }
 
 type userUsecase struct {
-	repo repositories.UserRepository
+	repo      repositories.UserRepository
+	tokenRepo tokenRepository.TokenRepository
+	Config    *models.Config
 }
 
-func NewUserUsecase(repo repositories.UserRepository) UserUsecase {
-	return &userUsecase{repo}
+func NewUserUsecase(repo repositories.UserRepository, config *models.Config) UserUsecase {
+	return &userUsecase{
+		repo:   repo,
+		Config: config,
+	}
+}
+
+func (u *userUsecase) Login(ctx echo.Context, request *models.UserLoginRequst) (token *models.Token, err error) {
+	var (
+		user     *models.User
+		tokenKey string
+		expTime  time.Time
+	)
+
+	if request.Password == "" || request.Username == "" {
+		return nil, models.ErrorInvalidUserPass
+	}
+
+	if user, err = u.repo.GetByUserName(request.Username); err != nil {
+		return
+	}
+	if isValid := helpers.ComparePassword(user.Password, request.Password); !isValid {
+		err = errors.New("wrong password")
+		return
+	}
+
+	if tokenKey, expTime, err = jwt.GenerateToken(u.Config.Auth, user); err != nil {
+		return
+	}
+
+	token = &models.Token{
+		TokenKey:   tokenKey,
+		Revoked:    false,
+		ExpireTime: expTime,
+		OwnerType:  "user",
+		OwnerID:    user.ID,
+	}
+
+	if token, err = u.tokenRepo.Create(token); err != nil {
+		return nil, err
+	}
+
+	token.User = user
+
+	return
 }
 
 func (u *userUsecase) CreateUser(user *models.User) error {
