@@ -3,7 +3,14 @@ package models
 import "errors"
 
 var (
-	ErrorInvalidUserPass = generateErr("invalid username or password")
+	ErrorBadRequest             = generateErr("bad request")
+	ErrorAccessDenied           = generateErr("access denied")
+	ErrorInvalidUserPass        = generateErr("invalid username or password")
+	ErrorInvalidUserRoles       = generateErr("user dosent have role")
+	ErrUserIsNotActive          = generateErr("user is not active")
+	ErrUnAuthorizedInValidToken = generateErr("unAuthorized")
+	ErrInvalidUserID            = generateErr("invalid user id")
+	ErrInvalidStudentID         = generateErr("invalid student id")
 )
 
 func generateErr(errMsg string) error {

@@ -1,9 +1,10 @@
 package models
 
 import "uni_app/database"
-//شهر
+
+// شهر
 type City struct {
 	database.Model
-	Name  string `gorm:"not null"`
-	Unies Unies
+	Name  string `gorm:"not null" json:"name,omitempty"`
+	Unies Unis   `json:"unies,omitempty"`
 }

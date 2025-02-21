@@ -57,54 +57,25 @@ const (
 	HeadersUser = "x-user"
 	// HeadersUserID ...
 	HeadersUserID = "x-user-id"
-	// HeadersStore ...
-	HeadersStore = "x-store"
-	// HeadersBranch ...
-	HeadersBranch = "x-branch"
-	// HeadersStock ...
-	HeadersStock = "x-stock"
-	// HeadersStoreID ...
-	HeadersStoreID = "x-store-id"
-	// HeadersBranchID ...
-	HeadersBranchID = "x-branch-id"
-	// HeadersStockID ...
-	HeadersStockID = "x-stock-id"
-	// HeadersRemoteStockID ...
-	HeadersRemoteStockID = "x-remote-stock-id"
-	// HeadersStockIDs ...
-	HeadersStockIDs = "x-stock-ids"
-	// HeadersStoreNo ...
-	HeadersBoothID = "x-booth-id"
-	// HeadersRemoteStockIDs ...
-	HeadersRemoteStockIDs = "x-remote-stock-ids"
-	// HeadersBranches ...
-	HeadersBranches = "x-branches"
-	// HeadersAdapterID ...
-	HeadersAdapterID = "x-adapter-id"
-	// HeadersAdapterAlias ...
-	HeadersAdapterAlias = "x-adapter-alias"
-	// Adapter
-	HeadersAdapter       = "x-adapter"
-	HeadersAdapterStore  = "x-adapter-store"
-	HeadersAdapterBranch = "x-adapter-branch"
-	HeadersAdapterStock  = "x-adapter-stock"
+	// HeadersStudent ...
+	HeadersStudent = "x-student"
+	// HeadersStudentID ...
+	HeadersStudentID = "x-student-id"
+	// HeadersRoles ...
+	HeadersRoles = "x-roles"
+	// HeadersMainRole ...
+	HeadersMainRole = "x-main-role"
+	// HeadersUni ...
+	HeadersUni = "x-uni"
+	// HeadersUniID ...
+	HeadersUniID = "x-uni-id"
 	// HeadersClient ...
 	HeadersClient = "x-client"
 	// HeadersClient ...
 	HeadersClientID = "x-client-id"
-	// HeadersCustomer ...
-	HeadersCustomer = "x-customer"
-	// HeadersCustomer ...
-	HeadersCustomerID = "x-customer-id"
-	// HeadersAuthenticated ...
-	HeadersAuthenticated = "x-authenticated"
 	// HeadersTokenKey ...
 	HeadersTokenKey = "x-token-key"
 	// HeadersPosType ...
-	HeadersPosType = "x-pos-type"
-	// HaedersProxyDestination ...
-	HaedersProxyDestination = "x-proxy-destination"
-	// HeadersTunnelKey ...
 	// HeadersTunnelKey = "x-tunnel-key"
 	HeadersTunnelKey = "x-client-id"
 	// HeadersPlatform pwa, wordpress, next, pl, cr, ...
@@ -688,6 +659,13 @@ func ComparePassword(dbPass, pass string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(dbPass), []byte(pass)) == nil
 }
 
+func ContextUniID(ctx echo.Context) (uniID database.PID) {
+	if uniID, err := database.ParsePID(GetFromContext(ctx, HeadersUniID)); err != nil {
+		return database.NilPID
+	} else {
+		return uniID
+	}
+}
 func ContextUserID(ctx echo.Context) (userID database.PID) {
 	if userID, err := database.ParsePID(GetFromContext(ctx, HeadersUserID)); err != nil {
 		return database.NilPID
@@ -696,43 +674,11 @@ func ContextUserID(ctx echo.Context) (userID database.PID) {
 	}
 }
 
-func ContextCustomerID(ctx echo.Context) (customerID database.PID) {
-	if customerID, err := database.ParsePID(GetFromContext(ctx, HeadersCustomerID)); err != nil {
+func ContextStudentID(ctx echo.Context) (studentID database.PID) {
+	if studentID, err := database.ParsePID(GetFromContext(ctx, HeadersStudentID)); err != nil {
 		return database.NilPID
 	} else {
-		return customerID
-	}
-}
-
-func ContextStoreID(ctx echo.Context) (storeID database.PID) {
-	if storeID, err := database.ParsePID(GetFromContext(ctx, HeadersStoreID)); err != nil {
-		return database.NilPID
-	} else {
-		return storeID
-	}
-}
-
-func ContextBranchID(ctx echo.Context) (branchID database.PID) {
-	if branchID, err := database.ParsePID(GetFromContext(ctx, HeadersBranchID)); err != nil {
-		return database.NilPID
-	} else {
-		return branchID
-	}
-}
-
-func ContextStockID(ctx echo.Context) (stockID database.PID) {
-	if stockID, err := database.ParsePID(GetFromContext(ctx, HeadersStockID)); err != nil {
-		return database.NilPID
-	} else {
-		return stockID
-	}
-}
-
-func ContextRemoteStockID(ctx echo.Context) (remoteStockID string) {
-	if remoteStockID := cast.ToString(GetFromContext(ctx, HeadersRemoteStockID)); remoteStockID == "" {
-		return ""
-	} else {
-		return remoteStockID
+		return studentID
 	}
 }
 
@@ -741,14 +687,6 @@ func ContextPlatform(ctx echo.Context) (platform string) {
 		return ""
 	} else {
 		return platform
-	}
-}
-
-func ContextAdapterAlias(ctx echo.Context) (alias string) {
-	if alias := cast.ToString(GetFromContext(ctx, HeadersAdapterAlias)); alias == "" {
-		return ""
-	} else {
-		return alias
 	}
 }
 
@@ -781,12 +719,7 @@ func SetHeaderToRequest(ctx echo.Context, key string, value interface{}) {
 
 func ContextToHeader(ctx echo.Context) (headers map[string]string) {
 	return map[string]string{
-		HeadersStoreID:       ContextStoreID(ctx).String(),
-		HeadersBranchID:      ContextBranchID(ctx).String(),
-		HeadersStockID:       ContextStockID(ctx).String(),
-		HeadersRemoteStockID: ContextRemoteStockID(ctx),
-		HeadersAdapterAlias:  ContextAdapterAlias(ctx),
-		HeadersPlatform:      ContextPlatform(ctx),
+		HeadersPlatform: ContextPlatform(ctx),
 	}
 }
 

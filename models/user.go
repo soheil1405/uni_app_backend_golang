@@ -4,6 +4,20 @@ import (
 	"uni_app/database"
 )
 
+// UserMode ...
+type UserMode uint
+
+const (
+	// PENDING ...
+	PENDING UserMode = iota + 1
+	// USER_STATUS_ACTIVE Active
+	USER_STATUS_ACTIVE
+	// USER_STATUS_INACTIVE Inactive
+	USER_STATUS_INACTIVE
+)
+
+type Users []*User
+
 type User struct {
 	database.Model
 	UserName      string       `gorm:"unique;not null" json:"user_name,omitempty"`
@@ -15,7 +29,13 @@ type User struct {
 	NominatedBy   *User        `gorm:"foreignKey:NominatedByID" json:"nominated_by,omitempty"`
 	Email         string       `gorm:"unique;not null" json:"email,omitempty"`
 	Password      string       `gorm:"not null" json:"password,omitempty"`
-	Roles         []Role       `gorm:"many2many:user_roles;" json:"roles,omitempty"`
+	Status        UserMode     `json:"status" gorm:"default:1"`
+
+	Roles        Roles        `gorm:"many2many:user_roles;" json:"roles,omitempty"`
+	Unis         Unis         `json:"unis,omitempty" gorm:"many2many:user_roles;"`
+	DaneshKadeha DaneshKadeha `json:"daneshKadeha,omitempty" gorm:"many2many:user_roles;"`
+
+	// UserRoles     []*UserRole  `json:"user_roles,omitempty" gorm:"association_autoupdate:false;association_autocreate:false;"`
 }
 
 type UserLoginRequst struct {
