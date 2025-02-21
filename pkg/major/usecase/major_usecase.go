@@ -4,11 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 	repositories "uni_app/pkg/major/repository"
+
+	"github.com/labstack/echo/v4"
 )
 
 type MajorUsecase interface {
 	CreateMajor(major *models.Major) error
-	GetMajorByID(ID database.PID) (*models.Major, error)
+	GetMajorByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Major, error)
 	UpdateMajor(major *models.Major) error
 	DeleteMajor(ID database.PID) error
 	GetAllMajors() ([]models.Major, error)
@@ -26,8 +28,8 @@ func (u *majorUsecase) CreateMajor(major *models.Major) error {
 	return u.repo.Create(major)
 }
 
-func (u *majorUsecase) GetMajorByID(ID database.PID) (*models.Major, error) {
-	return u.repo.GetByID(ID)
+func (u *majorUsecase) GetMajorByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Major, error) {
+	return u.repo.GetByID(ctx, ID, useCache)
 }
 
 func (u *majorUsecase) UpdateMajor(major *models.Major) error {

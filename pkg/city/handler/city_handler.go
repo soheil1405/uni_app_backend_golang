@@ -44,7 +44,7 @@ func (h *CityHandler) GetCityByID(c echo.Context) error {
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	city, err := h.usecase.GetCityByID(ID)
+	city, err := h.usecase.GetCityByID(c, ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}

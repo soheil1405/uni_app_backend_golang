@@ -44,7 +44,7 @@ func (h *StudentHandler) GetStudentByID(c echo.Context) error {
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	student, err := h.usecase.GetStudentByID(ID)
+	student, err := h.usecase.GetStudentByID(c, ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}

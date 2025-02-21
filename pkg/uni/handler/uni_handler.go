@@ -43,7 +43,7 @@ func (h *UniHandler) GetUniByID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	uni, err := h.usecase.GetUniByID(ID)
+	uni, err := h.usecase.GetUniByID(c, ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}

@@ -83,7 +83,7 @@ func (h *UserHandler) GetUserByID(c echo.Context) error {
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
 		return helper.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-	user, err := h.usecase.GetUserByID(ID)
+	user, err := h.usecase.GetUserByID(c, ID, false)
 	if err != nil {
 		return helper.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}

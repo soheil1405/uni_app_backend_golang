@@ -44,7 +44,7 @@ func (h *FacultyHandler) GetDaneshKadehByID(c echo.Context) error {
 	if daneshkadeh.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	daneshkadeh, err = h.usecase.GetDaneshKadehByID(daneshkadeh.ID)
+	daneshkadeh, err = h.usecase.GetDaneshKadehByID(c, daneshkadeh.ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}

@@ -16,7 +16,7 @@ import (
 type UserUsecase interface {
 	Login(ctx echo.Context, req *models.UserLoginRequst) (*models.Token, error)
 	CreateUser(user *models.User) error
-	GetUserByID(ID database.PID) (*models.User, error)
+	GetUserByID(ctx echo.Context, ID database.PID, useCache bool) (*models.User, error)
 	UpdateUser(user *models.User) error
 	DeleteUser(ID database.PID) error
 	GetAllUsers() ([]models.User, error)
@@ -71,7 +71,6 @@ func (u *userUsecase) Login(ctx echo.Context, request *models.UserLoginRequst) (
 	}
 
 	token.User = user
-
 	return
 }
 
@@ -79,8 +78,8 @@ func (u *userUsecase) CreateUser(user *models.User) error {
 	return u.repo.Create(user)
 }
 
-func (u *userUsecase) GetUserByID(ID database.PID) (*models.User, error) {
-	return u.repo.GetByID(ID)
+func (u *userUsecase) GetUserByID(ctx echo.Context, ID database.PID, useCache bool) (*models.User, error) {
+	return u.repo.GetByID(ctx, ID, useCache)
 }
 
 func (u *userUsecase) UpdateUser(user *models.User) error {

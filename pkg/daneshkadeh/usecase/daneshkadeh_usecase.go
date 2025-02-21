@@ -4,11 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 	repositories "uni_app/pkg/daneshkadeh/repository"
+
+	"github.com/labstack/echo/v4"
 )
 
 type FacultyUsecase interface {
 	CreateDaneshKadeh(faculty *models.DaneshKadeh) error
-	GetDaneshKadehByID(ID database.PID) (*models.DaneshKadeh, error)
+	GetDaneshKadehByID(ctx echo.Context, ID database.PID, useCache bool) (*models.DaneshKadeh, error)
 	UpdateDaneshKadeh(faculty *models.DaneshKadeh) error
 	DeleteDaneshKadeh(ID database.PID) error
 	GetAllDaneshKadeha() (*models.DaneshKadeha, error)
@@ -26,8 +28,8 @@ func (u *facultyUsecase) CreateDaneshKadeh(faculty *models.DaneshKadeh) error {
 	return u.repo.Create(faculty)
 }
 
-func (u *facultyUsecase) GetDaneshKadehByID(ID database.PID) (*models.DaneshKadeh, error) {
-	return u.repo.GetByID(ID)
+func (u *facultyUsecase) GetDaneshKadehByID(ctx echo.Context, ID database.PID, useCache bool) (*models.DaneshKadeh, error) {
+	return u.repo.GetByID(ctx, ID, useCache)
 }
 
 func (u *facultyUsecase) UpdateDaneshKadeh(faculty *models.DaneshKadeh) error {

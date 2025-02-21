@@ -44,7 +44,7 @@ func (h *PlaceHandler) GetPlaceByID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	place, err := h.usecase.GetPlaceByID(ID)
+	place, err := h.usecase.GetPlaceByID(c, ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}

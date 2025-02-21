@@ -4,12 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 type PlaceRepository interface {
 	Create(place *models.Place) error
-	GetByID(ID database.PID) (*models.Place, error)
+	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Place, error)
 	Update(place *models.Place) error
 	Delete(ID database.PID) error
 	GetAll() ([]models.Place, error)
@@ -27,7 +28,7 @@ func (r *placeRepository) Create(place *models.Place) error {
 	return r.db.Create(place).Error
 }
 
-func (r *placeRepository) GetByID(ID database.PID) (*models.Place, error) {
+func (r *placeRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Place, error) {
 	var place models.Place
 	if err := r.db.First(&place, ID).Error; err != nil {
 		return nil, err

@@ -45,7 +45,7 @@ func (h *ChartHandler) GetChartByID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	chart, err := h.usecase.GetChartByID(ID)
+	chart, err := h.usecase.GetChartByID(c, ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
@@ -80,7 +80,7 @@ func (h *ChartHandler) DeleteChart(c echo.Context) error {
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	
+
 	if err := h.usecase.DeleteChart(ID); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

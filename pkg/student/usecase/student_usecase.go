@@ -4,11 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 	repositories "uni_app/pkg/student/repository"
+
+	"github.com/labstack/echo/v4"
 )
 
 type StudentUsecase interface {
 	CreateStudent(student *models.Student) error
-	GetStudentByID(ID database.PID) (*models.Student, error)
+	GetStudentByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Student, error)
 	UpdateStudent(student *models.Student) error
 	DeleteStudent(ID database.PID) error
 	GetAllStudents() ([]models.Student, error)
@@ -26,8 +28,8 @@ func (u *userUsecase) CreateStudent(student *models.Student) error {
 	return u.repo.Create(student)
 }
 
-func (u *userUsecase) GetStudentByID(ID database.PID) (*models.Student, error) {
-	return u.repo.GetByID(ID)
+func (u *userUsecase) GetStudentByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Student, error) {
+	return u.repo.GetByID(ctx, ID, useCache)
 }
 
 func (u *userUsecase) UpdateStudent(student *models.Student) error {

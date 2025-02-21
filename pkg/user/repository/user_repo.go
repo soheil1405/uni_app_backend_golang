@@ -4,12 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 type UserRepository interface {
 	Create(user *models.User) error
-	GetByID(ID database.PID) (*models.User, error)
+	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.User, error)
 	GetByUserName(username string) (*models.User, error)
 	Update(user *models.User) error
 	Delete(ID database.PID) error
@@ -35,7 +36,7 @@ func (r *userRepository) Create(user *models.User) error {
 	return r.db.Create(user).Error
 }
 
-func (r *userRepository) GetByID(ID database.PID) (*models.User, error) {
+func (r *userRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.User, error) {
 	var user models.User
 	if err := r.db.First(&user, ID).Error; err != nil {
 		return nil, err

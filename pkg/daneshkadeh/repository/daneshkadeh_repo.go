@@ -4,12 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 type FacultyRepository interface {
 	Create(faculty *models.DaneshKadeh) error
-	GetByID(ID database.PID) (*models.DaneshKadeh, error)
+	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.DaneshKadeh, error)
 	Update(faculty *models.DaneshKadeh) error
 	Delete(ID database.PID) error
 	GetAll() (*models.DaneshKadeha, error)
@@ -27,7 +28,7 @@ func (r *facultyRepository) Create(faculty *models.DaneshKadeh) error {
 	return r.db.Create(faculty).Error
 }
 
-func (r *facultyRepository) GetByID(ID database.PID) (*models.DaneshKadeh, error) {
+func (r *facultyRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.DaneshKadeh, error) {
 	var faculty models.DaneshKadeh
 	if err := r.db.First(&faculty, ID).Error; err != nil {
 		return nil, err

@@ -44,7 +44,7 @@ func (h *MajorHandler) GetMajorByID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	major, err := h.usecase.GetMajorByID(ID)
+	major, err := h.usecase.GetMajorByID(c, ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}

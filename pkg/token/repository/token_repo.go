@@ -4,12 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 type TokenRepository interface {
 	Create(token *models.Token) (*models.Token, error)
-	GetByID(ID database.PID) (*models.Token, error)
+	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Token, error)
 }
 
 type tokenRepository struct {
@@ -27,7 +28,7 @@ func (r *tokenRepository) Create(token *models.Token) (*models.Token, error) {
 	return token, nil
 }
 
-func (r *tokenRepository) GetByID(ID database.PID) (*models.Token, error) {
+func (r *tokenRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Token, error) {
 	var token models.Token
 	if err := r.db.First(&token, ID).Error; err != nil {
 		return nil, err

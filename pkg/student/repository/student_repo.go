@@ -4,12 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 type StudentRepository interface {
 	Create(student *models.Student) error
-	GetByID(ID database.PID) (*models.Student, error)
+	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Student, error)
 	Update(student *models.Student) error
 	Delete(ID database.PID) error
 	GetAll() ([]models.Student, error)
@@ -27,7 +28,7 @@ func (r *studentRepository) Create(student *models.Student) error {
 	return r.db.Create(student).Error
 }
 
-func (r *studentRepository) GetByID(ID database.PID) (*models.Student, error) {
+func (r *studentRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Student, error) {
 	var student models.Student
 	if err := r.db.First(&student, ID).Error; err != nil {
 		return nil, err

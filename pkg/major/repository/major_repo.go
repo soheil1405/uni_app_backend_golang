@@ -4,12 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 type MajorRepository interface {
 	Create(major *models.Major) error
-	GetByID(ID database.PID) (*models.Major, error)
+	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Major, error)
 	Update(major *models.Major) error
 	Delete(ID database.PID) error
 	GetAll() ([]models.Major, error)
@@ -27,7 +28,7 @@ func (r *majorRepository) Create(major *models.Major) error {
 	return r.db.Create(major).Error
 }
 
-func (r *majorRepository) GetByID(ID database.PID) (*models.Major, error) {
+func (r *majorRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Major, error) {
 	var major models.Major
 	if err := r.db.First(&major, ID).Error; err != nil {
 		return nil, err

@@ -44,7 +44,7 @@ func (h *RoleHandler) GetRoleByID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	role, err := h.usecase.GetRoleByID(ID)
+	role, err := h.usecase.GetRoleByID(c, ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}

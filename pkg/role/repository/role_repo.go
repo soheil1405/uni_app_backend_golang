@@ -4,12 +4,13 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 type RoleRepository interface {
 	Create(role *models.Role) error
-	GetByID(ID database.PID) (*models.Role, error)
+	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Role, error)
 	Update(role *models.Role) error
 	Delete(ID database.PID) error
 	GetAll() ([]models.Role, error)
@@ -27,7 +28,7 @@ func (r *roleRepository) Create(role *models.Role) error {
 	return r.db.Create(role).Error
 }
 
-func (r *roleRepository) GetByID(ID database.PID) (*models.Role, error) {
+func (r *roleRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Role, error) {
 	var role models.Role
 	if err := r.db.First(&role, ID).Error; err != nil {
 		return nil, err
