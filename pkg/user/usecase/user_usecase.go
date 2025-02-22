@@ -24,15 +24,17 @@ type UserUsecase interface {
 }
 
 type userUsecase struct {
-	repo      repositories.UserRepository
-	tokenRepo tokenRepository.TokenRepository
-	Config    *env.Config
+	repo       repositories.UserRepository
+	tokenRepo  tokenRepository.TokenRepository
+	Config     *env.Config
+	authConfig map[string]string
 }
 
 func NewUserUsecase(repo repositories.UserRepository, config *env.Config) UserUsecase {
 	return &userUsecase{
-		repo:   repo,
-		Config: config,
+		repo:       repo,
+		Config:     config,
+		authConfig: config.GetStringMapString("service.auth"),
 	}
 }
 
@@ -55,7 +57,7 @@ func (u *userUsecase) Login(ctx echo.Context, request *models.UserLoginRequst) (
 		return
 	}
 
-	if tokenKey, expTime, err = jwt.GenerateToken(u.Config.Auth, user); err != nil {
+	if tokenKey, expTime, err = jwt.GenerateToken(u.authConfig, user); err != nil {
 		return
 	}
 
