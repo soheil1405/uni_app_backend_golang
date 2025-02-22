@@ -7,6 +7,7 @@ import (
 	"uni_app/models"
 	tokenRepository "uni_app/pkg/token/repository"
 	repositories "uni_app/pkg/user/repository"
+	"uni_app/services/env"
 	"uni_app/utils/helpers"
 	"uni_app/utils/jwt"
 
@@ -25,10 +26,10 @@ type UserUsecase interface {
 type userUsecase struct {
 	repo      repositories.UserRepository
 	tokenRepo tokenRepository.TokenRepository
-	Config    *models.Config
+	Config    *env.Config
 }
 
-func NewUserUsecase(repo repositories.UserRepository, config *models.Config) UserUsecase {
+func NewUserUsecase(repo repositories.UserRepository, config *env.Config) UserUsecase {
 	return &userUsecase{
 		repo:   repo,
 		Config: config,

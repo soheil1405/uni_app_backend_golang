@@ -8,4 +8,5 @@ type Config struct {
 	ApiVersion string            `json:"api_version,omitempty"`
 	Port       string            `json:"port,omitempty"`
 	Auth       map[string]string `json:"auth,omitempty"`
+	Migrations map[string]interface{}
 }

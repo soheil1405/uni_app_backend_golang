@@ -1,47 +1,37 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"uni_app/database"
-	"uni_app/models"
 	"uni_app/pkg"
+	"uni_app/services/env"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
 
-// loadConfig reads the configuration file
-func loadConfig(path string) (*models.Config, error) {
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	var config models.Config
-	if err := json.Unmarshal(data, &config); err != nil {
-		return nil, err
-	}
-	return &config, nil
-}
-
 func main() {
 	configPath := flag.String("c", "config.json", "Path to the configuration file")
-	flag.Parse()
-	config, err := loadConfig(*configPath)
-	if err != nil {
-		log.Fatalf("Error loading config: %v", err)
+	config := env.NewViperConfig(*configPath)
+	dbConn := &database.Database{
+		Host:     helpers.GetEnvDefault("DB_HOST", env.GetString("database.host")),
+		Port:     helpers.GetEnvDefault("DB_PORT", env.GetString("database.port")),
+		User:     helpers.GetEnvDefault("DB_USER", env.GetString("database.user")),
+		Password: helpers.GetEnvDefault("DB_PASS", env.GetString("database.pass")),
+		DBName:   helpers.GetEnvDefault("DB_NAME", env.GetString("database.name")),
+		SSLMode:  helpers.GetEnvDefault("DB_NAME", env.GetString("database.sslmode")),
 	}
+	flag.Parse()
 
-	db, err := database.Connection(&config.Database)
+	db, err := database.Connection(dbConn)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	echo := echo.New()
-	e := echo.Group(config.ApiVersion)
+	e := echo.Group(env.GetString("api_version"))
 
 	pkg.InitPkgs(db, *e, config)
 
@@ -49,5 +39,5 @@ func main() {
 		fmt.Printf("%s %s\n", route.Method, route.Path)
 	}
 
-	echo.Start(":" + config.Port)
+	echo.Start(":" + env.GetString("port"))
 }

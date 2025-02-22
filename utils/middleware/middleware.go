@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 	"uni_app/database"
 	"uni_app/models"
 	_authRepository "uni_app/pkg/auth/repository"
@@ -67,6 +68,24 @@ func cachSkipper(ctx echo.Context) bool {
 	path := ctx.Path()
 
 	return (strings.Index(path, "/api/v1/auth") == 0)
+}
+
+func validateToken(token *jwt.Token, signingKey string) error {
+	if !token.Valid {
+		return models.ErrUnAuthorizedInValidToken
+	}
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return models.ErrUnAuthorizedInValidToken
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		if !claims.VerifyExpiresAt(time.Now().Unix(), true) {
+			return models.ErrUnAuthorizedTokenExpired
+		}
+		// if claims["iss"] != "your-issuer" {
+		// 	return models.ErrUnAuthorizedInvalidIssuer
+		// }
+	}
+	return nil
 }
 
 // SetContext ...
