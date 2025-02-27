@@ -17,10 +17,10 @@ type UserHandler struct {
 
 func NewUserHandler(usecase usecases.UserUsecase, e echo.Group) {
 	userHandler := &UserHandler{usecase}
+	authRoutes := e.Group("/auth")
+	authRoutes.POST("/login", userHandler.Login)
+
 	userRoutes := e.Group("/users")
-
-	userRoutes.POST("/login", userHandler.Login)
-
 	userRoutes.POST("", userHandler.CreateUser)
 	userRoutes.GET("/:id", userHandler.GetUserByID)
 	userRoutes.PUT("/:id", userHandler.UpdateUser)
@@ -31,24 +31,24 @@ func NewUserHandler(usecase usecases.UserUsecase, e echo.Group) {
 
 func (h *UserHandler) Login(ctx echo.Context) error {
 	var (
-		request  models.UserLoginRequst
-		response *models.Token
-		err      error
+		request models.UserLoginRequst
+		user    *models.User
+		err     error
 	)
 
 	if err = ctx.Bind(&request); err != nil {
 		return helper.Reply(ctx, http.StatusBadRequest, err, nil, nil)
 	}
 
-	if response, err = h.usecase.Login(ctx, &request); err != nil {
+	if user, err = h.usecase.Login(ctx, &request); err != nil {
 		return helper.Reply(ctx, http.StatusBadRequest, err, nil, nil)
 	}
 
 	ctx.SetCookie(&http.Cookie{
 		Name:    "token",
-		Value:   response.TokenKey,
+		Value:   user.Token.TokenKey,
 		Path:    "/",
-		Expires: response.ExpireTime,
+		Expires: user.Token.ExpireTime,
 		Secure:  false,
 	})
 
@@ -57,8 +57,8 @@ func (h *UserHandler) Login(ctx echo.Context) error {
 		http.StatusOK,
 		nil,
 		map[string]interface{}{
-			"token":     response.TokenKey,
-			"token_new": response,
+			"token": user.Token.TokenKey,
+			"user":  user,
 		},
 		nil,
 	)
