@@ -26,7 +26,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 }
 
 func (r *userRepository) GetByUserName(username string) (user *models.User, err error) {
-	if err := r.db.Preload("Roles").Where("username = ?", username).First(&user).Error; err != nil {
+	if err := r.db.Preload("UserRoles").Where("username = ?", username).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil

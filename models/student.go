@@ -12,7 +12,7 @@ type Student struct {
 	NationalCode  database.PID `json:"national_code,omitempty"`
 	Password      string       `json:"-,omitempty"`
 	UniID         database.PID `json:"uni_id,omitempty"`
-	Uni           Uni          `json:"uni,omitempty"`
+	Uni           Uni          `gorm:"foreignKey:UniID" json:"uni,omitempty"`
 	MajorID       database.PID `json:"major_id,omitempty"`
 	DaneshKadehID database.PID `json:"daneshkadeh_id,omitempty"`
 	Status        UserMode     `json:"status,omitempty" gorm:"default:1"`

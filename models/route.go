@@ -6,6 +6,6 @@ type Route struct {
 	database.Model
 	Url          string
 	Method       string
-	RouteGroupID database.PID
-	RouteGroup   RouteGroup
+	RouteGroupID database.PID `json:"route_group_id,omitempty"`
+	RouteGroup   RouteGroup   `gorm:"foreignKey:RouteGroupID" json:"route_group,omitempty"`
 }

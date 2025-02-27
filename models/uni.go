@@ -8,17 +8,16 @@ import (
 type Unis []*Uni
 type Uni struct {
 	database.Model
-	Name         string       `json:"name,omitempty"`
-	DaneshKadeha DaneshKadeha `json:"danesh_kadeha,omitempty"`
-	UniTypeID    database.PID `json:"uni_type_id,omitempty"`
-	UniType      UniType      `json:"uni_type,omitempty" gorm:"foreignKey:UniTypeID"`
-	Students     Students     `json:"students,omitempty"`
-	Users        Users        `gorm:"many2many:user_roles;" json:"users,omitempty"`
-	Roles        Roles        `gorm:"many2many:user_roles;" json:"roles,omitempty"`
-	Phones       Phones       `json:"phones,omitempty"`
-	Address      Address      `json:"address,omitempty"`
-	ContactWays  ContactWays  `json:"contact_ways,omitempty"`
-
-	// UserRoles       []*UserRole  `json:"user_roles,omitempty" gorm:"association_autoupdate:false;association_autocreate:false;"`
-	EstablishedYear *time.Time `json:"established_year,omitempty"`
+	Name            string        `json:"name"`
+	UniTypeID       database.PID  `json:"uni_type_id,omitempty"`
+	UniType         *UniType      `gorm:"foreignKey:UniTypeID;constraint:OnDelete:SET NULL;" json:"uni_type,omitempty"`
+	ContactWays     []ContactWay  `gorm:"polymorphic:Owner;" json:"contact_ways,omitempty"`
+	EstablishedYear *time.Time    `json:"established_year,omitempty"`
+	Phones          []Phone       `gorm:"polymorphic:Owner;" json:"phones,omitempty"`
+	CityID          database.PID  `json:"city_id,omitempty"`
+	City            *City         `gorm:"foreignKey:CityID;constraint:OnDelete:SET NULL;" json:"city,omitempty"`
+	Addresses       []Address     `gorm:"polymorphic:Owner;" json:"addresses,omitempty"`
+	Students        []Student     `gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;" json:"students,omitempty"`
+	DaneshKadeha    []DaneshKadeh `gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;" json:"daneshkadeha,omitempty"`
+	UserRoles       []*UserRole   `json:"user_roles,omitempty"`
 }

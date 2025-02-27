@@ -4,18 +4,18 @@ import "uni_app/database"
 
 type DaneshKadeha []*DaneshKadeha
 
-// دانشکده
 type DaneshKadeh struct {
 	database.Model
-	Name              string          `json:"name,omitempty"`
-	Description       string          `json:"description,omitempty"`
-	University        Uni             `gorm:"foreignKey:UniversityID" json:"university,omitempty"`
-	UniversityID      database.PID    `json:"university_id,omitempty"`
-	Phones            Phones          `json:"phones,omitempty"`
-	Address           Address         `json:"address,omitempty"`
-	ContactWays       ContactWays     `json:"contact_ways,omitempty"`
-	DaneshKadehTypeID database.PID    `json:"dan]esh_kadeh_type_id,omitempty"`
-	DaneshKadehType   DaneshKadehType `json:"danesh_kadeh_type,omitempty" gorm:"foreignKey:DaneshKadehTypeID"`
+	Name              string           `json:"name"`
+	Description       string           `json:"description,omitempty"`
+	UniID             database.PID     `json:"uni_id,omitempty"`
+	Uni               *Uni             `gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;" json:"uni,omitempty"`
+	Phones            []Phone          `gorm:"polymorphic:Owner;" json:"phones,omitempty"`
+	Address           Address          `gorm:"polymorphic:Owner;" json:"address,omitempty"`
+	ContactWays       []ContactWay     `gorm:"polymorphic:Owner;" json:"contact_ways,omitempty"`
+	DaneshKadehTypeID database.PID     `json:"daneshkadeh_type_id,omitempty"`
+	DaneshKadehType   *DaneshKadehType `gorm:"foreignKey:DaneshKadehTypeID;constraint:OnDelete:SET NULL;" json:"daneshkadeh_type,omitempty"`
+	UserRoles         []*UserRole      `gorm:"foreignKey:DaneshKadehID;constraint:OnDelete:CASCADE;" json:"user_roles,omitempty"`
 }
 
 type DaneshKadehType struct {

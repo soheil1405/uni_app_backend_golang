@@ -6,23 +6,15 @@ type Addresses []*Address
 
 type Address struct {
 	database.Model
-
+	PolymorphicModel
 	Title       string       `json:"title,omitempty"`
 	FullAddress string       `json:"full_address,omitempty"`
 	Street      string       `json:"street,omitempty"`
 	Pelak       string       `json:"pelak,omitempty"`
 	PostalCode  *int         `json:"postal_code,omitempty"`
-	Phones      Phones       `json:"phones,omitempty"`
+	Phones      Phones       `json:"phones,omitempty" gorm:"polymorphic:Owner;"`
 	CityID      database.PID `json:"city_id,omitempty"`
-	City        City         `json:"city,omitempty"`
-	Location    Location     `json:"location,omitempty"`
-
-	PolymorphicModel
-}
-
-type Location struct {
-	database.Model
-	PolymorphicModel
-	Lat float64 `json:"lat,omitempty"`
-	Lng float64 `json:"lng,omitempty"`
+	City        City         `json:"city,omitempty" gorm:"foreignKey:CityID"`
+	Lat         float64      `json:"lat,omitempty"`
+	Lng         float64      `json:"lng,omitempty"`
 }

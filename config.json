@@ -1,4 +1,56 @@
 {
+    "migration":true,
+    "models":{
+        "auth":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"city":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"uni":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"daneshkadeh":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"major":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"major_chart":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"place":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"role":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"route":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"student":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"token":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        },"user":{
+            "migration":true,
+            "drop":false,
+            "seed":false
+        }
+    },
     "service":{
         "auth": {
             "active": true,
@@ -14,8 +66,8 @@
         "host": "localhost",
         "port": 11031,
         "user": "sika_user",
-        "password": "postgres",
-        "dbname": "local",
+        "pass": "postgres",
+        "name": "local",
         "sslmode": "disable"
     },
     "api_version" :"/api/v1",

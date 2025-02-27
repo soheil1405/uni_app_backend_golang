@@ -1,17 +1,15 @@
 package database
 
-// import (
-// 	"uni_app/models"
+import (
+	"log"
 
-// 	"gorm.io/gorm"
-// )
+	"gorm.io/gorm"
+)
 
-// func Migration(db *gorm.DB) {
-// 	db.AutoMigrate(&models.User{}, &models.FailedJob{}, &models.PersonalAccessToken{}, &models.City{}, &models.PlaceType{}, &models.Place{}, &models.UniType{}, &models.Uni{},
-// 		&models.Faculty{},
-// 		&models.Major{},
-// 		&models.UniMajor{},
-// 		&models.UserRole{},
-// 		&models.MajorsChart{},
-// 		&models.Role{})
-// }
+func DoMigrate(db *gorm.DB, models []interface{}) {
+	for _, m := range models {
+		if err := db.AutoMigrate(m); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
