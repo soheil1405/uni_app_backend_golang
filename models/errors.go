@@ -4,6 +4,7 @@ import "errors"
 
 var (
 	ErrorBadRequest             = generateErr("bad request")
+	ErrorWrongPassword          = generateErr("wrong passwrod")
 	ErrorAccessDenied           = generateErr("access denied")
 	ErrorInvalidUserPass        = generateErr("invalid username or password")
 	ErrorInvalidUserRoles       = generateErr("user dosent have role")
