@@ -16,11 +16,13 @@ type UniHandler struct {
 
 func NewUniHandler(usecase usecases.UniUsecase, e echo.Group) {
 	uniHandler := &UniHandler{usecase}
-	e.POST("/unis", uniHandler.CreateUni)
-	e.GET("/unis/:id", uniHandler.GetUniByID)
-	e.PUT("/unis/:id", uniHandler.UpdateUni)
-	e.DELETE("/unis/:id", uniHandler.DeleteUni)
-	e.GET("/unis", uniHandler.GetAllUnis)
+
+	uniRouteGroup := e.Group("/unis")
+	uniRouteGroup.POST("", uniHandler.CreateUni)
+	uniRouteGroup.GET("/:id", uniHandler.GetUniByID)
+	uniRouteGroup.PUT("/:id", uniHandler.UpdateUni)
+	uniRouteGroup.DELETE("/:id", uniHandler.DeleteUni)
+	uniRouteGroup.GET("", uniHandler.GetAllUnis)
 }
 
 func (h *UniHandler) CreateUni(c echo.Context) error {
