@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"errors"
 	"time"
 	"uni_app/database"
 	"uni_app/models"
@@ -15,7 +14,7 @@ import (
 )
 
 type UserUsecase interface {
-	Login(ctx echo.Context, req *models.UserLoginRequst) (*models.Token, error)
+	Login(ctx echo.Context, req *models.UserLoginRequst) (*models.User, error)
 	CreateUser(user *models.User) error
 	GetUserByID(ctx echo.Context, ID database.PID, useCache bool) (*models.User, error)
 	UpdateUser(user *models.User) error
@@ -30,17 +29,17 @@ type userUsecase struct {
 	authConfig map[string]string
 }
 
-func NewUserUsecase(repo repositories.UserRepository, config *env.Config) UserUsecase {
+func NewUserUsecase(repo repositories.UserRepository, tokenRepo tokenRepository.TokenRepository, config *env.Config) UserUsecase {
 	return &userUsecase{
 		repo:       repo,
 		Config:     config,
+		tokenRepo:  tokenRepo,
 		authConfig: config.GetStringMapString("service.auth"),
 	}
 }
 
-func (u *userUsecase) Login(ctx echo.Context, request *models.UserLoginRequst) (token *models.Token, err error) {
+func (u *userUsecase) Login(ctx echo.Context, request *models.UserLoginRequst) (user *models.User, err error) {
 	var (
-		user     *models.User
 		tokenKey string
 		expTime  time.Time
 	)
@@ -53,27 +52,28 @@ func (u *userUsecase) Login(ctx echo.Context, request *models.UserLoginRequst) (
 		return
 	}
 	if isValid := helpers.ComparePassword(user.Password, request.Password); !isValid {
-		err = errors.New("wrong password")
-		return
+		return nil, models.ErrorWrongPassword
 	}
 
 	if tokenKey, expTime, err = jwt.GenerateToken(u.authConfig, user); err != nil {
-		return
+		return nil, err
 	}
 
-	token = &models.Token{
+	token := &models.Token{
 		TokenKey:   tokenKey,
 		Revoked:    false,
 		ExpireTime: expTime,
-		OwnerType:  "user",
-		OwnerID:    user.ID,
+		PolymorphicModel: models.PolymorphicModel{
+			OwnerType: "user",
+			OwnerID:   user.ID,
+		},
 	}
 
 	if token, err = u.tokenRepo.Create(token); err != nil {
 		return nil, err
 	}
 
-	token.User = user
+	user.Token = *token
 	return
 }
 
