@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 
+	"github.com/spf13/cast"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -19,13 +20,13 @@ type Database struct {
 func Connection(dbCfg *Database) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
-		dbCfg.Host, dbCfg.Port, dbCfg.User, dbCfg.Password, dbCfg.DBName, dbCfg.SSLMode,
+		dbCfg.Host, cast.ToInt(dbCfg.Port), dbCfg.User, dbCfg.Password, dbCfg.DBName, dbCfg.SSLMode,
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
-
+	db.Debug()
 	return db, nil
 }
