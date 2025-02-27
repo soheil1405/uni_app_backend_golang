@@ -27,6 +27,6 @@ func Connection(dbCfg *Database) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db.Debug()
+	db = db.Debug()
 	return db, nil
 }

@@ -20,7 +20,7 @@ import (
 )
 
 func InitPkgs(db *gorm.DB, e echo.Group, cfg *env.Config) {
-	migrateModels(db, cfg)
+	// migrateModels(db, cfg)
 	uni.Init(db, e, cfg)
 	city.Init(db, e, cfg)
 	daneshkadeh.Init(db, e, cfg)
@@ -62,11 +62,12 @@ func migrateModels(db *gorm.DB, config *env.Config) {
 		// 	&models.Token{},
 		// }
 		fmt.Println("Migrating database...")
-		// db.Debug().AutoMigrate(&models.UserRole{})
-		// db.Debug().AutoMigrate(&models.Role{})
-		// // db.Debug().AutoMigrate(&models.DaneshKadeh{})
+		db.Debug().AutoMigrate(&models.UserRole{})
+		db.Debug().AutoMigrate(&models.Role{})
+		db.Debug().AutoMigrate(&models.DaneshKadeh{})
+		db.Debug().AutoMigrate(&models.DaneshKadehType{})
 		// // db.Debug().AutoMigrate(&models.Uni{})
-		db.Debug().AutoMigrate(&models.User{})
+		// db.Debug().AutoMigrate(&models.User{})
 		// db.Debug().AutoMigrate(&models.Address{})
 		// db.Debug().AutoMigrate(&models.Route{})
 		// db.Debug().AutoMigrate(&models.RouteGroup{})

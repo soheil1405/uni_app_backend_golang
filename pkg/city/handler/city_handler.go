@@ -17,11 +17,12 @@ type CityHandler struct {
 func NewCityHandler(usecase usecases.CityUsecase, e echo.Group) {
 	cityHandler := &CityHandler{usecase}
 
-	e.POST("/cities", cityHandler.CreateCity)
-	e.GET("/cities/:id", cityHandler.GetCityByID)
-	e.PUT("/cities/:id", cityHandler.UpdateCity)
-	e.DELETE("/cities/:id", cityHandler.DeleteCity)
-	e.GET("/cities", cityHandler.GetAllCities)
+	citiesRouteGroup := e.Group("/cities")
+	citiesRouteGroup.POST("", cityHandler.CreateCity)
+	citiesRouteGroup.GET("/:id", cityHandler.GetCityByID)
+	citiesRouteGroup.PUT("/:id", cityHandler.UpdateCity)
+	citiesRouteGroup.DELETE("/:id", cityHandler.DeleteCity)
+	citiesRouteGroup.GET("", cityHandler.GetAllCities)
 
 }
 

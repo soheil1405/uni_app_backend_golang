@@ -6,6 +6,8 @@ import (
 	"uni_app/models"
 	usecases "uni_app/pkg/daneshkadeh/usecase"
 	"uni_app/utils/ctxHelper"
+	"uni_app/utils/helpers"
+	"uni_app/utils/templates"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,12 +18,13 @@ type FacultyHandler struct {
 
 func NewDaneshKadehHandler(usecase usecases.FacultyUsecase, e echo.Group) {
 	facultyHandler := &FacultyHandler{usecase}
-	e.POST("/daneshkadeha", facultyHandler.CreateDaneshKadeh)
-	e.GET("/daneshkadeha/:id", facultyHandler.GetDaneshKadehByID)
-	e.PUT("/daneshkadeha/:id", facultyHandler.UpdateDaneshKadeh)
-	e.DELETE("/daneshkadeha/:id", facultyHandler.DeleteDaneshKadeh)
-	e.GET("/daneshkadeha", facultyHandler.GetAlldaneshkadeha)
 
+	daneshKadehRouteGroups := e.Group("/daneshkadeh")
+	daneshKadehRouteGroups.GET("", facultyHandler.GetAlldaneshkadeha)
+	daneshKadehRouteGroups.GET("/:id", facultyHandler.GetDaneshKadehByID)
+	daneshKadehRouteGroups.POST("", facultyHandler.CreateDaneshKadeh)
+	daneshKadehRouteGroups.PUT("/:id", facultyHandler.UpdateDaneshKadeh)
+	daneshKadehRouteGroups.DELETE("/:id", facultyHandler.DeleteDaneshKadeh)
 }
 
 func (h *FacultyHandler) CreateDaneshKadeh(c echo.Context) error {
@@ -37,18 +40,21 @@ func (h *FacultyHandler) CreateDaneshKadeh(c echo.Context) error {
 
 func (h *FacultyHandler) GetDaneshKadehByID(c echo.Context) error {
 	var (
-		err         error
-		daneshkadeh *models.DaneshKadeh
+		MyErr helpers.MyError
+		resp  map[string]interface{}
 	)
 
-	if daneshkadeh.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	}
-	daneshkadeh, err = h.usecase.GetDaneshKadehByID(c, daneshkadeh.ID, false)
+	id, err := ctxHelper.GetIDFromContxt(c)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, daneshkadeh)
+
+	resp, MyErr = h.usecase.GetDaneshKadehByID(c, id, false)
+	if MyErr.Err != nil {
+		return helpers.Reply(c, MyErr.Code, MyErr.Err, resp, nil)
+	}
+	
+	return helpers.Reply(c, MyErr.Code, MyErr.Err, resp, nil)
 }
 
 func (h *FacultyHandler) UpdateDaneshKadeh(c echo.Context) error {
@@ -87,9 +93,17 @@ func (h *FacultyHandler) DeleteDaneshKadeh(c echo.Context) error {
 }
 
 func (h *FacultyHandler) GetAlldaneshkadeha(c echo.Context) error {
-	daneshkadeha, err := h.usecase.GetAllDaneshKadeha()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	var (
+		err  helpers.MyError
+		req  *models.FetchRequest
+		resp map[string]interface{}
+		meta *templates.PaginateTemplate
+	)
+
+	if req, err = helpers.BindFetchRequestFromCtx(c); err.Err != nil {
+		return helpers.Reply(c, err.Code, err.Err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, daneshkadeha)
+
+	resp, meta, err = h.usecase.GetAllDaneshKadeha(c, *req)
+	return helpers.Reply(c, err.Code, err.Err, resp, meta)
 }

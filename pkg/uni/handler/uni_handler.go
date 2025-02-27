@@ -6,6 +6,8 @@ import (
 	"uni_app/models"
 	usecases "uni_app/pkg/uni/usecase"
 	"uni_app/utils/ctxHelper"
+	"uni_app/utils/helpers"
+	"uni_app/utils/templates"
 
 	"github.com/labstack/echo/v4"
 )
@@ -88,9 +90,17 @@ func (h *UniHandler) DeleteUni(c echo.Context) error {
 }
 
 func (h *UniHandler) GetAllUnis(c echo.Context) error {
-	unis, err := h.usecase.GetAllUnis()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	var (
+		err  helpers.MyError
+		req  *models.FetchRequest
+		resp map[string]interface{}
+		meta *templates.PaginateTemplate
+	)
+
+	if req, err = helpers.BindFetchRequestFromCtx(c); err.Err != nil {
+		return helpers.Reply(c, err.Code, err.Err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, unis)
+
+	resp, meta, err = h.usecase.GetAllUnis(c, *req)
+	return helpers.Reply(c, err.Code, err.Err, resp, meta)
 }

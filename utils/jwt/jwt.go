@@ -4,23 +4,23 @@ import (
 	"strconv"
 	"time"
 	"uni_app/models"
+	"uni_app/services/env"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/spf13/viper"
 )
 
 // GenerateToken ...
 func GenerateToken(auth map[string]string, user *models.User) (tokenKey string, expTime time.Time, err error) {
 	var (
 		expire    int64
-		jwtSecret = viper.GetString("service.auth.secret")
+		jwtSecret = env.GetString("service.auth.secret")
 	)
 
 	if expire, err = strconv.ParseInt(auth["expire"], 10, 64); err != nil {
 		return
 	}
 
-	expTime = time.Now().Local().Add(time.Hour * time.Duration(expire))
+	expTime = time.Now().Add(time.Second * time.Duration(expire))
 
 	claims := &jwt.StandardClaims{
 		Id:        user.ID.String(),

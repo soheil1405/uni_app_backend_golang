@@ -2,8 +2,11 @@ package helpers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
+	"uni_app/models"
 	"uni_app/utils/templates"
 
 	"github.com/labstack/echo/v4"
@@ -23,6 +26,50 @@ func ParsePaginationParams(ctx echo.Context) (limit, offset int, err error) {
 	}
 
 	return
+}
+
+// ParsePaginationParams ...
+func BindFetchRequestFromCtx(ctx echo.Context) (*models.FetchRequest, MyError) {
+	var (
+		MyErr   MyError
+		request = &models.FetchRequest{}
+	)
+	MyErr.Default()
+
+	if err := ctx.Bind(request); err != nil {
+		MyErr.SetError(err, http.StatusBadRequest)
+		return nil, MyErr
+	}
+
+	if request.Limit <= 0 {
+		request.Limit = 20
+	} else if request.Limit >= 100 {
+		request.Limit = 100
+	}
+
+	if request.Offset < 0 {
+		request.Offset = 0
+	}
+
+	if request.Page > 0 && request.Offset == 0 {
+		request.Offset = (request.Page - 1) * request.Limit
+	}
+
+	validSorts := []string{}
+	for _, sort := range request.Sorts {
+		if strings.HasPrefix(sort, "-") {
+			validSorts = append(validSorts, fmt.Sprintf("%s DESC", strings.TrimPrefix(sort, "-")))
+		} else {
+			validSorts = append(validSorts, fmt.Sprintf("%s ASC", sort))
+		}
+	}
+	request.Sorts = validSorts
+
+	if request.ID.IsValid() {
+		request.IDs = append(request.IDs, request.ID)
+	}
+
+	return request, MyErr
 }
 
 // Reply ...

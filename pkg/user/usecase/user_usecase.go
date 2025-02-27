@@ -45,14 +45,14 @@ func (u *userUsecase) Login(ctx echo.Context, request *models.UserLoginRequst) (
 	)
 
 	if request.Password == "" || request.Username == "" {
-		return nil, models.ErrorInvalidUserPass
+		return nil, helpers.ErrorInvalidUserPass
 	}
 
 	if user, err = u.repo.GetByUserName(request.Username); err != nil {
 		return
 	}
 	if isValid := helpers.ComparePassword(user.Password, request.Password); !isValid {
-		return nil, models.ErrorWrongPassword
+		return nil, helpers.ErrorWrongPassword
 	}
 
 	if tokenKey, expTime, err = jwt.GenerateToken(u.authConfig, user); err != nil {

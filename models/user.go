@@ -8,10 +8,10 @@ import (
 type UserMode uint
 
 const (
-	// PENDING ...
-	PENDING UserMode = iota + 1
 	// USER_STATUS_ACTIVE Active
-	USER_STATUS_ACTIVE
+	USER_STATUS_ACTIVE UserMode = iota + 1
+	// PENDING ...
+	PENDING
 	// USER_STATUS_INACTIVE Inactive
 	USER_STATUS_INACTIVE
 )
@@ -28,7 +28,7 @@ type User struct {
 	NominatedByID *database.PID `json:"nominated_by_id,omitempty"`
 	NominatedBy   *User         `gorm:"foreignKey:NominatedByID;constraint:OnDelete:SET NULL;" json:"nominated_by,omitempty"`
 	Email         string        `gorm:"uniqueIndex;" json:"email,omitempty"`
-	Password      string        `gorm:"not null" json:"password,omitempty"`
+	Password      string        `gorm:"not null" json:"-"`
 	Token         Token         `json:"token,omitempty"   gorm:"polymorphic:Owner;"`
 	Status        UserMode      `gorm:"default:1" json:"status,omitempty"`
 	UserRoles     []*UserRole   `json:"user_roles,omitempty"`
