@@ -48,16 +48,16 @@ var (
 // RegisterSkipper returns true if path =  /api/v1/register
 func RegisterSkipper(ctx echo.Context) bool {
 	if strings.Contains(ctx.Path(), "/auth/login") ||
-		strings.Contains(ctx.Path(), "/auth/password") ||
-		// strings.Contains(ctx.Path(), "/auth/signup") ||
-		ctx.Path() == "/api/v1/auth/verifycode" ||
-		ctx.Path() == "/api/v1/auth/register" ||
-		ctx.Path() == "/api/v1/auth/resetpassword" ||
-		ctx.Path() == "/api/v1/healthinfo" ||
-		ctx.Path() == "/api/v1/routes" ||
-		ctx.Path() == "/api/v1/config" ||
-		ctx.Path() == "/api/v1/auth/otp/login" ||
-		ctx.Path() == "/api/v1/auth/otp/sms" ||
+		// strings.Contains(ctx.Path(), "/auth/password") ||
+		// // strings.Contains(ctx.Path(), "/auth/signup") ||
+		// ctx.Path() == "/api/v1/auth/verifycode" ||
+		// ctx.Path() == "/api/v1/auth/register" ||
+		// ctx.Path() == "/api/v1/auth/resetpassword" ||
+		// ctx.Path() == "/api/v1/healthinfo" ||
+		// ctx.Path() == "/api/v1/routes" ||
+		// ctx.Path() == "/api/v1/config" ||
+		// ctx.Path() == "/api/v1/auth/otp/login" ||
+		// ctx.Path() == "/api/v1/auth/otp/sms" ||
 		callbackRegexp.MatchString(ctx.Path()) {
 		return true
 	}
@@ -100,7 +100,7 @@ func (m *GoMiddleware) SetContext(next echo.HandlerFunc) echo.HandlerFunc {
 			uniID    = database.Parse(ctx.QueryParam("uni_id"))
 			useCache = !cachSkipper(ctx)
 			claims   jwt.StandardClaims
-			mainRole *models.Role
+			// mainRole *models.Role
 		)
 
 		if !uniID.IsValid() {
@@ -116,13 +116,13 @@ func (m *GoMiddleware) SetContext(next echo.HandlerFunc) echo.HandlerFunc {
 				return helpers.Reply(ctx, http.StatusUnauthorized, models.ErrUserIsNotActive, nil, nil)
 			}
 
-			mainRole = user.Roles.GetMainRole()
-			if mainRole == nil || !mainRole.ID.IsValid() {
-				return helpers.Reply(ctx, http.StatusUnauthorized, models.ErrorInvalidUserRoles, nil, nil)
-			}
+			// mainRole = &user.Role
+			// if mainRole == nil || !mainRole.ID.IsValid() {
+			// 	return helpers.Reply(ctx, http.StatusUnauthorized, models.ErrorInvalidUserRoles, nil, nil)
+			// }
 
-			helpers.SetToContext(ctx, helpers.HeadersMainRole, mainRole)
-			helpers.SetToContext(ctx, helpers.HeadersRoles, user.Roles)
+			// helpers.SetToContext(ctx, helpers.HeadersMainRole, mainRole)
+			// helpers.SetToContext(ctx, helpers.HeadersUserRole, user.Role)
 			helpers.SetToContext(ctx, helpers.HeadersUser, user)
 			helpers.SetToContext(ctx, helpers.HeadersUserID, user.ID)
 		} else if token, ok = ctx.Get("student").(*jwt.Token); !ok {
@@ -134,13 +134,13 @@ func (m *GoMiddleware) SetContext(next echo.HandlerFunc) echo.HandlerFunc {
 				return helpers.Reply(ctx, http.StatusUnauthorized, models.ErrUserIsNotActive, nil, nil)
 			}
 
-			mainRole = student.Roles.GetMainRole()
-			if mainRole == nil || !mainRole.ID.IsValid() {
-				return helpers.Reply(ctx, http.StatusUnauthorized, models.ErrorInvalidUserRoles, nil, nil)
-			}
+			// mainRole = student.Roles.GetMainRole()
+			// if mainRole == nil || !mainRole.ID.IsValid() {
+			// 	return helpers.Reply(ctx, http.StatusUnauthorized, models.ErrorInvalidUserRoles, nil, nil)
+			// }
 
-			helpers.SetToContext(ctx, helpers.HeadersMainRole, mainRole)
-			helpers.SetToContext(ctx, helpers.HeadersRoles, student.Roles)
+			// helpers.SetToContext(ctx, helpers.HeadersMainRole, mainRole)
+			helpers.SetToContext(ctx, helpers.HeadersUserRole, student.Roles)
 			helpers.SetToContext(ctx, helpers.HeadersStudent, student)
 			helpers.SetToContext(ctx, helpers.HeadersStudentID, student.ID)
 		} else {
@@ -165,10 +165,10 @@ func (m *GoMiddleware) CheckAuthorization(pathURL string) echo.MiddlewareFunc {
 				return next(ctx)
 			}
 			var (
-				headerUser   = ctx.Get(helpers.HeadersUser)
-				authorized   bool
-				methodAction string
-				mainRole     *models.Role
+				headerUser = ctx.Get(helpers.HeadersUser)
+				// authorized   bool
+				// methodAction string
+				// mainRole     *models.Role
 			)
 
 			if headerUser == nil {
@@ -179,32 +179,32 @@ func (m *GoMiddleware) CheckAuthorization(pathURL string) echo.MiddlewareFunc {
 			if user == nil || !user.ID.IsValid() {
 				return helpers.Reply(ctx, http.StatusForbidden, models.ErrInvalidUserID, nil, nil)
 			}
+			// mainRole = &user.
+			// if !user.Role.ID.IsValid() {
+			// 	return helpers.Reply(ctx, http.StatusForbidden, models.ErrorInvalidUserRoles, nil, nil)
+			// }
 
-			if mainRole = user.Roles.GetMainRole(); mainRole == nil || !mainRole.ID.IsValid() {
-				return helpers.Reply(ctx, http.StatusForbidden, models.ErrorInvalidUserRoles, nil, nil)
-			}
+			// if mainRole.Priority < 0 {
+			// 	return next(ctx)
+			// }
 
-			if mainRole.Priority < 0 {
-				return next(ctx)
-			}
+			// uniID := helpers.ContextUniID(ctx)
+			// methodAction = ctx.Request().Method
 
-			uniID := helpers.ContextUniID(ctx)
-			methodAction = ctx.Request().Method
+			// request := &models.AuthRules{
+			// 	PolymorphicModel: models.PolymorphicModel{
+			// 		OwnerType: "roles",
+			// 		OwnerID:   mainRole.ID,
+			// 	},
+			// 	V2: "uni",
+			// 	V3: uniID.String(),
+			// 	V4: pathURL,
+			// 	V5: methodAction,
+			// }
 
-			request := &models.AuthRules{
-				PolymorphicModel: models.PolymorphicModel{
-					OwnerType: "roles",
-					OwnerID:   mainRole.ID.String(),
-				},
-				V2: "uni",
-				V3: uniID.String(),
-				V4: pathURL,
-				V5: methodAction,
-			}
-
-			if authorized = m.authUcecase.AuthEnforce(ctx, *request, false); !authorized {
-				return helpers.Reply(ctx, http.StatusForbidden, models.ErrorAccessDenied, nil, nil)
-			}
+			// if authorized = m.authUcecase.AuthEnforce(ctx, *request, false); !authorized {
+			// 	return helpers.Reply(ctx, http.StatusForbidden, models.ErrorAccessDenied, nil, nil)
+			// }
 
 			return next(ctx)
 		}
