@@ -59,7 +59,7 @@ func (r *uniRepository) GetAll(ctx echo.Context, request models.FetchRequest) ([
 		includes = request.Includes
 		sorts    = request.Sorts
 		meta     *templates.PaginateTemplate
-		query    = r.db.Debug()
+		query    = r.db
 	)
 
 	// Apply Filters
