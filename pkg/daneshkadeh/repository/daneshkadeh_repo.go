@@ -62,9 +62,15 @@ func (r *facultyRepository) GetAll(ctx echo.Context, request models.FetchRequest
 		query        = r.db
 	)
 
-	// Apply Filters
 	for key, value := range filters {
-		query = query.Where(fmt.Sprintf("%s = ?", key), value)
+		switch v := value.(type) {
+		case string:
+			query = query.Where(fmt.Sprintf("%s = ?", key), v)
+		case []string:
+			query = query.Where(fmt.Sprintf("%s IN (?)", key), v)
+		default:
+			fmt.Printf("Unexpected type for key %s: %T\n", key, v)
+		}
 	}
 
 	if len(ids) > 0 {
@@ -76,7 +82,6 @@ func (r *facultyRepository) GetAll(ctx echo.Context, request models.FetchRequest
 		query = query.Where("name like ? ", searchStr)
 	}
 
-	// Count total records
 	if err = query.Model(&models.DaneshKadeh{}).Count(&total).Error; err != nil {
 		return nil, nil, err
 	}
@@ -85,17 +90,12 @@ func (r *facultyRepository) GetAll(ctx echo.Context, request models.FetchRequest
 		query = query.Order(sort)
 	}
 
-	// Apply Includes (Relations)
 	for _, include := range includes {
 		query = query.Preload(include)
 	}
 
-	err = query.Limit(limit).Offset(offset).Find(daneshkadeha).Error
-	if err != nil {
-		return nil, nil, err
-	}
-
 	for {
+		query.Limit(limit).Offset(offset).Find(&daneshkadeha)
 		if limit > len(daneshkadeha) && int(total) > offset+limit {
 			offset += limit
 		} else {
