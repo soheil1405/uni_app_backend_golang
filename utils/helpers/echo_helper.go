@@ -41,6 +41,19 @@ func BindFetchRequestFromCtx(ctx echo.Context) (*models.FetchRequest, MyError) {
 		return nil, MyErr
 	}
 
+	filters := make(map[string]interface{})
+	for key, values := range ctx.QueryParams() {
+		if strings.HasPrefix(key, "filters[") && strings.HasSuffix(key, "]") {
+			filterKey := key[8 : len(key)-1] // Extract key inside brackets
+			if len(values) == 1 {
+				filters[filterKey] = values[0]
+			} else {
+				filters[filterKey] = values
+			}
+		}
+	}
+	request.Filters = filters
+
 	if request.Limit <= 0 {
 		request.Limit = 20
 	} else if request.Limit >= 100 {
