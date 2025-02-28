@@ -2,7 +2,7 @@ package models
 
 import "uni_app/database"
 
-type DaneshKadeha []*DaneshKadeha
+type DaneshKadeha []*DaneshKadeh
 
 type DaneshKadeh struct {
 	database.Model
