@@ -37,16 +37,17 @@ func main() {
 	echo := echo.New()
 	apiVersion := env.GetString("api_version")
 	e := echo.Group(apiVersion)
-	jwtSecret := env.GetString("service.auth.secret")
-	middle := middleware.InitMiddleware(e, db, config)
-
-	e.Use(mw.JWTWithConfig(mw.JWTConfig{
-		SigningKey: []byte(jwtSecret),
-		Claims:     &jwt.StandardClaims{},
-		Skipper:    middleware.RegisterSkipper,
-	}),
-		middle.SkipSetContext(middleware.RegisterSkipper), // Skip context middleware too
-	)
+	if auth := env.GetBool("service.auth.active"); auth {
+		jwtSecret := env.GetString("service.auth.secret")
+		middle := middleware.InitMiddleware(e, db, config)
+		e.Use(mw.JWTWithConfig(mw.JWTConfig{
+			SigningKey: []byte(jwtSecret),
+			Claims:     &jwt.StandardClaims{},
+			Skipper:    middleware.RegisterSkipper,
+		}),
+			middle.SkipSetContext(middleware.RegisterSkipper), // Skip context middleware too
+		)
+	}
 
 	pkg.InitPkgs(db, *e, config)
 
