@@ -37,6 +37,12 @@ func main() {
 	echo := echo.New()
 	apiVersion := env.GetString("api_version")
 	e := echo.Group(apiVersion)
+	// فعال کردن CORS
+	e.Use(mw.CORSWithConfig(mw.CORSConfig{
+		AllowOrigins:     []string{"http://localhost:3039"}, // دامنه فرانت‌اند
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
 	if auth := env.GetBool("service.auth.active"); auth {
 		jwtSecret := env.GetString("service.auth.secret")
 		middle := middleware.InitMiddleware(e, db, config)
