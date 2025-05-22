@@ -1,10 +1,10 @@
-package usecases
+package usecase
 
 import (
 	"errors"
 	"uni_app/database"
 	"uni_app/models"
-	repositories "uni_app/pkg/student/repository"
+	repository "uni_app/pkg/student/repository"
 	"uni_app/services/env"
 	"uni_app/utils/helpers"
 
@@ -17,17 +17,19 @@ type StudentUsecase interface {
 	GetStudentByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Student, error)
 	UpdateStudent(student *models.Student) error
 	DeleteStudent(ID database.PID) error
-	GetAllStudents(ctx echo.Context, request models.FetchRequest) ([]models.Student, *helpers.PaginateTemplate, error)
+	GetAllStudents(ctx echo.Context, request models.FetchStudentRequest) ([]models.Student, *helpers.PaginateTemplate, error)
 	RegisterStudent(student *models.Student) error
 	LoginStudent(studentCode database.PID, password string) (*models.Student, error)
+	GetStudentByStudentCode(studentCode database.PID) (*models.Student, error)
+	GetStudentByNationalCode(nationalCode database.PID) (*models.Student, error)
 }
 
 type studentUsecase struct {
-	repo   repositories.StudentRepository
+	repo   repository.StudentRepository
 	config *env.Config
 }
 
-func NewStudentUsecase(repo repositories.StudentRepository, config *env.Config) StudentUsecase {
+func NewStudentUsecase(repo repository.StudentRepository, config *env.Config) StudentUsecase {
 	return &studentUsecase{repo, config}
 }
 
@@ -47,7 +49,7 @@ func (u *studentUsecase) DeleteStudent(ID database.PID) error {
 	return u.repo.Delete(ID)
 }
 
-func (u *studentUsecase) GetAllStudents(ctx echo.Context, request models.FetchRequest) ([]models.Student, *helpers.PaginateTemplate, error) {
+func (u *studentUsecase) GetAllStudents(ctx echo.Context, request models.FetchStudentRequest) ([]models.Student, *helpers.PaginateTemplate, error) {
 	return u.repo.GetAll(ctx, request)
 }
 
@@ -109,4 +111,12 @@ func (u *studentUsecase) LoginStudent(studentCode database.PID, password string)
 	}
 
 	return student, nil
+}
+
+func (u *studentUsecase) GetStudentByStudentCode(studentCode database.PID) (*models.Student, error) {
+	return u.repo.GetByStudentCode(studentCode)
+}
+
+func (u *studentUsecase) GetStudentByNationalCode(nationalCode database.PID) (*models.Student, error) {
+	return u.repo.GetByNationalCode(nationalCode)
 }

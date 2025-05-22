@@ -1,33 +1,30 @@
-package handlers
+package handler
 
 import (
 	"net/http"
 	"uni_app/database"
 	"uni_app/models"
-	usecases "uni_app/pkg/student/usecase"
+	usecase "uni_app/pkg/student/usecase"
 	"uni_app/utils/ctxHelper"
 
 	"github.com/labstack/echo/v4"
 )
 
 type StudentHandler struct {
-	usecase usecases.StudentUsecase
+	usecase usecase.StudentUsecase
 }
 
-func NewStudentHandler(usecase usecases.StudentUsecase, e echo.Group) {
+func NewStudentHandler(usecase usecase.StudentUsecase, e echo.Group) {
 	studentHandler := &StudentHandler{usecase}
 
-	// Public routes
-	e.POST("/students/register", studentHandler.RegisterStudent)
-	e.POST("/students/login", studentHandler.LoginStudent)
-
-	// Protected routes
-	students := e.Group("/students")
-	students.POST("", studentHandler.CreateStudent)
-	students.GET("/:id", studentHandler.GetStudentByID)
-	students.PUT("/:id", studentHandler.UpdateStudent)
-	students.DELETE("/:id", studentHandler.DeleteStudent)
-	students.GET("", studentHandler.GetAllStudents)
+	studentsRouteGroup := e.Group("/students")
+	studentsRouteGroup.POST("", studentHandler.CreateStudent)
+	studentsRouteGroup.GET("/:id", studentHandler.GetStudentByID)
+	studentsRouteGroup.PUT("/:id", studentHandler.UpdateStudent)
+	studentsRouteGroup.DELETE("/:id", studentHandler.DeleteStudent)
+	studentsRouteGroup.GET("", studentHandler.GetAllStudents)
+	studentsRouteGroup.POST("/register", studentHandler.RegisterStudent)
+	studentsRouteGroup.POST("/login", studentHandler.LoginStudent)
 }
 
 func (h *StudentHandler) CreateStudent(c echo.Context) error {
@@ -56,14 +53,8 @@ func (h *StudentHandler) GetStudentByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, student)
 }
 
-func (h *StudentHandler) UpdateStudent(c echo.Context) error {
-	var (
-		student models.Student
-		err     error
-	)
-	if err := c.Bind(&student); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	}
+func (h *StudentHandler) UpdateStudent(c echo.Context) (err error) {
+	var student models.Student
 	if student.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
@@ -74,21 +65,19 @@ func (h *StudentHandler) UpdateStudent(c echo.Context) error {
 }
 
 func (h *StudentHandler) DeleteStudent(c echo.Context) error {
-	var (
-		ID  database.PID
-		err error
-	)
-	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+	ID, err := ctxHelper.GetIDFromContxt(c)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
+
 	if err := h.usecase.DeleteStudent(ID); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.NoContent(http.StatusNoContent)
+	return c.JSON(http.StatusOK, map[string]string{"message": "Student deleted"})
 }
 
 func (h *StudentHandler) GetAllStudents(c echo.Context) error {
-	var request models.FetchRequest
+	var request models.FetchStudentRequest
 	if err := c.Bind(&request); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
@@ -108,7 +97,7 @@ func (h *StudentHandler) RegisterStudent(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 	if err := h.usecase.RegisterStudent(&student); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusCreated, student)
 }

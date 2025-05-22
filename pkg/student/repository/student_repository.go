@@ -1,4 +1,4 @@
-package repositories
+package repository
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ type StudentRepository interface {
 	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Student, error)
 	Update(student *models.Student) error
 	Delete(ID database.PID) error
-	GetAll(ctx echo.Context, request models.FetchRequest) ([]models.Student, *helpers.PaginateTemplate, error)
+	GetAll(ctx echo.Context, request models.FetchStudentRequest) ([]models.Student, *helpers.PaginateTemplate, error)
 	GetByStudentCode(studentCode database.PID) (*models.Student, error)
 	GetByNationalCode(nationalCode database.PID) (*models.Student, error)
 }
@@ -48,7 +48,7 @@ func (r *studentRepository) Delete(ID database.PID) error {
 	return r.db.Delete(&models.Student{}, ID).Error
 }
 
-func (r *studentRepository) GetAll(ctx echo.Context, request models.FetchRequest) ([]models.Student, *helpers.PaginateTemplate, error) {
+func (r *studentRepository) GetAll(ctx echo.Context, request models.FetchStudentRequest) ([]models.Student, *helpers.PaginateTemplate, error) {
 	var students []models.Student
 	query := r.db.Model(&models.Student{})
 

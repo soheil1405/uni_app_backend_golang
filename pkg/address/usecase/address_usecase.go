@@ -5,6 +5,7 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 	repository "uni_app/pkg/address/repository"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -14,7 +15,7 @@ type AddressUsecase interface {
 	GetAddressByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Address, error)
 	UpdateAddress(address *models.Address) error
 	DeleteAddress(ID database.PID) error
-	GetAllAddresses() ([]models.Address, error)
+	GetAllAddresses(ctx echo.Context, request models.FetchAddressRequest) ([]models.Address, *helpers.PaginateTemplate, error)
 }
 
 type addressUsecase struct {
@@ -54,6 +55,6 @@ func (u *addressUsecase) DeleteAddress(ID database.PID) error {
 	return u.repo.Delete(ID)
 }
 
-func (u *addressUsecase) GetAllAddresses() ([]models.Address, error) {
-	return u.repo.GetAll()
+func (u *addressUsecase) GetAllAddresses(ctx echo.Context, request models.FetchAddressRequest) ([]models.Address, *helpers.PaginateTemplate, error) {
+	return u.repo.GetAll(ctx, request)
 }

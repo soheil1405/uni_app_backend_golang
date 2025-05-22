@@ -23,7 +23,6 @@ func NewUniMajorHandler(usecase usecase.UniMajorUsecase, e echo.Group) {
 	uniMajorsRouteGroup.PUT("/:id", uniMajorHandler.UpdateUniMajor)
 	uniMajorsRouteGroup.DELETE("/:id", uniMajorHandler.DeleteUniMajor)
 	uniMajorsRouteGroup.GET("", uniMajorHandler.GetAllUniMajors)
-
 }
 
 func (h *UniMajorHandler) CreateUniMajor(c echo.Context) error {
@@ -76,9 +75,16 @@ func (h *UniMajorHandler) DeleteUniMajor(c echo.Context) error {
 }
 
 func (h *UniMajorHandler) GetAllUniMajors(c echo.Context) error {
-	uniMajors, err := h.usecase.GetAllUniMajors()
+	var request models.FetchUniMajorRequest
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	uniMajors, paginate, err := h.usecase.GetAllUniMajors(c, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, uniMajors)
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"uni_majors": uniMajors,
+		"meta":       paginate,
+	})
 } 

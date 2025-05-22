@@ -1,20 +1,20 @@
-package handlers
+package handler
 
 import (
 	"net/http"
 	"uni_app/database"
 	"uni_app/models"
-	usecases "uni_app/pkg/city/usecase"
+	usecase "uni_app/pkg/city/usecase"
 	"uni_app/utils/ctxHelper"
 
 	"github.com/labstack/echo/v4"
 )
 
 type CityHandler struct {
-	usecase usecases.CityUsecase
+	usecase usecase.CityUsecase
 }
 
-func NewCityHandler(usecase usecases.CityUsecase, e echo.Group) {
+func NewCityHandler(usecase usecase.CityUsecase, e echo.Group) {
 	cityHandler := &CityHandler{usecase}
 
 	citiesRouteGroup := e.Group("/cities")
@@ -23,7 +23,6 @@ func NewCityHandler(usecase usecases.CityUsecase, e echo.Group) {
 	citiesRouteGroup.PUT("/:id", cityHandler.UpdateCity)
 	citiesRouteGroup.DELETE("/:id", cityHandler.DeleteCity)
 	citiesRouteGroup.GET("", cityHandler.GetAllCities)
-
 }
 
 func (h *CityHandler) CreateCity(c echo.Context) error {
@@ -76,9 +75,16 @@ func (h *CityHandler) DeleteCity(c echo.Context) error {
 }
 
 func (h *CityHandler) GetAllCities(c echo.Context) error {
-	cities, err := h.usecase.GetAllCities()
+	var request models.FetchCityRequest
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	cities, paginate, err := h.usecase.GetAllCities(c, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, cities)
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"cities": cities,
+		"meta":   paginate,
+	})
 }

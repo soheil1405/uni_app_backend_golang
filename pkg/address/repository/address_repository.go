@@ -3,6 +3,7 @@ package repository
 import (
 	"uni_app/database"
 	"uni_app/models"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -13,7 +14,7 @@ type AddressRepository interface {
 	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Address, error)
 	Update(address *models.Address) error
 	Delete(ID database.PID) error
-	GetAll() ([]models.Address, error)
+	GetAll(ctx echo.Context, request models.FetchAddressRequest) ([]models.Address, *helpers.PaginateTemplate, error)
 }
 
 type addressRepository struct {
@@ -44,10 +45,29 @@ func (r *addressRepository) Delete(ID database.PID) error {
 	return r.db.Delete(&models.Address{}, ID).Error
 }
 
-func (r *addressRepository) GetAll() ([]models.Address, error) {
+func (r *addressRepository) GetAll(ctx echo.Context, request models.FetchAddressRequest) ([]models.Address, *helpers.PaginateTemplate, error) {
 	var addresses []models.Address
-	if err := r.db.Find(&addresses).Error; err != nil {
-		return nil, err
+	query := r.db.Model(&models.Address{})
+
+	// Apply filters
+	if request.CityID != 0 {
+		query = query.Where("city_id = ?", request.CityID)
 	}
-	return addresses, nil
-} 
+
+	// Apply pagination
+	paginate := helpers.NewPaginateTemplate(request.Page, request.Limit)
+	query = paginate.Paginate(query)
+
+	// Apply includes
+	if len(request.Includes) > 0 {
+		for _, include := range request.Includes {
+			query = query.Preload(include)
+		}
+	}
+
+	if err := query.Find(&addresses).Error; err != nil {
+		return nil, nil, err
+	}
+
+	return addresses, paginate, nil
+}

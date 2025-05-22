@@ -1,9 +1,10 @@
-package usecases
+package usecase
 
 import (
 	"uni_app/database"
 	"uni_app/models"
-	repositories "uni_app/pkg/place/repository"
+	repository "uni_app/pkg/place/repository"
+	"uni_app/utils/templates"
 
 	"github.com/labstack/echo/v4"
 )
@@ -13,14 +14,14 @@ type PlaceUsecase interface {
 	GetPlaceByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Place, error)
 	UpdatePlace(place *models.Place) error
 	DeletePlace(ID database.PID) error
-	GetAllPlaces() ([]models.Place, error)
+	GetAllPlaces(ctx echo.Context, request models.FetchPlaceRequest) ([]models.Place, *templates.PaginateTemplate, error)
 }
 
 type placeUsecase struct {
-	repo repositories.PlaceRepository
+	repo repository.PlaceRepository
 }
 
-func NewPlaceUsecase(repo repositories.PlaceRepository) PlaceUsecase {
+func NewPlaceUsecase(repo repository.PlaceRepository) PlaceUsecase {
 	return &placeUsecase{repo}
 }
 
@@ -29,7 +30,7 @@ func (u *placeUsecase) CreatePlace(place *models.Place) error {
 }
 
 func (u *placeUsecase) GetPlaceByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Place, error) {
-	return u.repo.GetByID(ctx, ID, false)
+	return u.repo.GetByID(ctx, ID, useCache)
 }
 
 func (u *placeUsecase) UpdatePlace(place *models.Place) error {
@@ -40,6 +41,6 @@ func (u *placeUsecase) DeletePlace(ID database.PID) error {
 	return u.repo.Delete(ID)
 }
 
-func (u *placeUsecase) GetAllPlaces() ([]models.Place, error) {
-	return u.repo.GetAll()
+func (u *placeUsecase) GetAllPlaces(ctx echo.Context, request models.FetchPlaceRequest) ([]models.Place, *templates.PaginateTemplate, error) {
+	return u.repo.GetAll(ctx, request)
 }

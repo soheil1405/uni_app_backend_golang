@@ -5,6 +5,7 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 	repository "uni_app/pkg/major_lesson/repository"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -14,9 +15,8 @@ type MajorLessonUsecase interface {
 	GetMajorLessonByID(ctx echo.Context, ID database.PID, useCache bool) (*models.MajorLesson, error)
 	UpdateMajorLesson(majorLesson *models.MajorLesson) error
 	DeleteMajorLesson(ID database.PID) error
-	GetAllMajorLessons() ([]models.MajorLesson, error)
+	GetAllMajorLessons(ctx echo.Context, request models.FetchMajorLessonRequest) ([]models.MajorLesson, *helpers.PaginateTemplate, error)
 	GetLessonsByMajorID(majorID database.PID) ([]models.MajorLesson, error)
-	GetLessonsByLessonID(lessonID database.PID) ([]models.MajorLesson, error)
 }
 
 type majorLessonUsecase struct {
@@ -40,15 +40,17 @@ func (u *majorLessonUsecase) CreateMajorLesson(majorLesson *models.MajorLesson) 
 	// }
 
 	// Check if the combination already exists
-	existingLessons, err := u.repo.GetAll()
+	request := models.FetchMajorLessonRequest{
+		MajorID:  majorLesson.MajorID,
+		LessonID: majorLesson.LessonID,
+	}
+	existingLessons, _, err := u.repo.GetAll(nil, request)
 	if err != nil {
 		return err
 	}
 
-	for _, existing := range existingLessons {
-		if existing.MajorID == majorLesson.MajorID && existing.LessonID == majorLesson.LessonID {
-			return errors.New("this lesson already exists for this major")
-		}
+	if len(existingLessons) > 0 {
+		return errors.New("this lesson already exists for this major")
 	}
 
 	return u.repo.Create(majorLesson)
@@ -71,15 +73,17 @@ func (u *majorLessonUsecase) UpdateMajorLesson(majorLesson *models.MajorLesson) 
 	// }
 
 	// Check if the combination already exists (excluding current record)
-	existingLessons, err := u.repo.GetAll()
+	request := models.FetchMajorLessonRequest{
+		MajorID:  majorLesson.MajorID,
+		LessonID: majorLesson.LessonID,
+	}
+	existingLessons, _, err := u.repo.GetAll(nil, request)
 	if err != nil {
 		return err
 	}
 
 	for _, existing := range existingLessons {
-		if existing.ID != majorLesson.ID &&
-			existing.MajorID == majorLesson.MajorID &&
-			existing.LessonID == majorLesson.LessonID {
+		if existing.ID != majorLesson.ID {
 			return errors.New("this lesson already exists for this major")
 		}
 	}
@@ -93,38 +97,22 @@ func (u *majorLessonUsecase) DeleteMajorLesson(ID database.PID) error {
 	return u.repo.Delete(ID)
 }
 
-func (u *majorLessonUsecase) GetAllMajorLessons() ([]models.MajorLesson, error) {
-	return u.repo.GetAll()
+func (u *majorLessonUsecase) GetAllMajorLessons(ctx echo.Context, request models.FetchMajorLessonRequest) ([]models.MajorLesson, *helpers.PaginateTemplate, error) {
+	return u.repo.GetAll(ctx, request)
 }
 
 func (u *majorLessonUsecase) GetLessonsByMajorID(majorID database.PID) ([]models.MajorLesson, error) {
-	allLessons, err := u.repo.GetAll()
+	request := models.FetchMajorLessonRequest{
+		MajorID: majorID,
+		FetchRequest: models.FetchRequest{
+			Limit:  1,
+			Offset: 0,
+		},
+	}
+	allLessons, _, err := u.repo.GetAll(nil, request)
 	if err != nil {
 		return nil, err
 	}
 
-	var filteredLessons []models.MajorLesson
-	for _, lesson := range allLessons {
-		if lesson.MajorID == majorID {
-			filteredLessons = append(filteredLessons, lesson)
-		}
-	}
-
-	return filteredLessons, nil
-}
-
-func (u *majorLessonUsecase) GetLessonsByLessonID(lessonID database.PID) ([]models.MajorLesson, error) {
-	allLessons, err := u.repo.GetAll()
-	if err != nil {
-		return nil, err
-	}
-
-	var filteredLessons []models.MajorLesson
-	for _, lesson := range allLessons {
-		if lesson.LessonID == lessonID {
-			filteredLessons = append(filteredLessons, lesson)
-		}
-	}
-
-	return filteredLessons, nil
+	return allLessons, nil
 }

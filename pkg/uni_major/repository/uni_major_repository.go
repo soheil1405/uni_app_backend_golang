@@ -3,6 +3,7 @@ package repository
 import (
 	"uni_app/database"
 	"uni_app/models"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -13,7 +14,7 @@ type UniMajorRepository interface {
 	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.UniMajor, error)
 	Update(uniMajor *models.UniMajor) error
 	Delete(ID database.PID) error
-	GetAll() ([]models.UniMajor, error)
+	GetAll(ctx echo.Context, request models.FetchUniMajorRequest) ([]models.UniMajor, *helpers.PaginateTemplate, error)
 }
 
 type uniMajorRepository struct {
@@ -44,10 +45,24 @@ func (r *uniMajorRepository) Delete(ID database.PID) error {
 	return r.db.Delete(&models.UniMajor{}, ID).Error
 }
 
-func (r *uniMajorRepository) GetAll() ([]models.UniMajor, error) {
+func (r *uniMajorRepository) GetAll(ctx echo.Context, request models.FetchUniMajorRequest) ([]models.UniMajor, *helpers.PaginateTemplate, error) {
 	var uniMajors []models.UniMajor
-	if err := r.db.Find(&uniMajors).Error; err != nil {
-		return nil, err
+	query := r.db.Model(&models.UniMajor{})
+
+	// Apply pagination
+	paginate := helpers.NewPaginateTemplate(request.Page, request.Limit)
+	query = paginate.Paginate(query)
+
+	// Apply includes
+	if len(request.Includes) > 0 {
+		for _, include := range request.Includes {
+			query = query.Preload(include)
+		}
 	}
-	return uniMajors, nil
-} 
+
+	if err := query.Find(&uniMajors).Error; err != nil {
+		return nil, nil, err
+	}
+
+	return uniMajors, paginate, nil
+}

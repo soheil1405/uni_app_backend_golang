@@ -11,7 +11,7 @@ import (
 
 type AuthUsecase interface {
 	CreateAuth(auth *models.AuthRules) error
-	AuthEnforce(ctx echo.Context, req models.AuthRules, useCache bool) bool
+	// AuthEnforce(ctx echo.Context, req models.AuthRules, useCache bool) bool
 	GetAuthByID(ctx echo.Context, ID database.PID, useCache bool) (*models.AuthRules, error)
 	UpdateAuth(auth *models.AuthRules) error
 	DeleteAuth(ID database.PID) error
@@ -47,25 +47,25 @@ func (u *authUsecase) GetAllAuths() ([]models.AuthRules, error) {
 	return u.repo.GetAll()
 }
 
-func (u *authUsecase) AuthEnforce(ctx echo.Context, req models.AuthRules, useCache bool) bool {
-	var (
-		hasAccess = true
-		route     = &models.Route{
-			Url:    req.V4,
-			Method: req.V5,
-		}
-		auth *models.AuthRules
-		err  error
-	)
+// func (u *authUsecase) AuthEnforce(ctx echo.Context, req models.AuthRules, useCache bool) bool {
+// 	var (
+// 		hasAccess = true
+// 		route     = &models.Route{
+// 			Url:    req.V4,
+// 			Method: req.V5,
+// 		}
+// 		auth *models.AuthRules
+// 		err  error
+// 	)
 
-	if route, err = u.routeRepo.FetchRoute(ctx, route); err != nil || route == nil || !route.ID.IsValid() {
-		return hasAccess
-	}
+// 	if route, err = u.routeRepo.FetchRoute(ctx, route); err != nil || route == nil || !route.ID.IsValid() {
+// 		return hasAccess
+// 	}
 
-	req.V0 = route.RouteGroupID.String()
-	if auth, err = u.repo.Enforce(ctx, req, useCache); err != nil || auth == nil || !auth.ID.IsValid() {
-		hasAccess = false
-	}
+// 	req.V0 = route.RouteGroupID.String()
+// 	if auth, err = u.repo.Enforce(ctx, req, useCache); err != nil || auth == nil || !auth.ID.IsValid() {
+// 		hasAccess = false
+// 	}
 
-	return hasAccess
-}
+// 	return hasAccess
+// }

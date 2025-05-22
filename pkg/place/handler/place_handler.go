@@ -1,27 +1,28 @@
-package handlers
+package handler
 
 import (
 	"net/http"
 	"uni_app/database"
 	"uni_app/models"
-	usecases "uni_app/pkg/place/usecase"
+	usecase "uni_app/pkg/place/usecase"
 	"uni_app/utils/ctxHelper"
 
 	"github.com/labstack/echo/v4"
 )
 
 type PlaceHandler struct {
-	usecase usecases.PlaceUsecase
+	usecase usecase.PlaceUsecase
 }
 
-func NewPlaceHandler(usecase usecases.PlaceUsecase, e echo.Group) {
+func NewPlaceHandler(usecase usecase.PlaceUsecase, e echo.Group) {
 	placeHandler := &PlaceHandler{usecase}
-	e.POST("/places", placeHandler.CreatePlace)
-	e.GET("/places/:id", placeHandler.GetPlaceByID)
-	e.PUT("/places/:id", placeHandler.UpdatePlace)
-	e.DELETE("/places/:id", placeHandler.DeletePlace)
-	e.GET("/places", placeHandler.GetAllPlaces)
 
+	placesRouteGroup := e.Group("/places")
+	placesRouteGroup.POST("", placeHandler.CreatePlace)
+	placesRouteGroup.GET("/:id", placeHandler.GetPlaceByID)
+	placesRouteGroup.PUT("/:id", placeHandler.UpdatePlace)
+	placesRouteGroup.DELETE("/:id", placeHandler.DeletePlace)
+	placesRouteGroup.GET("", placeHandler.GetAllPlaces)
 }
 
 func (h *PlaceHandler) CreatePlace(c echo.Context) error {
@@ -37,13 +38,12 @@ func (h *PlaceHandler) CreatePlace(c echo.Context) error {
 
 func (h *PlaceHandler) GetPlaceByID(c echo.Context) error {
 	var (
-		err error
 		ID  database.PID
+		err error
 	)
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-
 	place, err := h.usecase.GetPlaceByID(c, ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
@@ -51,20 +51,11 @@ func (h *PlaceHandler) GetPlaceByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, place)
 }
 
-func (h *PlaceHandler) UpdatePlace(c echo.Context) error {
-	var (
-		err   error
-		ID    database.PID
-		place models.Place
-	)
-	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+func (h *PlaceHandler) UpdatePlace(c echo.Context) (err error) {
+	var place models.Place
+	if place.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-
-	if err := c.Bind(&place); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	}
-	place.ID = ID
 	if err := h.usecase.UpdatePlace(&place); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
@@ -72,11 +63,8 @@ func (h *PlaceHandler) UpdatePlace(c echo.Context) error {
 }
 
 func (h *PlaceHandler) DeletePlace(c echo.Context) error {
-	var (
-		err error
-		ID  database.PID
-	)
-	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+	ID, err := ctxHelper.GetIDFromContxt(c)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
@@ -87,9 +75,16 @@ func (h *PlaceHandler) DeletePlace(c echo.Context) error {
 }
 
 func (h *PlaceHandler) GetAllPlaces(c echo.Context) error {
-	places, err := h.usecase.GetAllPlaces()
+	var request models.FetchPlaceRequest
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	places, paginate, err := h.usecase.GetAllPlaces(c, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, places)
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"places": places,
+		"meta":   paginate,
+	})
 }

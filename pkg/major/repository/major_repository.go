@@ -3,6 +3,7 @@ package repositories
 import (
 	"uni_app/database"
 	"uni_app/models"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -13,7 +14,7 @@ type MajorRepository interface {
 	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Major, error)
 	Update(major *models.Major) error
 	Delete(ID database.PID) error
-	GetAll() ([]models.Major, error)
+	GetAll(ctx echo.Context, request models.FetchMajorRequest) ([]models.Major, *helpers.PaginateTemplate, error)
 }
 
 type majorRepository struct {
@@ -44,10 +45,24 @@ func (r *majorRepository) Delete(ID database.PID) error {
 	return r.db.Delete(&models.Major{}, ID).Error
 }
 
-func (r *majorRepository) GetAll() ([]models.Major, error) {
+func (r *majorRepository) GetAll(ctx echo.Context, request models.FetchMajorRequest) ([]models.Major, *helpers.PaginateTemplate, error) {
 	var majors []models.Major
-	if err := r.db.Find(&majors).Error; err != nil {
-		return nil, err
+	query := r.db.Model(&models.Major{})
+
+	// Apply pagination
+	paginate := helpers.NewPaginateTemplate(request.Page, request.Limit)
+	query = paginate.Paginate(query)
+
+	// Apply includes
+	if len(request.Includes) > 0 {
+		for _, include := range request.Includes {
+			query = query.Preload(include)
+		}
 	}
-	return majors, nil
+
+	if err := query.Find(&majors).Error; err != nil {
+		return nil, nil, err
+	}
+
+	return majors, paginate, nil
 }

@@ -1,9 +1,10 @@
-package usecases
+package usecase
 
 import (
 	"uni_app/database"
 	"uni_app/models"
-	repositories "uni_app/pkg/city/repository"
+	repository "uni_app/pkg/city/repository"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -13,14 +14,14 @@ type CityUsecase interface {
 	GetCityByID(ctx echo.Context, ID database.PID, useCache bool) (*models.City, error)
 	UpdateCity(city *models.City) error
 	DeleteCity(ID database.PID) error
-	GetAllCities() ([]models.City, error)
+	GetAllCities(ctx echo.Context, request models.FetchCityRequest) ([]models.City, *helpers.PaginateTemplate, error)
 }
 
 type cityUsecase struct {
-	repo repositories.CityRepository
+	repo repository.CityRepository
 }
 
-func NewCityUsecase(repo repositories.CityRepository) CityUsecase {
+func NewCityUsecase(repo repository.CityRepository) CityUsecase {
 	return &cityUsecase{repo}
 }
 
@@ -40,6 +41,6 @@ func (u *cityUsecase) DeleteCity(ID database.PID) error {
 	return u.repo.Delete(ID)
 }
 
-func (u *cityUsecase) GetAllCities() ([]models.City, error) {
-	return u.repo.GetAll()
+func (u *cityUsecase) GetAllCities(ctx echo.Context, request models.FetchCityRequest) ([]models.City, *helpers.PaginateTemplate, error) {
+	return u.repo.GetAll(ctx, request)
 }

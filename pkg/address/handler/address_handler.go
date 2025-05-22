@@ -23,7 +23,6 @@ func NewAddressHandler(usecase usecase.AddressUsecase, e echo.Group) {
 	addressesRouteGroup.PUT("/:id", addressHandler.UpdateAddress)
 	addressesRouteGroup.DELETE("/:id", addressHandler.DeleteAddress)
 	addressesRouteGroup.GET("", addressHandler.GetAllAddresses)
-
 }
 
 func (h *AddressHandler) CreateAddress(c echo.Context) error {
@@ -76,9 +75,16 @@ func (h *AddressHandler) DeleteAddress(c echo.Context) error {
 }
 
 func (h *AddressHandler) GetAllAddresses(c echo.Context) error {
-	addresses, err := h.usecase.GetAllAddresses()
+	var request models.FetchAddressRequest
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	addresses, paginate, err := h.usecase.GetAllAddresses(c, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, addresses)
-} 
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"addresses": addresses,
+		"meta":      paginate,
+	})
+}

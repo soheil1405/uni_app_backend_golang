@@ -5,6 +5,7 @@ import (
 	"uni_app/database"
 	"uni_app/models"
 	repository "uni_app/pkg/uni_major/repository"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -14,7 +15,7 @@ type UniMajorUsecase interface {
 	GetUniMajorByID(ctx echo.Context, ID database.PID, useCache bool) (*models.UniMajor, error)
 	UpdateUniMajor(uniMajor *models.UniMajor) error
 	DeleteUniMajor(ID database.PID) error
-	GetAllUniMajors() ([]models.UniMajor, error)
+	GetAllUniMajors(ctx echo.Context, request models.FetchUniMajorRequest) ([]models.UniMajor, *helpers.PaginateTemplate, error)
 }
 
 type uniMajorUsecase struct {
@@ -49,6 +50,6 @@ func (u *uniMajorUsecase) DeleteUniMajor(ID database.PID) error {
 	return u.repo.Delete(ID)
 }
 
-func (u *uniMajorUsecase) GetAllUniMajors() ([]models.UniMajor, error) {
-	return u.repo.GetAll()
+func (u *uniMajorUsecase) GetAllUniMajors(ctx echo.Context, request models.FetchUniMajorRequest) ([]models.UniMajor, *helpers.PaginateTemplate, error) {
+	return u.repo.GetAll(ctx, request)
 }

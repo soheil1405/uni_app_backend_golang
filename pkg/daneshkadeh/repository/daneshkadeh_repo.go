@@ -15,7 +15,7 @@ type FacultyRepository interface {
 	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.DaneshKadeh, error)
 	Update(faculty *models.DaneshKadeh) error
 	Delete(ID database.PID) error
-	GetAll(ctx echo.Context, request models.FetchRequest) (models.DaneshKadeha, *templates.PaginateTemplate, error)
+	GetAll(ctx echo.Context, request models.FetchDaneshKadehRequest) (models.DaneshKadeha, *templates.PaginateTemplate, error)
 }
 
 type facultyRepository struct {
@@ -46,7 +46,7 @@ func (r *facultyRepository) Delete(ID database.PID) error {
 	return r.db.Delete(&models.DaneshKadeha{}, ID).Error
 }
 
-func (r *facultyRepository) GetAll(ctx echo.Context, request models.FetchRequest) (models.DaneshKadeha, *templates.PaginateTemplate, error) {
+func (r *facultyRepository) GetAll(ctx echo.Context, request models.FetchDaneshKadehRequest) (models.DaneshKadeha, *templates.PaginateTemplate, error) {
 	var (
 		daneshkadeha models.DaneshKadeha
 		total        int64

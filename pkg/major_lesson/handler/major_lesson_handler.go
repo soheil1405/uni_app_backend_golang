@@ -23,7 +23,6 @@ func NewMajorLessonHandler(usecase usecase.MajorLessonUsecase, e echo.Group) {
 	majorLessonsRouteGroup.PUT("/:id", majorLessonHandler.UpdateMajorLesson)
 	majorLessonsRouteGroup.DELETE("/:id", majorLessonHandler.DeleteMajorLesson)
 	majorLessonsRouteGroup.GET("", majorLessonHandler.GetAllMajorLessons)
-
 }
 
 func (h *MajorLessonHandler) CreateMajorLesson(c echo.Context) error {
@@ -76,9 +75,16 @@ func (h *MajorLessonHandler) DeleteMajorLesson(c echo.Context) error {
 }
 
 func (h *MajorLessonHandler) GetAllMajorLessons(c echo.Context) error {
-	majorLessons, err := h.usecase.GetAllMajorLessons()
+	var request models.FetchMajorLessonRequest
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	majorLessons, paginate, err := h.usecase.GetAllMajorLessons(c, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, majorLessons)
-} 
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"major_lessons": majorLessons,
+		"meta":          paginate,
+	})
+}

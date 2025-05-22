@@ -1,12 +1,10 @@
-package usecases
+package usecase
 
 import (
-	"net/http"
 	"uni_app/database"
 	"uni_app/models"
-	repositories "uni_app/pkg/uni/repository"
+	repository "uni_app/pkg/uni/repository"
 	"uni_app/utils/helpers"
-	"uni_app/utils/templates"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,14 +14,14 @@ type UniUsecase interface {
 	GetUniByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Uni, error)
 	UpdateUni(uni *models.Uni) error
 	DeleteUni(ID database.PID) error
-	GetAllUnis(ctx echo.Context, request models.FetchRequest) (map[string]interface{}, *templates.PaginateTemplate, helpers.MyError)
+	GetAllUnis(ctx echo.Context, request models.FetchUniRequest) ([]models.Uni, *helpers.PaginateTemplate, error)
 }
 
 type uniUsecase struct {
-	repo repositories.UniRepository
+	repo repository.UniRepository
 }
 
-func NewUniUsecase(repo repositories.UniRepository) UniUsecase {
+func NewUniUsecase(repo repository.UniRepository) UniUsecase {
 	return &uniUsecase{repo}
 }
 
@@ -43,16 +41,6 @@ func (u *uniUsecase) DeleteUni(ID database.PID) error {
 	return u.repo.Delete(ID)
 }
 
-func (u *uniUsecase) GetAllUnis(ctx echo.Context, request models.FetchRequest) (map[string]interface{}, *templates.PaginateTemplate, helpers.MyError) {
-	var (
-		myErr    helpers.MyError
-		response = make(map[string]interface{})
-	)
-	unis, meta, err := u.repo.GetAll(ctx, request)
-	if err != nil {
-		myErr.SetError(err, http.StatusBadRequest)
-	}
-	response["unis"] = unis
-	myErr.Default()
-	return response, meta, myErr
+func (u *uniUsecase) GetAllUnis(ctx echo.Context, request models.FetchUniRequest) ([]models.Uni, *helpers.PaginateTemplate, error) {
+	return u.repo.GetAll(ctx, request)
 }

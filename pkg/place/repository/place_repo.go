@@ -3,6 +3,7 @@ package repositories
 import (
 	"uni_app/database"
 	"uni_app/models"
+	"uni_app/utils/templates"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -13,7 +14,7 @@ type PlaceRepository interface {
 	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Place, error)
 	Update(place *models.Place) error
 	Delete(ID database.PID) error
-	GetAll() ([]models.Place, error)
+	GetAll(ctx echo.Context, request models.FetchPlaceRequest) ([]models.Place, *templates.PaginateTemplate, error)
 }
 
 type placeRepository struct {
@@ -44,10 +45,50 @@ func (r *placeRepository) Delete(ID database.PID) error {
 	return r.db.Delete(&models.Place{}, ID).Error
 }
 
-func (r *placeRepository) GetAll() ([]models.Place, error) {
-	var places []models.Place
-	if err := r.db.Find(&places).Error; err != nil {
-		return nil, err
+func (r *placeRepository) GetAll(ctx echo.Context, request models.FetchPlaceRequest) ([]models.Place, *templates.PaginateTemplate, error) {
+	var (
+		places   []models.Place
+		query    = r.db
+		limit    = request.Limit
+		offset   = request.Offset
+		includes = request.Includes
+		total    int64
+		sorts    = request.Sorts
+	)
+
+	if request.CityID != 0 {
+		query = query.Where("city_id = ?", request.CityID)
 	}
-	return places, nil
+
+	if request.PlaceTypeID != 0 {
+		query = query.Where("place_type_id = ?", request.PlaceTypeID)
+	}
+
+	if request.Search != "" {
+		query = query.Where("name LIKE ?", "%"+request.Search+"%")
+	}
+
+	if err := query.Model(&models.Place{}).Count(&total).Error; err != nil {
+		return nil, nil, err
+	}
+	for _, sort := range sorts {
+		query = query.Order(sort)
+	}
+
+	for _, include := range includes {
+		query = query.Preload(include)
+	}
+
+	for {
+		query.Limit(limit).Offset(offset).Find(&places)
+		if limit > len(places) && int(total) > offset+limit {
+			offset += limit
+		} else {
+			break
+		}
+	}
+
+	meta := templates.CreatePaginateTemplate(int(total), offset, limit)
+
+	return places, meta, nil
 }

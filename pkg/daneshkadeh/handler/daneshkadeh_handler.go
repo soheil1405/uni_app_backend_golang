@@ -1,109 +1,90 @@
-package handlers
+package handler
 
 import (
 	"net/http"
 	"uni_app/database"
 	"uni_app/models"
-	usecases "uni_app/pkg/daneshkadeh/usecase"
+	usecase "uni_app/pkg/daneshkadeh/usecase"
 	"uni_app/utils/ctxHelper"
-	"uni_app/utils/helpers"
-	"uni_app/utils/templates"
 
 	"github.com/labstack/echo/v4"
 )
 
-type FacultyHandler struct {
-	usecase usecases.FacultyUsecase
+type DaneshKadehHandler struct {
+	usecase usecase.DaneshKadehUsecase
 }
 
-func NewDaneshKadehHandler(usecase usecases.FacultyUsecase, e echo.Group) {
-	facultyHandler := &FacultyHandler{usecase}
+func NewDaneshKadehHandler(usecase usecase.DaneshKadehUsecase, e echo.Group) {
+	daneshKadehHandler := &DaneshKadehHandler{usecase}
 
-	daneshKadehRouteGroups := e.Group("/daneshkadeh")
-	daneshKadehRouteGroups.GET("", facultyHandler.GetAlldaneshkadeha)
-	daneshKadehRouteGroups.GET("/:id", facultyHandler.GetDaneshKadehByID)
-	daneshKadehRouteGroups.POST("", facultyHandler.CreateDaneshKadeh)
-	daneshKadehRouteGroups.PUT("/:id", facultyHandler.UpdateDaneshKadeh)
-	daneshKadehRouteGroups.DELETE("/:id", facultyHandler.DeleteDaneshKadeh)
+	daneshKadehsRouteGroup := e.Group("/daneshkadehs")
+	daneshKadehsRouteGroup.POST("", daneshKadehHandler.CreateDaneshKadeh)
+	daneshKadehsRouteGroup.GET("/:id", daneshKadehHandler.GetDaneshKadehByID)
+	daneshKadehsRouteGroup.PUT("/:id", daneshKadehHandler.UpdateDaneshKadeh)
+	daneshKadehsRouteGroup.DELETE("/:id", daneshKadehHandler.DeleteDaneshKadeh)
+	daneshKadehsRouteGroup.GET("", daneshKadehHandler.GetAllDaneshKadehs)
 }
 
-func (h *FacultyHandler) CreateDaneshKadeh(c echo.Context) error {
-	var faculty models.DaneshKadeh
-	if err := c.Bind(&faculty); err != nil {
+func (h *DaneshKadehHandler) CreateDaneshKadeh(c echo.Context) error {
+	var daneshKadeh models.DaneshKadeh
+	if err := c.Bind(&daneshKadeh); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	if err := h.usecase.CreateDaneshKadeh(&faculty); err != nil {
+	if err := h.usecase.CreateDaneshKadeh(&daneshKadeh); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusCreated, faculty)
+	return c.JSON(http.StatusCreated, daneshKadeh)
 }
 
-func (h *FacultyHandler) GetDaneshKadehByID(c echo.Context) error {
+func (h *DaneshKadehHandler) GetDaneshKadehByID(c echo.Context) error {
 	var (
-		MyErr helpers.MyError
-		resp  map[string]interface{}
-	)
-
-	id, err := ctxHelper.GetIDFromContxt(c)
-	if err != nil {
-		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
-	}
-
-	resp, MyErr = h.usecase.GetDaneshKadehByID(c, id, false)
-	if MyErr.Err != nil {
-		return helpers.Reply(c, MyErr.Code, MyErr.Err, resp, nil)
-	}
-	
-	return helpers.Reply(c, MyErr.Code, MyErr.Err, resp, nil)
-}
-
-func (h *FacultyHandler) UpdateDaneshKadeh(c echo.Context) error {
-	var (
-		err         error
-		daneshkadeh models.DaneshKadeh
-	)
-
-	if err := c.Bind(&daneshkadeh); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	}
-
-	if daneshkadeh.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	}
-
-	if err := h.usecase.UpdateDaneshKadeh(&daneshkadeh); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
-	}
-	return c.JSON(http.StatusOK, daneshkadeh)
-}
-
-func (h *FacultyHandler) DeleteDaneshKadeh(c echo.Context) error {
-	var (
+		ID  database.PID
 		err error
-		id  database.PID
 	)
-	if id, err = ctxHelper.GetIDFromContxt(c); err != nil {
+	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	daneshKadeh, err := h.usecase.GetDaneshKadehByID(c, ID, false)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, daneshKadeh)
+}
+
+func (h *DaneshKadehHandler) UpdateDaneshKadeh(c echo.Context) (err error) {
+	var daneshKadeh models.DaneshKadeh
+	if daneshKadeh.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	if err := h.usecase.UpdateDaneshKadeh(&daneshKadeh); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, daneshKadeh)
+}
+
+func (h *DaneshKadehHandler) DeleteDaneshKadeh(c echo.Context) error {
+	ID, err := ctxHelper.GetIDFromContxt(c)
+	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	if err := h.usecase.DeleteDaneshKadeh(id); err != nil {
+	if err := h.usecase.DeleteDaneshKadeh(ID); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return c.JSON(http.StatusOK, map[string]string{"message": "Faculty deleted"})
+	return c.JSON(http.StatusOK, map[string]string{"message": "DaneshKadeh deleted"})
 }
 
-func (h *FacultyHandler) GetAlldaneshkadeha(c echo.Context) error {
-	var (
-		err  helpers.MyError
-		req  *models.FetchRequest
-		resp map[string]interface{}
-		meta *templates.PaginateTemplate
-	)
-
-	if req, err = helpers.BindFetchRequestFromCtx(c); err.Err != nil {
-		return helpers.Reply(c, err.Code, err.Err, nil, nil)
+func (h *DaneshKadehHandler) GetAllDaneshKadehs(c echo.Context) error {
+	var request models.FetchDaneshKadehRequest
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-
-	resp, meta, err = h.usecase.GetAllDaneshKadeha(c, *req)
-	return helpers.Reply(c, err.Code, err.Err, resp, meta)
+	daneshKadehs, paginate, err := h.usecase.GetAllDaneshKadehs(c, request)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"daneshkadehs": daneshKadehs,
+		"meta":         paginate,
+	})
 }
