@@ -10,3 +10,7 @@ type Phone struct {
 	Title string `json:"title,omitempty"`
 	Phone string `json:"phone,omitempty"`
 }
+
+func PhoneAcceptIncludes() []string {
+	return []string{}
+}

@@ -14,3 +14,18 @@ type UniMajor struct {
 	MajorID       database.PID `json:"major_id,omitempty"`
 	Major         Major        `gorm:"foreignKey:MajorID" json:"major,omitempty"`
 }
+
+type FetchUniMajorRequest struct {
+	FetchRequest
+	UniID         database.PID `json:"uni_id" query:"uni_id"`
+	DaneshKadehID database.PID `json:"daneshkadeh_id" query:"daneshkadeh_id"`
+	MajorID       database.PID `json:"major_id" query:"major_id"`
+}
+
+func UniMajorAcceptIncludes() []string {
+	return []string{
+		"Uni",
+		"DaneshKadeh",
+		"Major",
+	}
+}

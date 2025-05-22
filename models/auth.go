@@ -14,3 +14,7 @@ type AuthRules struct {
 	V6 string `json:"v6,omitempty"`
 	V7 string `json:"v7,omitempty"`
 }
+
+func AuthRulesAcceptIncludes() []string {
+	return []string{}
+}

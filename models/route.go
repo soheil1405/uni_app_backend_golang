@@ -9,3 +9,14 @@ type Route struct {
 	RouteGroupID database.PID `json:"route_group_id,omitempty"`
 	RouteGroup   RouteGroup   `gorm:"foreignKey:RouteGroupID" json:"route_group,omitempty"`
 }
+
+type FetchRouteRequest struct {
+	FetchRequest
+	RouteGroupID database.PID `json:"route_group_id" query:"route_group_id"`
+}
+
+func RouteAcceptIncludes() []string {
+	return []string{
+		"RouteGroup",
+	}
+}

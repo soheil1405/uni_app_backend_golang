@@ -18,3 +18,18 @@ type MajorsChart struct {
 	Uni             Uni          `gorm:"foreignKey:UniID" json:"uni"`
 	TotalCountRatio float64      `gorm:"not null" json:"total_count_ratio"`
 }
+type MajorChartRequest struct {
+	FetchRequest
+	MajorID       database.PID `json:"major_id" query:"major_id"`
+	DaneshKadehID database.PID `json:"danesh_kadeh_id" query:"danesh_kadeh_id"`
+	UniID         database.PID `json:"uni_id" query:"uni_id"`
+}
+
+func MajorChartAcceptIncludes() []string {
+	return []string{
+		"UniMajor",
+		"DaneshKadeh",
+		"Major",
+		"Uni",
+	}
+}

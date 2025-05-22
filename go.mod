@@ -5,6 +5,7 @@ go 1.21.5
 require (
 	github.com/fatih/color v1.14.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/uuid v1.4.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/labstack/echo/v4 v4.12.0

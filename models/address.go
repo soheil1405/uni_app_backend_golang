@@ -18,3 +18,15 @@ type Address struct {
 	Lat         float64      `json:"lat,omitempty"`
 	Lng         float64      `json:"lng,omitempty"`
 }
+
+type FetchAddressRequest struct {
+	FetchRequest
+	CityID database.PID `json:"city_id" query:"city_id"`
+}
+
+func AddressAcceptIncludes() []string {
+	return []string{
+		"Phones",
+		"City",
+	}
+}

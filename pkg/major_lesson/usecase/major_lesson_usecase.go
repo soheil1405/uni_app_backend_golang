@@ -35,9 +35,9 @@ func (u *majorLessonUsecase) CreateMajorLesson(majorLesson *models.MajorLesson) 
 	if majorLesson.LessonID == 0 {
 		return errors.New("lesson ID is required")
 	}
-	if majorLesson.UnitCount <= 0 {
-		return errors.New("unit count must be greater than 0")
-	}
+	// if majorLesson.UnitCount <= 0 {
+	// 	return errors.New("unit count must be greater than 0")
+	// }
 
 	// Check if the combination already exists
 	existingLessons, err := u.repo.GetAll()
@@ -66,9 +66,9 @@ func (u *majorLessonUsecase) UpdateMajorLesson(majorLesson *models.MajorLesson) 
 	if majorLesson.LessonID == 0 {
 		return errors.New("lesson ID is required")
 	}
-	if majorLesson.UnitCount <= 0 {
-		return errors.New("unit count must be greater than 0")
-	}
+	// if majorLesson.UnitCount <= 0 {
+	// 	return errors.New("unit count must be greater than 0")
+	// }
 
 	// Check if the combination already exists (excluding current record)
 	existingLessons, err := u.repo.GetAll()
@@ -127,4 +127,4 @@ func (u *majorLessonUsecase) GetLessonsByLessonID(lessonID database.PID) ([]mode
 	}
 
 	return filteredLessons, nil
-} 
+}

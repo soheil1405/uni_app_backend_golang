@@ -4,16 +4,11 @@ import (
 	"uni_app/database"
 )
 
-// UserMode ...
-type UserMode uint
+type UserStatus string
 
 const (
-	// USER_STATUS_ACTIVE Active
-	USER_STATUS_ACTIVE UserMode = iota + 1
-	// PENDING ...
-	PENDING
-	// USER_STATUS_INACTIVE Inactive
-	USER_STATUS_INACTIVE
+	USER_STATUS_ACTIVE   UserStatus = "active"
+	USER_STATUS_INACTIVE UserStatus = "inactive"
 )
 
 type Users []*User
@@ -38,11 +33,22 @@ type User struct {
 	Email         string        `gorm:"uniqueIndex;" json:"email,omitempty"`
 	Password      string        `gorm:"not null" json:"-,omitempty"`
 	Token         Token         `json:"token,omitempty" gorm:"polymorphic:Owner;"`
-	Status        UserMode      `gorm:"default:1" json:"status,omitempty"`
+	Status        UserStatus    `gorm:"default:'active'" json:"status,omitempty"`
 	UserRoles     []*UserRole   `json:"user_roles,omitempty"`
 }
 
 type UserLoginRequst struct {
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
+}
+
+func UserAcceptIncludes() []string {
+	return []string{
+		"DegreeLevel",
+		"DegreeMajor",
+		"DegreeUni",
+		"NominatedBy",
+		"Token",
+		"UserRoles",
+	}
 }

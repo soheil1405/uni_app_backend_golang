@@ -6,7 +6,6 @@ import (
 	"uni_app/models"
 	usecases "uni_app/pkg/user/usecase"
 	"uni_app/utils/ctxHelper"
-	helper "uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -17,118 +16,114 @@ type UserHandler struct {
 
 func NewUserHandler(usecase usecases.UserUsecase, e echo.Group) {
 	userHandler := &UserHandler{usecase}
-	authRoutes := e.Group("/auth")
-	authRoutes.POST("/login", userHandler.Login)
 
-	userRoutes := e.Group("/users")
-	userRoutes.POST("", userHandler.CreateUser)
-	userRoutes.GET("/:id", userHandler.GetUserByID)
-	userRoutes.PUT("/:id", userHandler.UpdateUser)
-	userRoutes.DELETE("/:id", userHandler.DeleteUser)
-	userRoutes.GET("", userHandler.GetAllUsers)
+	// Public routes
+	e.POST("/users/register", userHandler.RegisterUser)
+	e.POST("/users/login", userHandler.LoginUser)
 
-}
-
-func (h *UserHandler) Login(ctx echo.Context) error {
-	var (
-		request models.UserLoginRequst
-		user    *models.User
-		err     error
-	)
-
-	if err = ctx.Bind(&request); err != nil {
-		return helper.Reply(ctx, http.StatusBadRequest, err, nil, nil)
-	}
-
-	if user, err = h.usecase.Login(ctx, &request); err != nil {
-		return helper.Reply(ctx, http.StatusBadRequest, err, nil, nil)
-	}
-
-	ctx.SetCookie(&http.Cookie{
-		Name:    "token",
-		Value:   user.Token.TokenKey,
-		Path:    "/",
-		Expires: user.Token.ExpireTime,
-		Secure:  false,
-	})
-
-	return helper.Reply(
-		ctx,
-		http.StatusOK,
-		nil,
-		map[string]interface{}{
-			"token": user.Token.TokenKey,
-			"user":  user,
-		},
-		nil,
-	)
+	// Protected routes
+	users := e.Group("/users")
+	users.POST("", userHandler.CreateUser)
+	users.GET("/:id", userHandler.GetUserByID)
+	users.PUT("/:id", userHandler.UpdateUser)
+	users.DELETE("/:id", userHandler.DeleteUser)
+	users.GET("", userHandler.GetAllUsers)
 }
 
 func (h *UserHandler) CreateUser(c echo.Context) error {
 	var user models.User
 	if err := c.Bind(&user); err != nil {
-		return helper.Reply(c, http.StatusBadRequest, err, nil, nil)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 	if err := h.usecase.CreateUser(&user); err != nil {
-		return helper.Reply(c, http.StatusInternalServerError, err, nil, nil)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 	return c.JSON(http.StatusCreated, user)
 }
 
 func (h *UserHandler) GetUserByID(c echo.Context) error {
 	var (
-		err error
 		ID  database.PID
+		err error
 	)
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return helper.Reply(c, http.StatusBadRequest, err, nil, nil)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 	user, err := h.usecase.GetUserByID(c, ID, false)
 	if err != nil {
-		return helper.Reply(c, http.StatusBadRequest, err, nil, nil)
+		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
-	return helper.Reply(c, http.StatusOK, nil, map[string]interface{}{"user": user}, nil)
+	return c.JSON(http.StatusOK, user)
 }
 
 func (h *UserHandler) UpdateUser(c echo.Context) error {
 	var (
-		err  error
-		ID   database.PID
 		user models.User
+		err  error
 	)
-	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return helper.Reply(c, http.StatusBadRequest, err, nil, nil)
-	}
 	if err := c.Bind(&user); err != nil {
-		return helper.Reply(c, http.StatusBadRequest, err, nil, nil)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	user.ID = ID
+	if user.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
 	if err := h.usecase.UpdateUser(&user); err != nil {
-		return helper.Reply(c, http.StatusInternalServerError, err, nil, nil)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return helper.Reply(c, http.StatusOK, nil, map[string]interface{}{"user": user}, nil)
+	return c.JSON(http.StatusOK, user)
 }
 
 func (h *UserHandler) DeleteUser(c echo.Context) error {
 	var (
-		err error
 		ID  database.PID
+		err error
 	)
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return helper.Reply(c, http.StatusBadRequest, err, nil, nil)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-
 	if err := h.usecase.DeleteUser(ID); err != nil {
-		return helper.Reply(c, http.StatusInternalServerError, err, nil, nil)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
-	return helper.Reply(c, http.StatusOK, nil, map[string]interface{}{"id": ID}, nil)
+	return c.NoContent(http.StatusNoContent)
 }
 
 func (h *UserHandler) GetAllUsers(c echo.Context) error {
-	users, err := h.usecase.GetAllUsers()
-	if err != nil {
-		return helper.Reply(c, http.StatusInternalServerError, err, nil, nil)
+	var request models.FetchRequest
+	if err := c.Bind(&request); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
-	return helper.Reply(c, http.StatusOK, nil, map[string]interface{}{"users": users}, nil)
+	users, paginate, err := h.usecase.GetAllUsers(c, request)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"users": users,
+		"meta":  paginate,
+	})
+}
 
+func (h *UserHandler) RegisterUser(c echo.Context) error {
+	var user models.User
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	if err := h.usecase.RegisterUser(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusCreated, user)
+}
+
+func (h *UserHandler) LoginUser(c echo.Context) error {
+	var loginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	if err := c.Bind(&loginRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+	user, err := h.usecase.LoginUser(loginRequest.Username, loginRequest.Password)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, user)
 }

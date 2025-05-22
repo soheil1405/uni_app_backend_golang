@@ -10,3 +10,7 @@ type Lesson struct {
 	Name        string `gorm:"size:255;not null" json:"name"`
 	Description string `gorm:"size:500" json:"description"`
 }
+
+func LessonAcceptIncludes() []string {
+	return []string{}
+}

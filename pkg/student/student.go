@@ -11,7 +11,7 @@ import (
 )
 
 func Init(db *gorm.DB, e echo.Group, config *env.Config) {
-	roleRepo := repositories.NewStudentRepository(db)
-	roleUsecase := usecases.NewStudentUsecase(roleRepo)
-	handlers.NewStudentHandler(roleUsecase, e)
+	studentRepo := repositories.NewStudentRepository(db)
+	studentUsecase := usecases.NewStudentUsecase(studentRepo, config)
+	handlers.NewStudentHandler(studentUsecase, e)
 }

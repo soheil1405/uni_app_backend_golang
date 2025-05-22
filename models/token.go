@@ -13,3 +13,7 @@ type Token struct {
 	ExpireTime time.Time `json:"expire_time"`
 	Type       string    `json:"type"`
 }
+
+func TokenAcceptIncludes() []string {
+	return []string{}
+}

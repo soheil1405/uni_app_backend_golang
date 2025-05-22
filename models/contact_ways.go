@@ -15,3 +15,7 @@ type ContactWay struct {
 	Content string `json:"content,omitempty"`
 	PolymorphicModel
 }
+
+func ContactWayAcceptIncludes() []string {
+	return []string{}
+}

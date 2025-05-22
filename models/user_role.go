@@ -15,3 +15,12 @@ type UserRole struct {
 	Meta          string        `gorm:"type:json" json:"meta,omitempty"`
 	Description   string        `json:"description,omitempty"`
 }
+
+func UserRoleAcceptIncludes() []string {
+	return []string{
+		"User",
+		"Role",
+		"DaneshKadeh",
+		"Uni",
+	}
+}

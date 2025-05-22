@@ -31,3 +31,9 @@ func (roles Roles) GetMainRole() (role *Role) {
 	}
 	return
 }
+
+func RoleAcceptIncludes() []string {
+	return []string{
+		"UserRoles",
+	}
+}

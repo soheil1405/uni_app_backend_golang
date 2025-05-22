@@ -21,3 +21,22 @@ type Uni struct {
 	DaneshKadeha    []DaneshKadeh `gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;" json:"daneshkadeha,omitempty"`
 	UserRoles       []*UserRole   `json:"user_roles,omitempty"`
 }
+
+type FetchUniRequest struct {
+	FetchRequest
+	UniTypeID database.PID `json:"uni_type_id" query:"uni_type_id"`
+	CityID    database.PID `json:"city_id" query:"city_id"`
+}
+
+func UniAcceptIncludes() []string {
+	return []string{
+		"UniType",
+		"ContactWays",
+		"Phones",
+		"City",
+		"Addresses",
+		"Students",
+		"DaneshKadeha",
+		"UserRoles",
+	}
+}

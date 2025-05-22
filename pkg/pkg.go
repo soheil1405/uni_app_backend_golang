@@ -37,7 +37,7 @@ func migrateModels(db *gorm.DB, config *env.Config) {
 	// interfaces []interface{}
 	// err error
 	)
-	if migration := config.Viper.GetBool("migration"); migration {
+	if migration := config.GetBool("migration"); migration {
 		// interfaces = []interface{}{
 		// 	&models.Uni{},
 		// 	&models.User{},

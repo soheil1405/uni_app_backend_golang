@@ -1,7 +1,6 @@
 package user
 
 import (
-	_tokenRepo "uni_app/pkg/token/repository"
 	handlers "uni_app/pkg/user/handler"
 	repositories "uni_app/pkg/user/repository"
 	usecases "uni_app/pkg/user/usecase"
@@ -12,8 +11,7 @@ import (
 )
 
 func Init(db *gorm.DB, e echo.Group, config *env.Config) {
-	roleRepo := repositories.NewUserRepository(db)
-	tokenRepo := _tokenRepo.NewTokenRepository(db)
-	roleUsecase := usecases.NewUserUsecase(roleRepo, tokenRepo, config)
-	handlers.NewUserHandler(roleUsecase, e)
+	userRepo := repositories.NewUserRepository(db)
+	userUsecase := usecases.NewUserUsecase(userRepo, config)
+	handlers.NewUserHandler(userUsecase, e)
 }

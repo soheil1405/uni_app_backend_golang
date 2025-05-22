@@ -20,9 +20,28 @@ type DaneshKadeh struct {
 	MajorsCharts      MajorsCharts     `json:"majors_charts,omitempty" gorm:"foreignKey:DaneshKadehID;constraint:OnDelete:CASCADE;"`
 }
 
+type FetchDaneshKadehRequest struct {
+	FetchRequest
+	UniID             database.PID `json:"uni_id" query:"uni_id"`
+	DaneshKadehTypeID database.PID `json:"daneshkadeh_type_id" query:"daneshkadeh_type_id"`
+}
+
 type DaneshKadehType struct {
 	database.Model
 	Name        string `json:"name,omitempty"`
 	Type        string `gorm:"unique;not null" json:"type,omitempty"`
 	Description string `gorm:"type:text" json:"description,omitempty"`
+}
+
+func DaneshKadehAcceptIncludes() []string {
+	return []string{
+		"Uni",
+		"Phones",
+		"Address",
+		"ContactWays",
+		"Students",
+		"DaneshKadehType",
+		"UserRoles",
+		"MajorsCharts",
+	}
 }

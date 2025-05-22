@@ -1,50 +1,46 @@
 package models
 
 import (
-	"fmt"
 	"uni_app/database"
 
 	"gorm.io/gorm"
 )
 
 type FetchRequest struct {
-	ID       database.PID           `json:"id" query:"id"`
-	IDs      []database.PID         `json:"ids" query:"ids"`
-	Search   string                 `json:"search" query:"search"`
-	Limit    int                    `json:"limit" query:"limit"`
-	Offset   int                    `json:"offset" query:"offset"`
-	Page     int                    `json:"page" query:"page"`
-	Filters  map[string]interface{} `json:"filters" query:"filters"`
-	Includes []string               `json:"includes" query:"includes"`
-	Sorts    []string               `json:"sorts" query:"sorts"`
+	ID        database.PID   `json:"id" query:"id"`
+	IDs       []database.PID `json:"ids" query:"ids"`
+	SearchKey string         `json:"search_key" query:"search_key"`
+	Search    string         `json:"search" query:"search"`
+	Limit     int            `json:"limit" query:"limit"`
+	Offset    int            `json:"offset" query:"offset"`
+	Page      int            `json:"page" query:"page"`
+	Includes  []string       `json:"includes" query:"includes"`
+	Sorts     []string       `json:"sorts" query:"sorts"`
+	Filters   map[string]interface{} `json:"filters" query:"filters"`
 }
-
 func (request *FetchRequest) PrepareQuery(query *gorm.DB) *gorm.DB {
 	var (
-		search  = request.Search
-		ids     = request.IDs
-		filters = request.Filters
-		sorts   = request.Sorts
+		search = request.Search
+		ids    = request.IDs
+		sorts  = request.Sorts
 	)
-
-	for key, value := range filters {
-		switch v := value.(type) {
-		case string:
-			query = query.Where(fmt.Sprintf("%s = ?", key), v)
-		case []string:
-			query = query.Where(fmt.Sprintf("%s IN (?)", key), v)
-		default:
-			fmt.Printf("Unexpected type for key %s: %T\n", key, v)
+	if request.Filters != nil {
+		for key, value := range request.Filters {
+			query = query.Where(key, value)
 		}
+	}
+
+	if request.ID.IsValid() {
+		ids = append(ids, request.ID)
 	}
 
 	if len(ids) > 0 {
 		query = query.Where("id in (?)", ids)
 	}
 
-	if search != "" {
+	if search != "" && request.SearchKey != "" {
 		searchStr := "%" + search + "%"
-		query = query.Where("name like ? ", searchStr)
+		query = query.Where("? like ? ", request.SearchKey, searchStr)
 	}
 
 	for _, sort := range sorts {

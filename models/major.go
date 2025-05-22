@@ -10,3 +10,13 @@ type Major struct {
 	Description string    `json:"description,omitempty"`
 	Students    []Student `gorm:"foreignKey:MajorID;constraint:OnDelete:CASCADE;" json:"students,omitempty"`
 }
+
+type FetchMajorRequest struct {
+	FetchRequest
+}
+
+func MajorAcceptIncludes() []string {
+	return []string{
+		"Students",
+	}
+}
