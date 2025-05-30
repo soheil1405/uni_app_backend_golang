@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"uni_app/models"
 	"uni_app/pkg/gallery/usecase"
-	"uni_app/pkg/model"
 	"uni_app/utils/ctxHelper"
 	"uni_app/utils/helpers"
 
@@ -29,7 +29,7 @@ func NewGalleryHandler(galleryUsecase usecase.GalleryUsecase, e echo.Group) {
 }
 
 func (h *GalleryHandler) CreateGallery(c echo.Context) error {
-	var gallery model.Gallery
+	var gallery models.Gallery
 	if err := c.Bind(&gallery); err != nil {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
@@ -56,7 +56,7 @@ func (h *GalleryHandler) GetGalleryByID(c echo.Context) error {
 }
 
 func (h *GalleryHandler) UpdateGallery(c echo.Context) error {
-	var gallery model.Gallery
+	var gallery models.Gallery
 	if err := c.Bind(&gallery); err != nil {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
@@ -65,7 +65,7 @@ func (h *GalleryHandler) UpdateGallery(c echo.Context) error {
 	if err != nil {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-	gallery.ID = uint(ID)
+	gallery.ID = ID
 
 	if err := h.galleryUsecase.UpdateGallery(c.Request().Context(), &gallery); err != nil {
 		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
