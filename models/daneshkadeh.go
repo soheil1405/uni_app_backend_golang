@@ -18,6 +18,7 @@ type DaneshKadeh struct {
 	DaneshKadehType   *DaneshKadehType `gorm:"auto_preload:false;foreignKey:DaneshKadehTypeID;constraint:OnDelete:SET NULL;" json:"daneshkadeh_type,omitempty"`
 	UserRoles         []*UserRole      `gorm:"auto_preload:false;foreignKey:DaneshKadehID;constraint:OnDelete:CASCADE;" json:"user_roles,omitempty"`
 	MajorsCharts      MajorsCharts     `json:"majors_charts,omitempty" gorm:"foreignKey:DaneshKadehID;constraint:OnDelete:CASCADE;"`
+	Ratings           []Rating         `json:"ratings,omitempty" gorm:"polymorphic:Owner;polymorphicValue:daneshkadeh"`
 }
 
 type FetchDaneshKadehRequest struct {
@@ -43,5 +44,6 @@ func DaneshKadehAcceptIncludes() []string {
 		"DaneshKadehType",
 		"UserRoles",
 		"MajorsCharts",
+		"Ratings",
 	}
 }

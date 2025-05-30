@@ -20,6 +20,7 @@ type Uni struct {
 	Students        []Student     `gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;" json:"students,omitempty"`
 	DaneshKadeha    []DaneshKadeh `gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;" json:"daneshkadeha,omitempty"`
 	UserRoles       []*UserRole   `json:"user_roles,omitempty"`
+	Ratings         []Rating      `json:"ratings,omitempty" gorm:"polymorphic:Owner;polymorphicValue:uni"`
 }
 
 type FetchUniRequest struct {
@@ -38,5 +39,6 @@ func UniAcceptIncludes() []string {
 		"Students",
 		"DaneshKadeha",
 		"UserRoles",
+		"Ratings",
 	}
 }

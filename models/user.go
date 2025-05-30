@@ -34,7 +34,9 @@ type User struct {
 	Token         Token         `json:"token,omitempty" gorm:"polymorphic:Owner;"`
 	Status        UserStatus    `gorm:"default:'active'" json:"status,omitempty"`
 	UserRoles     []*UserRole   `json:"user_roles,omitempty"`
+	Ratings       []Rating      `json:"ratings,omitempty" gorm:"foreignKey:UserID"`
 }
+
 type FetchUserRequest struct {
 	FetchRequest
 	DegreeLevel   DegreeLevel `json:"degree_level_id,omitempty"`
@@ -46,6 +48,7 @@ type FetchUserRequest struct {
 	Number        string      `json:"number,omitempty"`
 	PersonalCode  string      `json:"personal_code,omitempty"`
 }
+
 type UserRegisterRequest struct {
 	UserName      string      `json:"username,omitempty"`
 	FirstName     string      `json:"first_name,omitempty"`
@@ -73,5 +76,6 @@ func UserAcceptIncludes() []string {
 		"NominatedBy",
 		"Token",
 		"UserRoles",
+		"Ratings",
 	}
 }

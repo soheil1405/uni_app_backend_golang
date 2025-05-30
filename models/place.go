@@ -12,6 +12,7 @@ type Place struct {
 	PlaceType   *PlaceType   `gorm:"foreignKey:PlaceTypeID" json:"place_type"`
 	AddressID   database.PID `gorm:"not null" json:"address_id"`
 	Address     *Address     `gorm:"foreignKey:AddressID" json:"address"`
+	Ratings     []Rating     `json:"ratings,omitempty" gorm:"polymorphic:Owner;polymorphicValue:place"`
 }
 
 type FetchPlaceRequest struct {
@@ -24,5 +25,6 @@ func PlaceAcceptIncludes() []string {
 	return []string{
 		"City",
 		"PlaceType",
+		"Ratings",
 	}
 }
