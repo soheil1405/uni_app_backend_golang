@@ -6,6 +6,7 @@ import (
 	"uni_app/models"
 	usecase "uni_app/pkg/uni_major/usecase"
 	"uni_app/utils/ctxHelper"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,12 +29,12 @@ func NewUniMajorHandler(usecase usecase.UniMajorUsecase, e echo.Group) {
 func (h *UniMajorHandler) CreateUniMajor(c echo.Context) error {
 	var uniMajor models.UniMajor
 	if err := c.Bind(&uniMajor); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	if err := h.usecase.CreateUniMajor(&uniMajor); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusCreated, uniMajor)
+	return helpers.Reply(c, http.StatusCreated, nil, map[string]interface{}{"uni_major": uniMajor}, nil)
 }
 
 func (h *UniMajorHandler) GetUniMajorByID(c echo.Context) error {
@@ -42,49 +43,46 @@ func (h *UniMajorHandler) GetUniMajorByID(c echo.Context) error {
 		err error
 	)
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	uniMajor, err := h.usecase.GetUniMajorByID(c, ID, false)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusNotFound, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, uniMajor)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"uni_major": uniMajor}, nil)
 }
 
 func (h *UniMajorHandler) UpdateUniMajor(c echo.Context) (err error) {
 	var uniMajor models.UniMajor
 	if uniMajor.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	if err := h.usecase.UpdateUniMajor(&uniMajor); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, uniMajor)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"uni_major": uniMajor}, nil)
 }
 
 func (h *UniMajorHandler) DeleteUniMajor(c echo.Context) error {
 	ID, err := ctxHelper.GetIDFromContxt(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 
 	if err := h.usecase.DeleteUniMajor(ID); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, map[string]string{"message": "UniMajor deleted"})
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"message": "UniMajor deleted"}, nil)
 }
 
 func (h *UniMajorHandler) GetAllUniMajors(c echo.Context) error {
 	var request models.FetchUniMajorRequest
 	if err := c.Bind(&request); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	uniMajors, paginate, err := h.usecase.GetAllUniMajors(c, request)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"uni_majors": uniMajors,
-		"meta":       paginate,
-	})
-} 
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"uni_majors": uniMajors}, paginate)
+}

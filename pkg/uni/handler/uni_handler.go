@@ -1,103 +1,88 @@
-package handlers
+package handler
 
 import (
 	"net/http"
 	"uni_app/database"
 	"uni_app/models"
-	usecases "uni_app/pkg/uni/usecase"
+	usecase "uni_app/pkg/uni/usecase"
 	"uni_app/utils/ctxHelper"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
 
 type UniHandler struct {
-	usecase usecases.UniUsecase
+	usecase usecase.UniUsecase
 }
 
-func NewUniHandler(usecase usecases.UniUsecase, e echo.Group) {
+func NewUniHandler(usecase usecase.UniUsecase, e echo.Group) {
 	uniHandler := &UniHandler{usecase}
 
-	uniRouteGroup := e.Group("/unis")
-	uniRouteGroup.POST("", uniHandler.CreateUni)
-	uniRouteGroup.GET("/:id", uniHandler.GetUniByID)
-	uniRouteGroup.PUT("/:id", uniHandler.UpdateUni)
-	uniRouteGroup.DELETE("/:id", uniHandler.DeleteUni)
-	uniRouteGroup.GET("", uniHandler.GetAllUnis)
+	unisRouteGroup := e.Group("/unis")
+	unisRouteGroup.POST("", uniHandler.CreateUni)
+	unisRouteGroup.GET("/:id", uniHandler.GetUniByID)
+	unisRouteGroup.PUT("/:id", uniHandler.UpdateUni)
+	unisRouteGroup.DELETE("/:id", uniHandler.DeleteUni)
+	unisRouteGroup.GET("", uniHandler.GetAllUnis)
 }
 
 func (h *UniHandler) CreateUni(c echo.Context) error {
 	var uni models.Uni
 	if err := c.Bind(&uni); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	if err := h.usecase.CreateUni(&uni); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusCreated, uni)
+	return helpers.Reply(c, http.StatusCreated, nil, map[string]interface{}{"uni": uni}, nil)
 }
 
 func (h *UniHandler) GetUniByID(c echo.Context) error {
 	var (
-		err error
 		ID  database.PID
+		err error
 	)
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-
 	uni, err := h.usecase.GetUniByID(c, ID, false)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusNotFound, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, uni)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"uni": uni}, nil)
 }
 
-func (h *UniHandler) UpdateUni(c echo.Context) error {
-	var (
-		err error
-		ID  database.PID
-		uni models.Uni
-	)
-	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+func (h *UniHandler) UpdateUni(c echo.Context) (err error) {
+	var uni models.Uni
+	if uni.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-
-	if err := c.Bind(&uni); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
-	}
-	uni.ID = ID
 	if err := h.usecase.UpdateUni(&uni); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, uni)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"uni": uni}, nil)
 }
 
 func (h *UniHandler) DeleteUni(c echo.Context) error {
-	var (
-		err error
-		ID  database.PID
-	)
-	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	ID, err := ctxHelper.GetIDFromContxt(c)
+	if err != nil {
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 
 	if err := h.usecase.DeleteUni(ID); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, map[string]string{"message": "Uni deleted"})
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"message": "Uni deleted"}, nil)
 }
 
 func (h *UniHandler) GetAllUnis(c echo.Context) error {
 	var request models.FetchUniRequest
 	if err := c.Bind(&request); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	unis, paginate, err := h.usecase.GetAllUnis(c, request)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"unis": unis,
-		"meta": paginate,
-	})
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"unis": unis}, paginate)
 }

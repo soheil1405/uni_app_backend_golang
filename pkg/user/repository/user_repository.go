@@ -15,7 +15,7 @@ type UserRepository interface {
 	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.User, error)
 	Update(user *models.User) error
 	Delete(ID database.PID) error
-	GetAll(ctx echo.Context, request models.FetchRequest) ([]models.User, *helpers.PaginateTemplate, error)
+	GetAll(ctx echo.Context, request models.FetchUserRequest) ([]models.User, *helpers.PaginateTemplate, error)
 	GetByUsername(username string) (*models.User, error)
 	GetByEmail(email string) (*models.User, error)
 	GetByTeacherCode(teacherCode string) (*models.User, error)
@@ -49,9 +49,30 @@ func (r *userRepository) Delete(ID database.PID) error {
 	return r.db.Delete(&models.User{}, ID).Error
 }
 
-func (r *userRepository) GetAll(ctx echo.Context, request models.FetchRequest) ([]models.User, *helpers.PaginateTemplate, error) {
+func (r *userRepository) GetAll(ctx echo.Context, request models.FetchUserRequest) ([]models.User, *helpers.PaginateTemplate, error) {
 	var users []models.User
 	query := r.db.Model(&models.User{})
+	if request.DegreeLevel != "" {
+		query = query.Where("degree_level = ?", request.DegreeLevel)
+	}
+	if request.DegreeMajorID != 0 {
+		query = query.Where("degree_major_id = ?", request.DegreeMajorID)
+	}
+	if request.DegreeUniID != 0 {
+		query = query.Where("degree_uni_id = ?", request.DegreeUniID)
+	}
+	if request.NationalCode != "" {
+		query = query.Where("national_code = ?", request.NationalCode)
+	}
+	if request.Email != "" {
+		query = query.Where("email = ?", request.Email)
+	}
+	if request.Number != "" {
+		query = query.Where("number = ?", request.Number)
+	}
+	if request.PersonalCode != "" {
+		query = query.Where("personal_code = ?", request.PersonalCode)
+	}
 
 	// Apply pagination
 	paginate := helpers.NewPaginateTemplate(request.Page, request.Limit)

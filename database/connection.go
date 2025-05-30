@@ -28,5 +28,6 @@ func Connection(dbCfg *Database) (*gorm.DB, error) {
 		return nil, err
 	}
 	db = db.Debug()
+	fmt.Println("Connected to database :", dsn)
 	return db, nil
 }

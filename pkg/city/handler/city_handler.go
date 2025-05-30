@@ -6,6 +6,7 @@ import (
 	"uni_app/models"
 	usecase "uni_app/pkg/city/usecase"
 	"uni_app/utils/ctxHelper"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -28,12 +29,12 @@ func NewCityHandler(usecase usecase.CityUsecase, e echo.Group) {
 func (h *CityHandler) CreateCity(c echo.Context) error {
 	var city models.City
 	if err := c.Bind(&city); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	if err := h.usecase.CreateCity(&city); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusCreated, city)
+	return helpers.Reply(c, http.StatusCreated, nil, map[string]interface{}{"city": city}, nil)
 }
 
 func (h *CityHandler) GetCityByID(c echo.Context) error {
@@ -42,49 +43,46 @@ func (h *CityHandler) GetCityByID(c echo.Context) error {
 		err error
 	)
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	city, err := h.usecase.GetCityByID(c, ID, false)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusNotFound, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, city)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"city": city}, nil)
 }
 
 func (h *CityHandler) UpdateCity(c echo.Context) (err error) {
 	var city models.City
 	if city.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	if err := h.usecase.UpdateCity(&city); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, city)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"city": city}, nil)
 }
 
 func (h *CityHandler) DeleteCity(c echo.Context) error {
 	ID, err := ctxHelper.GetIDFromContxt(c)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 
 	if err := h.usecase.DeleteCity(ID); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, map[string]string{"message": "City deleted"})
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"message": "City deleted"}, nil)
 }
 
 func (h *CityHandler) GetAllCities(c echo.Context) error {
 	var request models.FetchCityRequest
 	if err := c.Bind(&request); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	cities, paginate, err := h.usecase.GetAllCities(c, request)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"cities": cities,
-		"meta":   paginate,
-	})
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"cities": cities}, paginate)
 }

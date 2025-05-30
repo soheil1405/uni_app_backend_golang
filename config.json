@@ -64,8 +64,8 @@
     },
     "database":{
         "host": "localhost",
-        "port": 11031,
-        "user": "sika_user",
+        "port": 21432,
+        "user": "soheil",
         "pass": "postgres",
         "name": "local",
         "sslmode": "disable"

@@ -60,7 +60,11 @@ func (m *GoMiddleware) SkipSetContext(skipper func(echo.Context) bool) echo.Midd
 }
 
 func RegisterSkipper(ctx echo.Context) bool {
-	if strings.Contains(ctx.Path(), "/api/v1/auth/login") || callbackRegexp.MatchString(ctx.Path()) {
+	if strings.Contains(ctx.Path(), "/api/v1/users/register") ||
+		strings.Contains(ctx.Path(), "/api/v1/users/login") ||
+		strings.Contains(ctx.Path(), "/api/v1/unis") ||
+		strings.Contains(ctx.Path(), "/api/v1/majors") ||
+		callbackRegexp.MatchString(ctx.Path()) {
 		return true
 	}
 	return false

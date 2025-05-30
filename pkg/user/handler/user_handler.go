@@ -6,6 +6,7 @@ import (
 	"uni_app/models"
 	usecases "uni_app/pkg/user/usecase"
 	"uni_app/utils/ctxHelper"
+	"uni_app/utils/helpers"
 
 	"github.com/labstack/echo/v4"
 )
@@ -33,12 +34,12 @@ func NewUserHandler(usecase usecases.UserUsecase, e echo.Group) {
 func (h *UserHandler) CreateUser(c echo.Context) error {
 	var user models.User
 	if err := c.Bind(&user); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	if err := h.usecase.CreateUser(&user); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusCreated, user)
+	return helpers.Reply(c, http.StatusCreated, nil, map[string]interface{}{"user": user}, nil)
 }
 
 func (h *UserHandler) GetUserByID(c echo.Context) error {
@@ -47,13 +48,13 @@ func (h *UserHandler) GetUserByID(c echo.Context) error {
 		err error
 	)
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	user, err := h.usecase.GetUserByID(c, ID, false)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusNotFound, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, user)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"user": user}, nil)
 }
 
 func (h *UserHandler) UpdateUser(c echo.Context) error {
@@ -62,15 +63,15 @@ func (h *UserHandler) UpdateUser(c echo.Context) error {
 		err  error
 	)
 	if err := c.Bind(&user); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	if user.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	if err := h.usecase.UpdateUser(&user); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, user)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"user": user}, nil)
 }
 
 func (h *UserHandler) DeleteUser(c echo.Context) error {
@@ -79,38 +80,35 @@ func (h *UserHandler) DeleteUser(c echo.Context) error {
 		err error
 	)
 	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	if err := h.usecase.DeleteUser(ID); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.NoContent(http.StatusNoContent)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"message": "User deleted"}, nil)
 }
 
 func (h *UserHandler) GetAllUsers(c echo.Context) error {
-	var request models.FetchRequest
+	var request models.FetchUserRequest
 	if err := c.Bind(&request); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	users, paginate, err := h.usecase.GetAllUsers(c, request)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"users": users,
-		"meta":  paginate,
-	})
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"users": users}, paginate)
 }
 
 func (h *UserHandler) RegisterUser(c echo.Context) error {
-	var user models.User
-	if err := c.Bind(&user); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	var request models.UserRegisterRequest
+	if err := c.Bind(&request); err != nil {
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-	if err := h.usecase.RegisterUser(&user); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	if err := h.usecase.RegisterUser(c, &request); err != nil {
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-	return c.JSON(http.StatusCreated, user)
+	return helpers.Reply(c, http.StatusCreated, nil, map[string]interface{}{"user": request}, nil)
 }
 
 func (h *UserHandler) LoginUser(c echo.Context) error {
@@ -119,11 +117,11 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 		Password string `json:"password"`
 	}
 	if err := c.Bind(&loginRequest); err != nil {
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 	user, err := h.usecase.LoginUser(loginRequest.Username, loginRequest.Password)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{"error": err.Error()})
+		return helpers.Reply(c, http.StatusUnauthorized, err, nil, nil)
 	}
-	return c.JSON(http.StatusOK, user)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"user": user}, nil)
 }

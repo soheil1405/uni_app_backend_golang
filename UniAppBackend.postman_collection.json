@@ -1,0 +1,1020 @@
+{
+  "info": {
+    "_postman_id": "uni-app-backend-collection",
+    "name": "UniApp Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for UniApp Backend API. Uses {{base_url}} as the base URL."
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080" }
+  ],
+  "item": [
+    {
+      "name": "uni_app",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Register User",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{base_url}}/users/register", "host": ["{{base_url}}"], "path": ["users", "register"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\",\n  \"email\": \"test@example.com\",\n  \"first_name\": \"Test\",\n  \"last_name\": \"User\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Login User",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{base_url}}/users/login", "host": ["{{base_url}}"], "path": ["users", "login"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"password123\"\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Users",
+          "item": [
+            {
+              "name": "Create User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/users", "host": ["{{base_url}}"], "path": ["users"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"newuser\",\n  \"password\": \"password123\",\n  \"email\": \"new@example.com\",\n  \"first_name\": \"New\",\n  \"last_name\": \"User\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get User By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/users/1", "host": ["{{base_url}}"], "path": ["users", "1"] }
+              }
+            },
+            {
+              "name": "Update User",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/users/1", "host": ["{{base_url}}"], "path": ["users", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"updated@example.com\",\n  \"first_name\": \"Updated\",\n  \"last_name\": \"User\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete User",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/users/1", "host": ["{{base_url}}"], "path": ["users", "1"] }
+              }
+            },
+            {
+              "name": "Get All Users",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/users?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["users"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Addresses",
+          "item": [
+            {
+              "name": "Create Address",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/addresses", "host": ["{{base_url}}"], "path": ["addresses"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"street\": \"123 Main St\",\n  \"city_id\": 1,\n  \"postal_code\": \"12345\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Address By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/addresses/1", "host": ["{{base_url}}"], "path": ["addresses", "1"] }
+              }
+            },
+            {
+              "name": "Update Address",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/addresses/1", "host": ["{{base_url}}"], "path": ["addresses", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"street\": \"456 Updated St\",\n  \"city_id\": 2,\n  \"postal_code\": \"54321\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Address",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/addresses/1", "host": ["{{base_url}}"], "path": ["addresses", "1"] }
+              }
+            },
+            {
+              "name": "Get All Addresses",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/addresses?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["addresses"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cities",
+          "item": [
+            {
+              "name": "Create City",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/cities", "host": ["{{base_url}}"], "path": ["cities"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Tehran\",\n  \"province\": \"Tehran\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get City By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/cities/1", "host": ["{{base_url}}"], "path": ["cities", "1"] }
+              }
+            },
+            {
+              "name": "Update City",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/cities/1", "host": ["{{base_url}}"], "path": ["cities", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated City\",\n  \"province\": \"Updated Province\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete City",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/cities/1", "host": ["{{base_url}}"], "path": ["cities", "1"] }
+              }
+            },
+            {
+              "name": "Get All Cities",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/cities?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["cities"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "DaneshKadehs",
+          "item": [
+            {
+              "name": "Create DaneshKadeh",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/daneshkadehs", "host": ["{{base_url}}"], "path": ["daneshkadehs"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Engineering Faculty\",\n  \"uni_id\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "Get DaneshKadeh By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/daneshkadehs/1", "host": ["{{base_url}}"], "path": ["daneshkadehs", "1"] }
+              }
+            },
+            {
+              "name": "Update DaneshKadeh",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/daneshkadehs/1", "host": ["{{base_url}}"], "path": ["daneshkadehs", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Faculty\",\n  \"uni_id\": 2\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete DaneshKadeh",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/daneshkadehs/1", "host": ["{{base_url}}"], "path": ["daneshkadehs", "1"] }
+              }
+            },
+            {
+              "name": "Get All DaneshKadehs",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/daneshkadehs?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["daneshkadehs"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Degrees",
+          "item": [
+            {
+              "name": "Create Degree",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/degrees", "host": ["{{base_url}}"], "path": ["degrees"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Bachelor\",\n  \"level\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Degree By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/degrees/1", "host": ["{{base_url}}"], "path": ["degrees", "1"] }
+              }
+            },
+            {
+              "name": "Update Degree",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/degrees/1", "host": ["{{base_url}}"], "path": ["degrees", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Master\",\n  \"level\": 2\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Degree",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/degrees/1", "host": ["{{base_url}}"], "path": ["degrees", "1"] }
+              }
+            },
+            {
+              "name": "Get All Degrees",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/degrees", "host": ["{{base_url}}"], "path": ["degrees"] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lessons",
+          "item": [
+            {
+              "name": "Create Lesson",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/lessons", "host": ["{{base_url}}"], "path": ["lessons"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Mathematics\",\n  \"code\": \"MATH101\",\n  \"credits\": 3\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Lesson By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/lessons/1", "host": ["{{base_url}}"], "path": ["lessons", "1"] }
+              }
+            },
+            {
+              "name": "Update Lesson",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/lessons/1", "host": ["{{base_url}}"], "path": ["lessons", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Advanced Mathematics\",\n  \"code\": \"MATH201\",\n  \"credits\": 4\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Lesson",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/lessons/1", "host": ["{{base_url}}"], "path": ["lessons", "1"] }
+              }
+            },
+            {
+              "name": "Get All Lessons",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/lessons", "host": ["{{base_url}}"], "path": ["lessons"] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Majors",
+          "item": [
+            {
+              "name": "Create Major",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/majors", "host": ["{{base_url}}"], "path": ["majors"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Computer Science\",\n  \"code\": \"CS\",\n  \"daneshkadeh_id\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Major By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/majors/1", "host": ["{{base_url}}"], "path": ["majors", "1"] }
+              }
+            },
+            {
+              "name": "Update Major",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/majors/1", "host": ["{{base_url}}"], "path": ["majors", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Software Engineering\",\n  \"code\": \"SE\",\n  \"daneshkadeh_id\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Major",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/majors/1", "host": ["{{base_url}}"], "path": ["majors", "1"] }
+              }
+            },
+            {
+              "name": "Get All Majors",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/majors?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["majors"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Major Charts",
+          "item": [
+            {
+              "name": "Create Major Chart",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/charts", "host": ["{{base_url}}"], "path": ["charts"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"major_id\": 1,\n  \"year\": 2024,\n  \"capacity\": 100\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Major Chart By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/charts/1", "host": ["{{base_url}}"], "path": ["charts", "1"] }
+              }
+            },
+            {
+              "name": "Update Major Chart",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/charts/1", "host": ["{{base_url}}"], "path": ["charts", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"major_id\": 1,\n  \"year\": 2024,\n  \"capacity\": 150\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Major Chart",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/charts/1", "host": ["{{base_url}}"], "path": ["charts", "1"] }
+              }
+            },
+            {
+              "name": "Get All Major Charts",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/charts", "host": ["{{base_url}}"], "path": ["charts"] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Major Lessons",
+          "item": [
+            {
+              "name": "Create Major Lesson",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/major-lessons", "host": ["{{base_url}}"], "path": ["major-lessons"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"major_id\": 1,\n  \"lesson_id\": 1,\n  \"semester\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Major Lesson By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/major-lessons/1", "host": ["{{base_url}}"], "path": ["major-lessons", "1"] }
+              }
+            },
+            {
+              "name": "Update Major Lesson",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/major-lessons/1", "host": ["{{base_url}}"], "path": ["major-lessons", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"major_id\": 1,\n  \"lesson_id\": 1,\n  \"semester\": 2\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Major Lesson",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/major-lessons/1", "host": ["{{base_url}}"], "path": ["major-lessons", "1"] }
+              }
+            },
+            {
+              "name": "Get All Major Lessons",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/major-lessons?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["major-lessons"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Place Types",
+          "item": [
+            {
+              "name": "Create Place Type",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/place-types", "host": ["{{base_url}}"], "path": ["place-types"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Classroom\",\n  \"description\": \"Regular classroom\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Place Type By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/place-types/1", "host": ["{{base_url}}"], "path": ["place-types", "1"] }
+              }
+            },
+            {
+              "name": "Update Place Type",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/place-types/1", "host": ["{{base_url}}"], "path": ["place-types", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Laboratory\",\n  \"description\": \"Science laboratory\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Place Type",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/place-types/1", "host": ["{{base_url}}"], "path": ["place-types", "1"] }
+              }
+            },
+            {
+              "name": "Get All Place Types",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/place-types", "host": ["{{base_url}}"], "path": ["place-types"] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Roles",
+          "item": [
+            {
+              "name": "Create Role",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/roles", "host": ["{{base_url}}"], "path": ["roles"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Student\",\n  \"description\": \"Student role\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Role By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/roles/1", "host": ["{{base_url}}"], "path": ["roles", "1"] }
+              }
+            },
+            {
+              "name": "Update Role",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/roles/1", "host": ["{{base_url}}"], "path": ["roles", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Role\",\n  \"description\": \"Updated role description\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Role",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/roles/1", "host": ["{{base_url}}"], "path": ["roles", "1"] }
+              }
+            },
+            {
+              "name": "Get All Roles",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/roles?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["roles"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Routes",
+          "item": [
+            {
+              "name": "Create Route",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/routes", "host": ["{{base_url}}"], "path": ["routes"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"GET /users\",\n  \"method\": \"GET\",\n  \"path\": \"/users\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Route By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/routes/1", "host": ["{{base_url}}"], "path": ["routes", "1"] }
+              }
+            },
+            {
+              "name": "Update Route",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/routes/1", "host": ["{{base_url}}"], "path": ["routes", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Route\",\n  \"method\": \"POST\",\n  \"path\": \"/users/new\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Route",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/routes/1", "host": ["{{base_url}}"], "path": ["routes", "1"] }
+              }
+            },
+            {
+              "name": "Get All Routes",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/routes?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["routes"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Universities",
+          "item": [
+            {
+              "name": "Create University",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/unis", "host": ["{{base_url}}"], "path": ["unis"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Tehran University\",\n  \"address_id\": 1,\n  \"type\": \"public\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get University By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/unis/1", "host": ["{{base_url}}"], "path": ["unis", "1"] }
+              }
+            },
+            {
+              "name": "Update University",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/unis/1", "host": ["{{base_url}}"], "path": ["unis", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated University\",\n  \"address_id\": 2,\n  \"type\": \"private\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete University",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/unis/1", "host": ["{{base_url}}"], "path": ["unis", "1"] }
+              }
+            },
+            {
+              "name": "Get All Universities",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/unis?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["unis"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "University Majors",
+          "item": [
+            {
+              "name": "Create University Major",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/uni-majors", "host": ["{{base_url}}"], "path": ["uni-majors"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uni_id\": 1,\n  \"major_id\": 1,\n  \"degree_id\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "Get University Major By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/uni-majors/1", "host": ["{{base_url}}"], "path": ["uni-majors", "1"] }
+              }
+            },
+            {
+              "name": "Update University Major",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/uni-majors/1", "host": ["{{base_url}}"], "path": ["uni-majors", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"uni_id\": 2,\n  \"major_id\": 2,\n  \"degree_id\": 2\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete University Major",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/uni-majors/1", "host": ["{{base_url}}"], "path": ["uni-majors", "1"] }
+              }
+            },
+            {
+              "name": "Get All University Majors",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/uni-majors?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["uni-majors"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "User Roles",
+          "item": [
+            {
+              "name": "Create User Role",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/user-roles", "host": ["{{base_url}}"], "path": ["user-roles"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"user_id\": 1,\n  \"role_id\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "Get User Role By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/user-roles/1", "host": ["{{base_url}}"], "path": ["user-roles", "1"] }
+              }
+            },
+            {
+              "name": "Update User Role",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/user-roles/1", "host": ["{{base_url}}"], "path": ["user-roles", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"user_id\": 1,\n  \"role_id\": 2\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete User Role",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/user-roles/1", "host": ["{{base_url}}"], "path": ["user-roles", "1"] }
+              }
+            },
+            {
+              "name": "Get All User Roles",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/user-roles?page=1&limit=10",
+                  "host": ["{{base_url}}"],
+                  "path": ["user-roles"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+} 

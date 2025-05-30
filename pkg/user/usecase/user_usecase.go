@@ -19,8 +19,8 @@ type UserUsecase interface {
 	GetUserByID(ctx echo.Context, ID database.PID, useCache bool) (*models.User, error)
 	UpdateUser(user *models.User) error
 	DeleteUser(ID database.PID) error
-	GetAllUsers(ctx echo.Context, request models.FetchRequest) ([]models.User, *helpers.PaginateTemplate, error)
-	RegisterUser(user *models.User) error
+	GetAllUsers(ctx echo.Context, request models.FetchUserRequest) ([]models.User, *helpers.PaginateTemplate, error)
+	RegisterUser(ctx echo.Context, request *models.UserRegisterRequest) error
 	LoginUser(username, password string) (*models.User, error)
 	ValidateToken(token string) (*models.User, error)
 }
@@ -50,63 +50,79 @@ func (u *userUsecase) DeleteUser(ID database.PID) error {
 	return u.repo.Delete(ID)
 }
 
-func (u *userUsecase) GetAllUsers(ctx echo.Context, request models.FetchRequest) ([]models.User, *helpers.PaginateTemplate, error) {
+func (u *userUsecase) GetAllUsers(ctx echo.Context, request models.FetchUserRequest) ([]models.User, *helpers.PaginateTemplate, error) {
 	return u.repo.GetAll(ctx, request)
 }
 
-func (u *userUsecase) RegisterUser(user *models.User) error {
+func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegisterRequest) error {
 	// Validate required fields
-	if user.UserName == "" {
+	if request.UserName == "" {
 		return errors.New("username is required")
 	}
-	if user.Email == "" {
+	if request.Email == "" {
 		return errors.New("email is required")
 	}
-	if user.Password == "" {
+	if request.Password == "" {
 		return errors.New("password is required")
 	}
-	if user.TeacherCode == "" {
-		return errors.New("teacher code is required")
+	fetchRequest := models.FetchUserRequest{
+		DegreeLevel:   request.DegreeLevel,
+		DegreeMajorID: request.DegreeMajorID,
+		DegreeUniID:   request.DegreeUniID,
+		NationalCode:  request.NationalCode,
+		Email:         request.Email,
+		Number:        request.Number,
+		PersonalCode:  request.PersonalCode,
+		FetchRequest: models.FetchRequest{
+			Limit:  1,
+			Offset: 0,
+		},
 	}
-
-	// Check if username already exists
-	existingUser, err := u.repo.GetByUsername(user.UserName)
-	if err != nil {
-		return err
-	}
-	if existingUser != nil {
+	existingUser, _, err := u.repo.GetAll(ctx, fetchRequest)
+	if err != nil || len(existingUser) > 0 {
 		return errors.New("username already exists")
 	}
 
-	// Check if email already exists
-	existingUser, err = u.repo.GetByEmail(user.Email)
-	if err != nil {
-		return err
-	}
-	if existingUser != nil {
-		return errors.New("email already exists")
-	}
-
-	// Check if teacher code already exists
-	existingUser, err = u.repo.GetByTeacherCode(user.TeacherCode)
-	if err != nil {
-		return err
-	}
-	if existingUser != nil {
-		return errors.New("teacher code already exists")
+	user := &models.User{
+		UserName:      request.UserName,
+		Email:         request.Email,
+		Status:        models.USER_STATUS_ACTIVE,
+		FirstName:     request.FirstName,
+		LastName:      request.LastName,
+		Number:        request.Number,
+		PersonalCode:  request.PersonalCode,
+		DegreeLevel:   request.DegreeLevel,
+		DegreeMajorID: request.DegreeMajorID,
 	}
 
 	// Hash password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 	user.Password = string(hashedPassword)
-
-	// Set default status
 	user.Status = models.USER_STATUS_ACTIVE
+	if err := u.repo.Create(user); err != nil {
+		return err
+	}
 
-	return u.repo.Create(user)
+	// Generate JWT token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": user.ID,
+		// "role":    user.,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	// Sign the token with the secret key
+	tokenString, err := token.SignedString([]byte(u.config.GetString("JWT_SECRET")))
+	if err != nil {
+		return err
+	}
+
+	// Set the token in the user object
+	user.Token.TokenKey = tokenString
+
+	return nil
 }
 
 func (u *userUsecase) LoginUser(username, password string) (*models.User, error) {
