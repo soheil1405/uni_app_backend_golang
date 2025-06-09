@@ -1,7 +1,10 @@
 package models
 
 import (
+	"encoding/json"
 	"uni_app/database"
+
+	"gorm.io/gorm"
 )
 
 type Roles []Role
@@ -10,11 +13,27 @@ type Roles []Role
 
 type Role struct {
 	database.Model
-	Name        string      `gorm:"not null" json:"name"`
-	Priority    int         `gorm:"not null;unique;" json:"priority"`
-	Description string      `json:"description,omitempty"`
-	Meta        string      `gorm:"type:json" json:"meta,omitempty"`
-	UserRoles   []*UserRole `json:"user_roles,omitempty"`
+	Name        string          `gorm:"not null" json:"name"`
+	Priority    int             `gorm:"not null;unique;" json:"priority"`
+	Description string          `json:"description,omitempty"`
+	Meta        json.RawMessage `gorm:"type:json" json:"meta,omitempty"`
+	UserRoles   []*UserRole     `json:"user_roles,omitempty"`
+}
+
+func (role *Role) BeforeCreate(tx *gorm.DB) (err error) {
+	var maxPriority *int
+	if err := tx.Model(&Role{}).Select("MAX(priority)").Scan(&maxPriority).Error; err != nil {
+		return err
+	}
+
+	if role.Priority == 0 {
+		if maxPriority == nil {
+			role.Priority = 1
+		} else {
+			role.Priority = *maxPriority + 1
+		}
+	}
+	return
 }
 
 func (roles Roles) GetMainRole() (role *Role) {

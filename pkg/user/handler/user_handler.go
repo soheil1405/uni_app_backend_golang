@@ -19,12 +19,11 @@ func NewUserHandler(usecase usecases.UserUsecase, e echo.Group) {
 	userHandler := &UserHandler{usecase}
 
 	// Public routes
-	e.POST("/users/register", userHandler.RegisterUser)
-	e.POST("/users/login", userHandler.LoginUser)
-
 	// Protected routes
 	users := e.Group("/users")
 	users.POST("", userHandler.CreateUser)
+	users.POST("/register", userHandler.RegisterUser)
+	users.POST("/login", userHandler.LoginUser)
 	users.GET("/:id", userHandler.GetUserByID)
 	users.PUT("/:id", userHandler.UpdateUser)
 	users.DELETE("/:id", userHandler.DeleteUser)
@@ -105,6 +104,11 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 	if err := c.Bind(&request); err != nil {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
+
+	if err := request.IsValid(); err != nil {
+		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
+	}
+
 	if err := h.usecase.RegisterUser(c, &request); err != nil {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}

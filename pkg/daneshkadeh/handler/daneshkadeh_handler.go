@@ -18,12 +18,12 @@ type DaneshKadehHandler struct {
 func NewDaneshKadehHandler(usecase usecase.DaneshKadehUsecase, e echo.Group) {
 	daneshKadehHandler := &DaneshKadehHandler{usecase}
 
-	daneshKadehsRouteGroup := e.Group("/daneshkadehs")
-	daneshKadehsRouteGroup.POST("", daneshKadehHandler.CreateDaneshKadeh)
-	daneshKadehsRouteGroup.GET("/:id", daneshKadehHandler.GetDaneshKadehByID)
-	daneshKadehsRouteGroup.PUT("/:id", daneshKadehHandler.UpdateDaneshKadeh)
-	daneshKadehsRouteGroup.DELETE("/:id", daneshKadehHandler.DeleteDaneshKadeh)
-	daneshKadehsRouteGroup.GET("", daneshKadehHandler.GetAllDaneshKadehs)
+	daneshKadehaRouteGroup := e.Group("/daneshkadeha")
+	daneshKadehaRouteGroup.POST("", daneshKadehHandler.CreateDaneshKadeh)
+	daneshKadehaRouteGroup.GET("/:id", daneshKadehHandler.GetDaneshKadehByID)
+	daneshKadehaRouteGroup.PUT("/:id", daneshKadehHandler.UpdateDaneshKadeh)
+	daneshKadehaRouteGroup.DELETE("/:id", daneshKadehHandler.DeleteDaneshKadeh)
+	daneshKadehaRouteGroup.GET("", daneshKadehHandler.GetAllDaneshKadeha)
 }
 
 func (h *DaneshKadehHandler) CreateDaneshKadeh(c echo.Context) error {
@@ -75,14 +75,14 @@ func (h *DaneshKadehHandler) DeleteDaneshKadeh(c echo.Context) error {
 	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"message": "DaneshKadeh deleted"}, nil)
 }
 
-func (h *DaneshKadehHandler) GetAllDaneshKadehs(c echo.Context) error {
+func (h *DaneshKadehHandler) GetAllDaneshKadeha(c echo.Context) error {
 	var request models.FetchDaneshKadehRequest
 	if err := c.Bind(&request); err != nil {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-	daneshKadehs, paginate, err := h.usecase.GetAllDaneshKadehs(c, request)
+	daneshKadeha, paginate, err := h.usecase.GetAllDaneshKadehs(c, request)
 	if err != nil {
 		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
-	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"daneshkadehs": daneshKadehs}, paginate)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"daneshkadeha": daneshKadeha}, paginate)
 }

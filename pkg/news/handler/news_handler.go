@@ -196,3 +196,4 @@ func (h *NewsHandler) ProcessNotifications(c echo.Context) error {
 
 	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"message": "Notifications processed successfully"}, nil)
 }
+ 

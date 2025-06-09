@@ -8,7 +8,7 @@ import (
 type Token struct {
 	database.Model
 	PolymorphicModel
-	TokenKey   string    `json:"key"`
+	Token      string    `json:"token"`
 	Revoked    bool      `json:"revoked" gorm:"default:false"`
 	ExpireTime time.Time `json:"expire_time"`
 	Type       string    `json:"type"`

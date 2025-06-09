@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"encoding/json"
 	"uni_app/database"
 	"uni_app/models"
 	repositories "uni_app/pkg/role/repository"
@@ -25,6 +26,10 @@ func NewRoleUsecase(repo repositories.RoleRepository) RoleUsecase {
 }
 
 func (u *roleUsecase) CreateRole(role *models.Role) error {
+	if role.Meta == nil {
+		role.Meta = json.RawMessage{}
+	}
+
 	return u.repo.Create(role)
 }
 

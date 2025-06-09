@@ -1013,6 +1013,469 @@
               }
             }
           ]
+        },
+        {
+          "name": "News",
+          "item": [
+            {
+              "name": "Create News",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/news", "host": ["{{base_url}}"], "path": ["news"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Sample News Title\",\n  \"content\": \"Sample news content\",\n  \"owner_id\": 1,\n  \"owner_type\": \"university\",\n  \"status\": \"draft\",\n  \"notify_at\": \"2024-03-20T10:00:00Z\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get News By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/news/1", "host": ["{{base_url}}"], "path": ["news", "1"] }
+              }
+            },
+            {
+              "name": "Update News",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/news/1", "host": ["{{base_url}}"], "path": ["news", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Updated News Title\",\n  \"content\": \"Updated news content\",\n  \"status\": \"published\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete News",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/news/1", "host": ["{{base_url}}"], "path": ["news", "1"] }
+              }
+            },
+            {
+              "name": "Get All News",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/news?page=1&limit=10&status=published",
+                  "host": ["{{base_url}}"],
+                  "path": ["news"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "limit", "value": "10" },
+                    { "key": "status", "value": "published" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get News By Owner",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/news/owner/university/1", "host": ["{{base_url}}"], "path": ["news", "owner", "university", "1"] }
+              }
+            },
+            {
+              "name": "Get Published News",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/news/published", "host": ["{{base_url}}"], "path": ["news", "published"] }
+              }
+            },
+            {
+              "name": "Publish News",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/news/1/publish", "host": ["{{base_url}}"], "path": ["news", "1", "publish"] }
+              }
+            },
+            {
+              "name": "Archive News",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/news/1/archive", "host": ["{{base_url}}"], "path": ["news", "1", "archive"] }
+              }
+            },
+            {
+              "name": "Get Pending Notifications",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/news/notifications/pending", "host": ["{{base_url}}"], "path": ["news", "notifications", "pending"] }
+              }
+            },
+            {
+              "name": "Process Notifications",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/news/notifications/process", "host": ["{{base_url}}"], "path": ["news", "notifications", "process"] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Attentions",
+          "item": [
+            {
+              "name": "Create Attention",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/attentions", "host": ["{{base_url}}"], "path": ["attentions"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"notification\",\n  \"title\": \"Important Notice\",\n  \"message\": \"This is an important notice\",\n  \"recipient_id\": 1,\n  \"recipient_type\": \"user\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Attention By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/attentions/1", "host": ["{{base_url}}"], "path": ["attentions", "1"] }
+              }
+            },
+            {
+              "name": "Update Attention",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/attentions/1", "host": ["{{base_url}}"], "path": ["attentions", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Updated Notice\",\n  \"message\": \"This is an updated notice\",\n  \"status\": \"read\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Attention",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/attentions/1", "host": ["{{base_url}}"], "path": ["attentions", "1"] }
+              }
+            },
+            {
+              "name": "Get All Attentions",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/attentions?page=1&per_page=10&type=notification&status=active",
+                  "host": ["{{base_url}}"],
+                  "path": ["attentions"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "per_page", "value": "10" },
+                    { "key": "type", "value": "notification" },
+                    { "key": "status", "value": "active" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Mark Attention as Read",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/attentions/1/read", "host": ["{{base_url}}"], "path": ["attentions", "1", "read"] }
+              }
+            },
+            {
+              "name": "Archive Attention",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/attentions/1/archive", "host": ["{{base_url}}"], "path": ["attentions", "1", "archive"] }
+              }
+            },
+            {
+              "name": "Get Attentions By Recipient",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/attentions/recipient/1?type=user",
+                  "host": ["{{base_url}}"],
+                  "path": ["attentions", "recipient", "1"],
+                  "query": [
+                    { "key": "type", "value": "user" }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Notifications",
+          "item": [
+            {
+              "name": "Create Notification",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/api/notifications", "host": ["{{base_url}}"], "path": ["api", "notifications"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"push\",\n  \"title\": \"New Message\",\n  \"body\": \"You have a new message\",\n  \"recipient_id\": 1,\n  \"recipient_type\": \"user\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Notification By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/api/notifications/1", "host": ["{{base_url}}"], "path": ["api", "notifications", "1"] }
+              }
+            },
+            {
+              "name": "Update Notification",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/api/notifications/1", "host": ["{{base_url}}"], "path": ["api", "notifications", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Updated Message\",\n  \"body\": \"Your message has been updated\",\n  \"status\": \"sent\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Notification",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/api/notifications/1", "host": ["{{base_url}}"], "path": ["api", "notifications", "1"] }
+              }
+            },
+            {
+              "name": "Get Notifications By Recipient",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/api/notifications/recipient/1?type=user",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "notifications", "recipient", "1"],
+                  "query": [
+                    { "key": "type", "value": "user" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Pending Notifications",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/api/notifications/pending", "host": ["{{base_url}}"], "path": ["api", "notifications", "pending"] }
+              }
+            },
+            {
+              "name": "Get All Notifications",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/api/notifications?page=1&per_page=10&type=push&status=pending",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "notifications"],
+                  "query": [
+                    { "key": "page", "value": "1" },
+                    { "key": "per_page", "value": "10" },
+                    { "key": "type", "value": "push" },
+                    { "key": "status", "value": "pending" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Send Notification",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/api/notifications/1/send", "host": ["{{base_url}}"], "path": ["api", "notifications", "1", "send"] }
+              }
+            },
+            {
+              "name": "Create Template",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/api/notifications/templates", "host": ["{{base_url}}"], "path": ["api", "notifications", "templates"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"welcome_message\",\n  \"title\": \"Welcome to UniApp\",\n  \"body\": \"Welcome {{name}} to UniApp!\",\n  \"type\": \"push\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Template By Name",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/api/notifications/templates/welcome_message", "host": ["{{base_url}}"], "path": ["api", "notifications", "templates", "welcome_message"] }
+              }
+            },
+            {
+              "name": "Get Notification Preference",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/api/notifications/preferences/1?type=user",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "notifications", "preferences", "1"],
+                  "query": [
+                    { "key": "type", "value": "user" }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Notification Preference",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/api/notifications/preferences/1", "host": ["{{base_url}}"], "path": ["api", "notifications", "preferences", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"owner_type\": \"user\",\n  \"push_enabled\": true,\n  \"sms_enabled\": false\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Comments",
+          "item": [
+            {
+              "name": "Create Comment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/comments", "host": ["{{base_url}}"], "path": ["comments"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"content\": \"This is a comment\",\n  \"user_id\": 1,\n  \"owner_id\": 1,\n  \"owner_type\": \"article\",\n  \"parent_id\": null\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Comment By ID",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/comments/1", "host": ["{{base_url}}"], "path": ["comments", "1"] }
+              }
+            },
+            {
+              "name": "Update Comment",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "url": { "raw": "{{base_url}}/comments/1", "host": ["{{base_url}}"], "path": ["comments", "1"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"content\": \"Updated comment content\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Comment",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/comments/1", "host": ["{{base_url}}"], "path": ["comments", "1"] }
+              }
+            },
+            {
+              "name": "Get Comments By Commentable",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/comments/commentable/article/1", "host": ["{{base_url}}"], "path": ["comments", "commentable", "article", "1"] }
+              }
+            },
+            {
+              "name": "Get Comments By User",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/comments/user/1", "host": ["{{base_url}}"], "path": ["comments", "user", "1"] }
+              }
+            },
+            {
+              "name": "Get Comment Replies",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": { "raw": "{{base_url}}/comments/replies/1", "host": ["{{base_url}}"], "path": ["comments", "replies", "1"] }
+              }
+            },
+            {
+              "name": "Get All Comments",
+              "request": {
+                "method": "GET",
+                "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+                "url": {
+                  "raw": "{{base_url}}/comments?user_id=1&commentable_id=1&commentable_type=article&includes[]=user&includes[]=replies",
+                  "host": ["{{base_url}}"],
+                  "path": ["comments"],
+                  "query": [
+                    { "key": "user_id", "value": "1" },
+                    { "key": "commentable_id", "value": "1" },
+                    { "key": "commentable_type", "value": "article" },
+                    { "key": "includes[]", "value": "user" },
+                    { "key": "includes[]", "value": "replies" }
+                  ]
+                }
+              }
+            }
+          ]
         }
       ]
     }

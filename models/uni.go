@@ -5,12 +5,17 @@ import (
 	"uni_app/database"
 )
 
+type UniType string
+
+const (
+	UniTypePezeshki UniType = "pezeshki"
+)
+
 type Unis []*Uni
 type Uni struct {
 	database.Model
 	Name            string        `json:"name"`
-	UniTypeID       database.PID  `json:"uni_type_id,omitempty"`
-	UniType         *UniType      `gorm:"foreignKey:UniTypeID;constraint:OnDelete:SET NULL;" json:"uni_type,omitempty"`
+	UniType         *UniType      `json:"uni_type,omitempty"`
 	ContactWays     []ContactWay  `gorm:"polymorphic:Owner;" json:"contact_ways,omitempty"`
 	EstablishedYear *time.Time    `json:"established_year,omitempty"`
 	Phones          []Phone       `gorm:"polymorphic:Owner;" json:"phones,omitempty"`

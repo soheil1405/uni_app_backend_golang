@@ -20,8 +20,8 @@ func NewNotificationHandler(notificationUseCase usecase.NotificationUseCase) *No
 	}
 }
 
-func (h *NotificationHandler) RegisterRoutes(e *echo.Echo) {
-	notifications := e.Group("/api/notifications")
+func (h *NotificationHandler) RegisterRoutes(e echo.Group) {
+	notifications := e.Group("/notifications")
 	notifications.POST("", h.CreateNotification)
 	notifications.GET("/:id", h.GetNotificationByID)
 	notifications.PUT("/:id", h.UpdateNotification)

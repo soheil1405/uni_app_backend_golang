@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"fmt"
 	"uni_app/database"
 	"uni_app/models"
@@ -101,6 +102,10 @@ func (r *facultyRepository) GetAll(ctx echo.Context, request models.FetchDaneshK
 		} else {
 			break
 		}
+	}
+
+	if len(daneshkadeha) == 0 {
+		return nil, nil, errors.New("no data found")
 	}
 
 	meta = templates.CreatePaginateTemplate(int(total), offset, limit)

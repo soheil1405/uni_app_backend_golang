@@ -22,7 +22,7 @@ func NewCommentHandler(usecase usecase.CommentUseCase) *CommentHandler {
 	}
 }
 
-func (h *CommentHandler) RegisterRoutes(e *echo.Echo) {
+func (h *CommentHandler) RegisterRoutes(e echo.Group) {
 	comments := e.Group("/comments")
 	comments.POST("", h.CreateComment)
 	comments.GET("/:id", h.GetCommentByID)

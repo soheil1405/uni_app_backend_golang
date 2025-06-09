@@ -6,10 +6,12 @@ import (
 	"uni_app/pkg/address"
 	"uni_app/pkg/auth"
 	"uni_app/pkg/city"
+	"uni_app/pkg/comment/comment"
 	daneshkadeh "uni_app/pkg/daneshkadeh"
 	"uni_app/pkg/lesson"
 	"uni_app/pkg/major"
 	"uni_app/pkg/major_chart"
+	"uni_app/pkg/notification"
 	"uni_app/pkg/place"
 	"uni_app/pkg/place_type"
 	"uni_app/pkg/rating"
@@ -45,6 +47,8 @@ func InitPkgs(db *gorm.DB, e echo.Group, cfg *env.Config) {
 	uni.Init(db, e, cfg)
 	uni_major.Init(db, e, cfg)
 	user.Init(db, e, cfg)
+	notification.InitNotification(e, db)
+	comment.Init(db, e, cfg)
 }
 
 func migrateModels(db *gorm.DB, config *env.Config) {
@@ -57,7 +61,6 @@ func migrateModels(db *gorm.DB, config *env.Config) {
 			&models.UserRole{},
 			&models.Role{},
 			&models.DaneshKadeh{},
-			&models.DaneshKadehType{},
 			&models.Place{},
 			&models.PlaceType{},
 			&models.Student{},
@@ -79,6 +82,10 @@ func migrateModels(db *gorm.DB, config *env.Config) {
 			&models.MajorsChart{},
 			&models.StudentPassedLesson{},
 			&models.Rating{},
+			&models.Notification{},
+			&models.NotificationTemplate{},
+			&models.NotificationPreference{},
+			&models.Comment{},
 		); err != nil {
 			panic(err)
 		}

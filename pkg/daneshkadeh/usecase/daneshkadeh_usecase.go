@@ -42,5 +42,9 @@ func (u *daneshKadehUsecase) DeleteDaneshKadeh(ID database.PID) error {
 }
 
 func (u *daneshKadehUsecase) GetAllDaneshKadehs(ctx echo.Context, request models.FetchDaneshKadehRequest) (models.DaneshKadeha, *templates.PaginateTemplate, error) {
+	if request.Limit == 0 {
+		request.Limit = 10
+	}
+
 	return u.repo.GetAll(ctx, request)
 }

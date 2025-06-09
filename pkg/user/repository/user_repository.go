@@ -55,11 +55,11 @@ func (r *userRepository) GetAll(ctx echo.Context, request models.FetchUserReques
 	if request.DegreeLevel != "" {
 		query = query.Where("degree_level = ?", request.DegreeLevel)
 	}
-	if request.DegreeMajorID != 0 {
-		query = query.Where("degree_major_id = ?", request.DegreeMajorID)
+	if request.MajorID != 0 {
+		query = query.Where("major_id = ?", request.MajorID)
 	}
-	if request.DegreeUniID != 0 {
-		query = query.Where("degree_uni_id = ?", request.DegreeUniID)
+	if request.UniID != 0 {
+		query = query.Where("uni_id = ?", request.UniID)
 	}
 	if request.NationalCode != "" {
 		query = query.Where("national_code = ?", request.NationalCode)

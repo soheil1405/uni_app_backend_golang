@@ -35,6 +35,7 @@ func NewUserUsecase(repo repositories.UserRepository, config *env.Config) UserUs
 }
 
 func (u *userUsecase) CreateUser(user *models.User) error {
+
 	return u.repo.Create(user)
 }
 
@@ -55,24 +56,11 @@ func (u *userUsecase) GetAllUsers(ctx echo.Context, request models.FetchUserRequ
 }
 
 func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegisterRequest) error {
-	// Validate required fields
-	if request.UserName == "" {
-		return errors.New("username is required")
-	}
-	if request.Email == "" {
-		return errors.New("email is required")
-	}
-	if request.Password == "" {
-		return errors.New("password is required")
-	}
 	fetchRequest := models.FetchUserRequest{
-		DegreeLevel:   request.DegreeLevel,
-		DegreeMajorID: request.DegreeMajorID,
-		DegreeUniID:   request.DegreeUniID,
-		NationalCode:  request.NationalCode,
-		Email:         request.Email,
-		Number:        request.Number,
-		PersonalCode:  request.PersonalCode,
+		NationalCode: request.NationalCode,
+		Email:        request.Email,
+		Number:       request.Number,
+		PersonalCode: request.PersonalCode,
 		FetchRequest: models.FetchRequest{
 			Limit:  1,
 			Offset: 0,
@@ -83,16 +71,19 @@ func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegiste
 		return errors.New("username already exists")
 	}
 
+	nationalCode := request.NationalCode
 	user := &models.User{
-		UserName:      request.UserName,
-		Email:         request.Email,
-		Status:        models.USER_STATUS_ACTIVE,
-		FirstName:     request.FirstName,
-		LastName:      request.LastName,
-		Number:        request.Number,
-		PersonalCode:  request.PersonalCode,
-		DegreeLevel:   request.DegreeLevel,
-		DegreeMajorID: request.DegreeMajorID,
+		UserName:     request.UserName,
+		Email:        request.Email,
+		Status:       models.USER_STATUS_ACTIVE,
+		FirstName:    request.FirstName,
+		LastName:     request.LastName,
+		Number:       request.Number,
+		PersonalCode: request.PersonalCode,
+		DegreeLevel:  request.DegreeLevel,
+		MajorID:      request.MajorID,
+		UniID:        request.UniID,
+		NationalCode: &nationalCode,
 	}
 
 	// Hash password
@@ -103,24 +94,23 @@ func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegiste
 	user.Password = string(hashedPassword)
 	user.Status = models.USER_STATUS_ACTIVE
 	if err := u.repo.Create(user); err != nil {
-		return err
+		return errors.New("user already exists")
 	}
 
 	// Generate JWT token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.ID,
-		// "role":    user.,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Id:        user.ID.String(),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	// Sign the token with the secret key
-	tokenString, err := token.SignedString([]byte(u.config.GetString("JWT_SECRET")))
+	tokenString, err := token.SignedString([]byte(u.config.GetString("service.auth.secret")))
 	if err != nil {
 		return err
 	}
 
 	// Set the token in the user object
-	user.Token.TokenKey = tokenString
+	user.Token.Token = tokenString
 
 	return nil
 }
@@ -140,20 +130,19 @@ func (u *userUsecase) LoginUser(username, password string) (*models.User, error)
 	}
 
 	// Generate JWT token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.ID,
-		// "role":    user.,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Id:        user.ID.String(),
+		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	// Sign the token with the secret key
-	tokenString, err := token.SignedString([]byte(u.config.GetString("JWT_SECRET")))
+	tokenString, err := token.SignedString([]byte(u.config.GetString("service.auth.secret")))
 	if err != nil {
 		return nil, err
 	}
 
 	// Set the token in the user object
-	user.Token.TokenKey = tokenString
+	user.Token.Token = tokenString
 
 	return user, nil
 }
@@ -165,7 +154,7 @@ func (u *userUsecase) ValidateToken(tokenString string) (*models.User, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
-		return []byte(u.config.GetString("JWT_SECRET")), nil
+		return []byte(u.config.GetString("service.auth.secret")), nil
 	})
 
 	if err != nil {
@@ -178,19 +167,19 @@ func (u *userUsecase) ValidateToken(tokenString string) (*models.User, error) {
 	}
 
 	// Get the claims
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(jwt.StandardClaims)
 	if !ok {
 		return nil, errors.New("invalid token claims")
 	}
 
 	// Get the user ID from the claims
-	userID, ok := claims["user_id"].(float64)
-	if !ok {
+	userID := database.Parse(claims.Id)
+	if !userID.IsValid() {
 		return nil, errors.New("invalid user ID in token")
 	}
 
 	// Get the user from the database
-	user, err := u.repo.GetByID(nil, database.PID(userID), false)
+	user, err := u.repo.GetByID(nil, userID, false)
 	if err != nil {
 		return nil, err
 	}
