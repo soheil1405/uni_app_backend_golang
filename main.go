@@ -1,66 +1,53 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"uni_app/database"
-	"uni_app/pkg"
+	handler "uni_app/pkg/auth/handler"
+	"uni_app/pkg/auth/middleware"
+	repositories "uni_app/pkg/auth/repository"
+	"uni_app/pkg/auth/usecase"
 	"uni_app/services/env"
-	"uni_app/utils/helpers"
-	"uni_app/utils/middleware"
 
-	mw "github.com/labstack/echo/v4/middleware"
-
-	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
-	configPath := flag.String("c", "config.json", "Path to the configuration file")
-	config := env.NewViperConfig(*configPath)
-	flag.Parse()
-	dbCfg := &database.Database{
-		Host:     helpers.GetEnvDefault("DB_HOST", env.GetString("database.host")),
-		Port:     helpers.GetEnvDefault("DB_PORT", env.GetString("database.port")),
-		User:     helpers.GetEnvDefault("DB_USER", env.GetString("database.user")),
-		Password: helpers.GetEnvDefault("DB_PASS", env.GetString("database.pass")),
-		DBName:   helpers.GetEnvDefault("DB_NAME", env.GetString("database.name")),
-		SSLMode:  helpers.GetEnvDefault("DB_NAME", env.GetString("database.sslmode")),
-	}
+	// Load configuration
+	config := env.NewConfig()
 
-	db, err := database.Connection(dbCfg)
+	// Connect to database
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to connect to database:", err)
 	}
 
-	echo := echo.New()
-	apiVersion := env.GetString("api_version")
-	e := echo.Group(apiVersion)
-	// فعال کردن CORS
-	e.Use(mw.CORSWithConfig(mw.CORSConfig{
-		AllowOrigins:     []string{"http://localhost:5173"}, // دامنه فرانت‌اند
-		AllowHeaders:     []string{"Content-Type", "Authorization"},
-		AllowCredentials: true,
-	}))
-	
-	if auth := env.GetBool("service.auth.active"); auth {
-		jwtSecret := env.GetString("service.auth.secret")
-		middle := middleware.InitMiddleware(e, db, config)
-		e.Use(mw.JWTWithConfig(mw.JWTConfig{
-			SigningKey: []byte(jwtSecret),
-			Claims:     &jwt.StandardClaims{},
-			Skipper:    middleware.RegisterSkipper,
-		}),
-			middle.SkipSetContext(middleware.RegisterSkipper), // Skip context middleware too
-		)
+	// Initialize database
+	if err := database.Init(db); err != nil {
+		log.Fatal("Failed to initialize database:", err)
 	}
 
-	pkg.InitPkgs(db, *e, config)
+	// Initialize repositories
+	authRepo := repositories.NewAuthRepository(db)
 
-	for _, route := range echo.Routes() {
-		fmt.Printf("%s %s\n", route.Method, route.Path)
-	}
+	// Initialize usecases
+	authUsecase := usecase.NewAuthUsecase(authRepo, config)
 
-	echo.Start(":" + env.GetString("port"))
+	// Initialize middleware
+	_ = middleware.NewAuthMiddleware(authRepo, config)
+
+	// Initialize Echo
+	e := echo.New()
+
+	// Initialize handlers
+	apiGroup := e.Group("/api")
+	handler.NewAuthHandler(authUsecase, *apiGroup)
+
+	// Start server
+	e.Logger.Fatal(e.Start(":8080"))
 }

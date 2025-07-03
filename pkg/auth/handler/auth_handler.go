@@ -2,83 +2,125 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 	"uni_app/database"
 	"uni_app/models"
-	usecase "uni_app/pkg/auth/usecase"
-	"uni_app/utils/ctxHelper"
-	"uni_app/utils/helpers"
+	"uni_app/pkg/auth/usecase"
 
 	"github.com/labstack/echo/v4"
 )
 
 type AuthHandler struct {
 	usecase usecase.AuthUsecase
+	group   echo.Group
 }
 
-func NewAuthHandler(usecase usecase.AuthUsecase, e echo.Group) {
-	authHandler := &AuthHandler{usecase}
-
-	authRouteGroup := e.Group("/auth-rules")
-	authRouteGroup.POST("", authHandler.CreateAuth)
-	authRouteGroup.GET("/:id", authHandler.GetAuthByID)
-	authRouteGroup.PUT("/:id", authHandler.UpdateAuth)
-	authRouteGroup.DELETE("/:id", authHandler.DeleteAuth)
-	authRouteGroup.GET("", authHandler.GetAllAuths)
+func NewAuthHandler(usecase usecase.AuthUsecase, group echo.Group) {
+	handler := &AuthHandler{
+		usecase: usecase,
+		group:   group,
+	}
+	handler.initRoutes()
 }
 
-func (h *AuthHandler) CreateAuth(c echo.Context) error {
-	var auth models.AuthRules
-	if err := c.Bind(&auth); err != nil {
-		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
-	}
-	if err := h.usecase.CreateAuth(&auth); err != nil {
-		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
-	}
-	return helpers.Reply(c, http.StatusCreated, nil, map[string]interface{}{"auth": auth}, nil)
+func (h *AuthHandler) initRoutes() {
+	authGroup := h.group.Group("/auth")
+
+	authGroup.POST("/register", h.Register)
+	authGroup.POST("/login", h.Login)
+	authGroup.PUT("/:id", h.Update)
+	authGroup.DELETE("/:id", h.Delete)
+	authGroup.GET("/:id", h.GetByID)
+	authGroup.GET("", h.List)
 }
 
-func (h *AuthHandler) GetAuthByID(c echo.Context) error {
-	var (
-		ID  database.PID
-		err error
-	)
-	if ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
+func (h *AuthHandler) Register(c echo.Context) error {
+	var user models.User
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	auth, err := h.usecase.GetAuthByID(c, ID, false)
+
+	if err := h.usecase.Register(&user); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, user)
+}
+
+func (h *AuthHandler) Login(c echo.Context) error {
+	var loginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	if err := c.Bind(&loginRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	user, err := h.usecase.Login(loginRequest.Username, loginRequest.Password)
 	if err != nil {
-		return helpers.Reply(c, http.StatusNotFound, err, nil, nil)
+		return c.JSON(http.StatusUnauthorized, err.Error())
 	}
-	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"auth": auth}, nil)
+
+	return c.JSON(http.StatusOK, user)
 }
 
-func (h *AuthHandler) UpdateAuth(c echo.Context) (err error) {
-	var auth models.AuthRules
-	if auth.ID, err = ctxHelper.GetIDFromContxt(c); err != nil {
-		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
-	}
-	if err := h.usecase.UpdateAuth(&auth); err != nil {
-		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
-	}
-	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"auth": auth}, nil)
-}
-
-func (h *AuthHandler) DeleteAuth(c echo.Context) error {
-	ID, err := ctxHelper.GetIDFromContxt(c)
+func (h *AuthHandler) Update(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
+		return c.JSON(http.StatusBadRequest, "Invalid ID")
 	}
 
-	if err := h.usecase.DeleteAuth(ID); err != nil {
-		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
+	var user models.User
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"message": "Auth rule deleted"}, nil)
+
+	user.ID = database.PID(id)
+	if err := h.usecase.Update(&user); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, user)
 }
 
-func (h *AuthHandler) GetAllAuths(c echo.Context) error {
-	auths, err := h.usecase.GetAllAuths()
+func (h *AuthHandler) Delete(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
+		return c.JSON(http.StatusBadRequest, "Invalid ID")
 	}
-	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"auths": auths}, nil)
+
+	if err := h.usecase.Delete(database.PID(id)); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.NoContent(http.StatusNoContent)
+}
+
+func (h *AuthHandler) GetByID(c echo.Context) error {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid ID")
+	}
+
+	user, err := h.usecase.GetByID(database.PID(id))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, user)
+}
+
+func (h *AuthHandler) List(c echo.Context) error {
+	var filters models.FetchUserRequest
+	if err := c.Bind(&filters); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	users, err := h.usecase.List(&filters)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, users)
 }

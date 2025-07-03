@@ -3,46 +3,71 @@ package middleware
 import (
 	"net/http"
 	"strings"
-	usecases "uni_app/pkg/user/usecase"
+	"uni_app/models"
+	"uni_app/services/env"
 	"uni_app/utils/ctxHelper"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
 type AuthMiddleware struct {
-	userUsecase usecases.UserUsecase
+	repo   repository.AuthRepository
+	config *env.Config
 }
 
-func NewAuthMiddleware(userUsecase usecases.UserUsecase) *AuthMiddleware {
-	return &AuthMiddleware{userUsecase}
+func NewAuthMiddleware(repo repository.AuthRepository, config *env.Config) *AuthMiddleware {
+	return &AuthMiddleware{
+		repo:   repo,
+		config: config,
+	}
 }
 
-func (m *AuthMiddleware) Authenticate(next echo.HandlerFunc) echo.HandlerFunc {
+func (m *AuthMiddleware) Auth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		authHeader := c.Request().Header.Get("Authorization")
 		if authHeader == "" {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "authorization header is required"})
+			return c.JSON(http.StatusUnauthorized, "Authorization header is required")
 		}
 
-		// Check if the header has the Bearer prefix
-		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || parts[0] != "Bearer" {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid authorization header format"})
-		}
+		tokenString := strings.Replace(authHeader, "Bearer ", "", 1)
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
+			}
+			return []byte(m.config.JWTSecret), nil
+		})
 
-		// Get the token
-		token := parts[1]
-
-		// Validate the token and get the user
-		user, err := m.userUsecase.ValidateToken(token)
 		if err != nil {
-			return c.JSON(http.StatusUnauthorized, map[string]string{"error": "invalid token"})
+			return c.JSON(http.StatusUnauthorized, "Invalid token")
 		}
 
-		// Set the user in the context
-		ctxHelper.SetUserInContext(c, user)
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			userID := claims["user_id"].(string)
+			user, err := m.repo.GetByID(userID)
+			if err != nil {
+				return c.JSON(http.StatusUnauthorized, "User not found")
+			}
 
-		return next(c)
+			c.Set("user", user)
+			return next(c)
+		}
+
+		return c.JSON(http.StatusUnauthorized, "Invalid token")
+	}
+}
+
+func (m *AuthMiddleware) Role(roles ...string) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			user := c.Get("user").(*models.User)
+			for _, role := range roles {
+				if user.Role == role {
+					return next(c)
+				}
+			}
+			return c.JSON(http.StatusForbidden, "Access denied")
+		}
 	}
 }
 

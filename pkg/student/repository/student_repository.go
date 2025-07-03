@@ -18,6 +18,7 @@ type StudentRepository interface {
 	GetAll(ctx echo.Context, request models.FetchStudentRequest) ([]models.Student, *helpers.PaginateTemplate, error)
 	GetByStudentCode(studentCode database.PID) (*models.Student, error)
 	GetByNationalCode(nationalCode database.PID) (*models.Student, error)
+	List(filters *models.FetchStudentRequest) ([]*models.Student, error)
 }
 
 type studentRepository struct {
@@ -90,4 +91,32 @@ func (r *studentRepository) GetByNationalCode(nationalCode database.PID) (*model
 		return nil, err
 	}
 	return &student, nil
+}
+
+func (r *studentRepository) List(filters *models.FetchStudentRequest) ([]*models.Student, error) {
+	var students []*models.Student
+	query := r.db.Model(&models.Student{})
+
+	if filters.Name != "" {
+		query = query.Where("name LIKE ?", "%"+filters.Name+"%")
+	}
+
+	if filters.Email != "" {
+		query = query.Where("email LIKE ?", "%"+filters.Email+"%")
+	}
+
+	if filters.Phone != "" {
+		query = query.Where("phone LIKE ?", "%"+filters.Phone+"%")
+	}
+
+	err := query.Preload("CourseInstances").
+		Preload("CourseInstances.Course").
+		Preload("CourseInstances.ClassSchedules").
+		Preload("CourseInstances.ClassSchedules.Room").
+		Preload("CourseInstances.ClassSchedules.Room.Building").
+		Find(&students).Error
+	if err != nil {
+		return nil, err
+	}
+	return students, nil
 }

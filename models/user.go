@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"time"
 	"uni_app/database"
 )
 
@@ -15,38 +16,20 @@ const (
 type Users []*User
 
 type User struct {
-	database.Model
-	UserName      string        `gorm:"uniqueIndex;not null" json:"username,omitempty"`
-	FirstName     string        `gorm:"not null" json:"first_name,omitempty"`
-	LastName      string        `gorm:"not null" json:"last_name,omitempty"`
-	Number        string        `gorm:"uniqueIndex;not null" json:"number,omitempty"`
-	PersonalCode  string        `json:"personal_code,omitempty"`
-	DegreeLevel   DegreeLevel   `gorm:"not null" json:"degree_level_id,omitempty"`
-	MajorID       database.PID  `gorm:"not null" json:"major_id,omitempty"`
-	Major         Major         `gorm:"foreignKey:MajorID" json:"major,omitempty"`
-	UniID         database.PID  `json:"uni_id,omitempty"`
-	Uni           Uni           `json:"uni,omitempty" gorm:"foreignKey:UniID"`
-	NationalCode  *string       `gorm:"uniqueIndex" json:"national_code,omitempty"`
-	NominatedByID *database.PID `json:"nominated_by_id,omitempty"`
-	NominatedBy   *User         `gorm:"foreignKey:NominatedByID;constraint:OnDelete:SET NULL;" json:"nominated_by,omitempty"`
-	Email         string        `gorm:"uniqueIndex;" json:"email,omitempty"`
-	Password      string        `gorm:"not null" json:"-,omitempty"`
-	Token         Token         `json:"token,omitempty" gorm:"polymorphic:Owner;"`
-	Status        UserStatus    `gorm:"default:'active'" json:"status,omitempty"`
-	UserRoles     []*UserRole   `json:"user_roles,omitempty"`
-	Ratings       []Rating      `json:"ratings,omitempty" gorm:"foreignKey:UserID"`
+	ID        string    `gorm:"primaryKey" json:"id"`
+	Username  string    `gorm:"not null;unique" json:"username"`
+	Email     string    `gorm:"not null;unique" json:"email"`
+	Password  string    `gorm:"not null" json:"-"`
+	Role      string    `gorm:"not null" json:"role"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type FetchUserRequest struct {
 	FetchRequest
-	DegreeLevel  DegreeLevel  `json:"degree_level_id,omitempty"`
-	MajorID      database.PID `json:"major_id,omitempty"`
-	UniID        database.PID `json:"uni_id,omitempty"`
-	NationalCode string       `json:"national_code,omitempty"`
-	TeacherCode  string       `json:"teacher_code,omitempty"`
-	Email        string       `json:"email,omitempty"`
-	Number       string       `json:"number,omitempty"`
-	PersonalCode string       `json:"personal_code,omitempty"`
+	Username string `json:"username,omitempty"`
+	Email    string `json:"email,omitempty"`
+	Role     string `json:"role,omitempty"`
 }
 
 type UserRegisterRequest struct {

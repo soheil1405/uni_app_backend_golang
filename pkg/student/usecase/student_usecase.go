@@ -8,15 +8,17 @@ import (
 	"uni_app/services/env"
 	"uni_app/utils/helpers"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type StudentUsecase interface {
-	CreateStudent(student *models.Student) error
-	GetStudentByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Student, error)
-	UpdateStudent(student *models.Student) error
-	DeleteStudent(ID database.PID) error
+	Create(student *models.Student) error
+	Update(student *models.Student) error
+	Delete(id database.PID) error
+	GetByID(id database.PID) (*models.Student, error)
+	List(filters *models.FetchStudentRequest) ([]*models.Student, error)
 	GetAllStudents(ctx echo.Context, request models.FetchStudentRequest) ([]models.Student, *helpers.PaginateTemplate, error)
 	RegisterStudent(student *models.Student) error
 	LoginStudent(studentCode database.PID, password string) (*models.Student, error)
@@ -30,23 +32,35 @@ type studentUsecase struct {
 }
 
 func NewStudentUsecase(repo repository.StudentRepository, config *env.Config) StudentUsecase {
-	return &studentUsecase{repo, config}
+	return &studentUsecase{
+		repo:   repo,
+		config: config,
+	}
 }
 
-func (u *studentUsecase) CreateStudent(student *models.Student) error {
+func (u *studentUsecase) Create(student *models.Student) error {
+	id, err := database.ParsePID(uuid.New().String())
+	if err != nil {
+		return err
+	}
+	student.ID = id
 	return u.repo.Create(student)
 }
 
-func (u *studentUsecase) GetStudentByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Student, error) {
-	return u.repo.GetByID(ctx, ID, useCache)
-}
-
-func (u *studentUsecase) UpdateStudent(student *models.Student) error {
+func (u *studentUsecase) Update(student *models.Student) error {
 	return u.repo.Update(student)
 }
 
-func (u *studentUsecase) DeleteStudent(ID database.PID) error {
-	return u.repo.Delete(ID)
+func (u *studentUsecase) Delete(id database.PID) error {
+	return u.repo.Delete(id)
+}
+
+func (u *studentUsecase) GetByID(id database.PID) (*models.Student, error) {
+	return u.repo.GetByID(id)
+}
+
+func (u *studentUsecase) List(filters *models.FetchStudentRequest) ([]*models.Student, error) {
+	return u.repo.List(filters)
 }
 
 func (u *studentUsecase) GetAllStudents(ctx echo.Context, request models.FetchStudentRequest) ([]models.Student, *helpers.PaginateTemplate, error) {
