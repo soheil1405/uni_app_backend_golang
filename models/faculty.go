@@ -36,3 +36,18 @@ type Faculty struct {
 	Ratings     []*Rating     `json:"ratings,omitempty" gorm:"polymorphic:Owner;polymorphicValue:faculties"`
 	Majors      []*Major      `json:"majors,omitempty"`
 }
+
+func FacultyAcceptedPreloads() []string {
+	return []string{
+		"Uni",
+		"Address",
+		"Departments",
+		"ContactWays",
+		"Courses",
+		"Floors",
+		"Students",
+		"Users",
+		"Ratings",
+		"Majors",
+	}
+}

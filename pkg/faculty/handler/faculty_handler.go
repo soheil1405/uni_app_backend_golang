@@ -31,8 +31,6 @@ func (h *FacultyHandler) initRoutes() {
 	facultyGroup.DELETE("/:id", h.Delete)
 	facultyGroup.GET("/:id", h.GetByID)
 	facultyGroup.GET("", h.List)
-	facultyGroup.POST("/:id/departments/:department_id", h.AddDepartment)
-	facultyGroup.DELETE("/:id/departments/:department_id", h.RemoveDepartment)
 	facultyGroup.POST("/:id/teachers/:teacher_id", h.AddTeacher)
 	facultyGroup.DELETE("/:id/teachers/:teacher_id", h.RemoveTeacher)
 	facultyGroup.POST("/:id/staff/:user_id", h.AddStaff)
@@ -110,42 +108,6 @@ func (h *FacultyHandler) List(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, faculties)
-}
-
-func (h *FacultyHandler) AddDepartment(c echo.Context) error {
-	facultyID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid faculty ID")
-	}
-
-	departmentID, err := strconv.ParseUint(c.Param("department_id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid department ID")
-	}
-
-	if err := h.usecase.AddDepartment(database.PID(facultyID), database.PID(departmentID)); err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-
-	return c.NoContent(http.StatusNoContent)
-}
-
-func (h *FacultyHandler) RemoveDepartment(c echo.Context) error {
-	facultyID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid faculty ID")
-	}
-
-	departmentID, err := strconv.ParseUint(c.Param("department_id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid department ID")
-	}
-
-	if err := h.usecase.RemoveDepartment(database.PID(facultyID), database.PID(departmentID)); err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-
-	return c.NoContent(http.StatusNoContent)
 }
 
 func (h *FacultyHandler) AddTeacher(c echo.Context) error {

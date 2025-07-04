@@ -8,52 +8,52 @@ import (
 	"gorm.io/gorm"
 )
 
-type StudentPassedLessonRepository interface {
-	Create(passedLesson *models.StudentPassedLesson) error
-	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.StudentPassedLesson, error)
-	Update(passedLesson *models.StudentPassedLesson) error
+type StudentPassedCourseRepository interface {
+	Create(passedCourse *models.StudentPassedCourse) error
+	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.StudentPassedCourse, error)
+	Update(passedCourse *models.StudentPassedCourse) error
 	Delete(ID database.PID) error
-	GetAll(ctx echo.Context, request models.FetchStudentPassedLessonRequest) ([]models.StudentPassedLesson, error)
-	GetByStudentID(studentID database.PID) ([]models.StudentPassedLesson, error)
+	GetAll(ctx echo.Context, request models.FetchStudentPassedCourseRequest) ([]models.StudentPassedCourse, error)
+	GetByStudentID(studentID database.PID) ([]models.StudentPassedCourse, error)
 }
 
-type studentPassedLessonRepository struct {
+type studentPassedCourseRepository struct {
 	db *gorm.DB
 }
 
-func NewStudentPassedLessonRepository(db *gorm.DB) StudentPassedLessonRepository {
-	return &studentPassedLessonRepository{db}
+func NewStudentPassedCourseRepository(db *gorm.DB) StudentPassedCourseRepository {
+	return &studentPassedCourseRepository{db}
 }
 
-func (r *studentPassedLessonRepository) Create(passedLesson *models.StudentPassedLesson) error {
-	return r.db.Create(passedLesson).Error
+func (r *studentPassedCourseRepository) Create(passedCourse *models.StudentPassedCourse) error {
+	return r.db.Create(passedCourse).Error
 }
 
-func (r *studentPassedLessonRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.StudentPassedLesson, error) {
-	var passedLesson models.StudentPassedLesson
-	if err := r.db.First(&passedLesson, ID).Error; err != nil {
+func (r *studentPassedCourseRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.StudentPassedCourse, error) {
+	var passedCourse models.StudentPassedCourse
+	if err := r.db.First(&passedCourse, ID).Error; err != nil {
 		return nil, err
 	}
-	return &passedLesson, nil
+	return &passedCourse, nil
 }
 
-func (r *studentPassedLessonRepository) Update(passedLesson *models.StudentPassedLesson) error {
-	return r.db.Save(passedLesson).Error
+func (r *studentPassedCourseRepository) Update(passedCourse *models.StudentPassedCourse) error {
+	return r.db.Save(passedCourse).Error
 }
 
-func (r *studentPassedLessonRepository) Delete(ID database.PID) error {
-	return r.db.Delete(&models.StudentPassedLesson{}, ID).Error
+func (r *studentPassedCourseRepository) Delete(ID database.PID) error {
+	return r.db.Delete(&models.StudentPassedCourse{}, ID).Error
 }
 
-func (r *studentPassedLessonRepository) GetAll(ctx echo.Context, request models.FetchStudentPassedLessonRequest) ([]models.StudentPassedLesson, error) {
-	var passedLessons []models.StudentPassedLesson
-	query := r.db.Model(&models.StudentPassedLesson{})
+func (r *studentPassedCourseRepository) GetAll(ctx echo.Context, request models.FetchStudentPassedCourseRequest) ([]models.StudentPassedCourse, error) {
+	var passedCourses []models.StudentPassedCourse
+	query := r.db.Model(&models.StudentPassedCourse{})
 
 	if request.StudentID > 0 {
 		query = query.Where("student_id = ?", request.StudentID)
 	}
-	if request.LessonID > 0 {
-		query = query.Where("lesson_id = ?", request.LessonID)
+	if request.CourseID > 0 {
+		query = query.Where("lesson_id = ?", request.CourseID)
 	}
 	if request.Term > 0 {
 		query = query.Where("term = ?", request.Term)
@@ -66,18 +66,18 @@ func (r *studentPassedLessonRepository) GetAll(ctx echo.Context, request models.
 		}
 	}
 
-	if err := query.Find(&passedLessons).Error; err != nil {
+	if err := query.Find(&passedCourses).Error; err != nil {
 		return nil, err
 	}
-	return passedLessons, nil
+	return passedCourses, nil
 }
 
-func (r *studentPassedLessonRepository) GetByStudentID(studentID database.PID) ([]models.StudentPassedLesson, error) {
-	var passedLessons []models.StudentPassedLesson
+func (r *studentPassedCourseRepository) GetByStudentID(studentID database.PID) ([]models.StudentPassedCourse, error) {
+	var passedCourses []models.StudentPassedCourse
 	if err := r.db.Where("student_id = ?", studentID).
 		Preload("Lesson").
-		Find(&passedLessons).Error; err != nil {
+		Find(&passedCourses).Error; err != nil {
 		return nil, err
 	}
-	return passedLessons, nil
+	return passedCourses, nil
 }

@@ -13,8 +13,6 @@ type FacultyRepository interface {
 	Delete(id database.PID) error
 	GetByID(id database.PID) (*models.Faculty, error)
 	List(filters *models.FetchFacultyRequest) ([]*models.Faculty, error)
-	AddDepartment(facultyID, departmentID database.PID) error
-	RemoveDepartment(facultyID, departmentID database.PID) error
 	AddTeacher(facultyID, teacherID database.PID) error
 	RemoveTeacher(facultyID, teacherID database.PID) error
 	AddStaff(facultyID, userID database.PID) error
@@ -43,12 +41,16 @@ func (r *facultyRepository) Delete(id database.PID) error {
 
 func (r *facultyRepository) GetByID(id database.PID) (*models.Faculty, error) {
 	var faculty models.Faculty
-	err := r.db.Preload("University").
-		Preload("Floors").
+	err := r.db.Preload("Uni").
+		Preload("Address").
 		Preload("Departments").
+		Preload("ContactWays").
+		Preload("Courses").
+		Preload("Floors").
 		Preload("Students").
-		Preload("Teachers").
-		Preload("Staff").
+		Preload("Users").
+		Preload("Ratings").
+		Preload("Majors").
 		First(&faculty, id).Error
 	if err != nil {
 		return nil, err
@@ -60,35 +62,19 @@ func (r *facultyRepository) List(filters *models.FetchFacultyRequest) ([]*models
 	var faculties []*models.Faculty
 	query := r.db.Model(&models.Faculty{})
 
-	if filters.UniversityID.IsValid() {
-		query = query.Where("university_id = ?", filters.UniversityID)
+	if filters.UniID.IsValid() {
+		query = query.Where("uni_id = ?", filters.UniID)
 	}
 
 	if filters.Name != "" {
 		query = query.Where("name LIKE ?", "%"+filters.Name+"%")
 	}
 
-	err := query.Preload("University").
-		Preload("Floors").
-		Preload("Departments").
-		Preload("Students").
-		Preload("Teachers").
-		Preload("Staff").
-		Find(&faculties).Error
+	err := query.Find(&faculties).Error
 	if err != nil {
 		return nil, err
 	}
 	return faculties, nil
-}
-
-func (r *facultyRepository) AddDepartment(facultyID, departmentID database.PID) error {
-	return r.db.Model(&models.Faculty{}).Where("id = ?", facultyID).
-		Association("Departments").Append(&models.Department{Model: database.Model{ID: departmentID}})
-}
-
-func (r *facultyRepository) RemoveDepartment(facultyID, departmentID database.PID) error {
-	return r.db.Model(&models.Faculty{}).Where("id = ?", facultyID).
-		Association("Departments").Delete(&models.Department{Model: database.Model{ID: departmentID}})
 }
 
 func (r *facultyRepository) AddTeacher(facultyID, teacherID database.PID) error {

@@ -15,6 +15,8 @@ type CourseInstanceUsecase interface {
 	Delete(id database.PID) error
 	GetByID(id database.PID) (*models.CourseInstance, error)
 	List(filters *models.FetchCourseInstanceRequest) ([]*models.CourseInstance, error)
+	AddStudent(courseInstanceID, studentID database.PID) error
+	RemoveStudent(courseInstanceID, studentID database.PID) error
 }
 
 type courseInstanceUsecase struct {
@@ -52,4 +54,10 @@ func (u *courseInstanceUsecase) GetByID(id database.PID) (*models.CourseInstance
 
 func (u *courseInstanceUsecase) List(filters *models.FetchCourseInstanceRequest) ([]*models.CourseInstance, error) {
 	return u.repo.List(filters)
+}
+func (u *courseInstanceUsecase) AddStudent(courseInstanceID, studentID database.PID) error {
+	return u.repo.AddStudent(courseInstanceID, studentID)
+}
+func (u *courseInstanceUsecase) RemoveStudent(courseInstanceID, studentID database.PID) error {
+	return u.repo.RemoveStudent(courseInstanceID, studentID)
 }

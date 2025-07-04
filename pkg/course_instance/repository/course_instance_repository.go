@@ -15,8 +15,6 @@ type CourseInstanceRepository interface {
 	List(filters *models.FetchCourseInstanceRequest) ([]*models.CourseInstance, error)
 	AddStudent(courseInstanceID, studentID database.PID) error
 	RemoveStudent(courseInstanceID, studentID database.PID) error
-	AddSchedule(courseInstanceID database.PID, schedule *models.ClassSchedule) error
-	RemoveSchedule(courseInstanceID, scheduleID database.PID) error
 }
 
 type courseInstanceRepository struct {
@@ -44,9 +42,8 @@ func (r *courseInstanceRepository) GetByID(id database.PID) (*models.CourseInsta
 	err := r.db.Preload("Course").
 		Preload("Teacher").
 		Preload("Students").
-		Preload("ClassSchedules").
-		Preload("ClassSchedules.Room").
-		Preload("ClassSchedules.Room.Building").
+		Preload("Room").
+		Preload("Faculty").
 		First(&courseInstance, id).Error
 	if err != nil {
 		return nil, err
@@ -66,20 +63,11 @@ func (r *courseInstanceRepository) List(filters *models.FetchCourseInstanceReque
 		query = query.Where("teacher_id = ?", filters.TeacherID)
 	}
 
-	if filters.Semester != "" {
-		query = query.Where("semester = ?", filters.Semester)
-	}
-
-	if filters.Year != 0 {
-		query = query.Where("year = ?", filters.Year)
-	}
-
 	err := query.Preload("Course").
 		Preload("Teacher").
 		Preload("Students").
-		Preload("ClassSchedules").
-		Preload("ClassSchedules.Room").
-		Preload("ClassSchedules.Room.Building").
+		Preload("Room").
+		Preload("Faculty").
 		Find(&courseInstances).Error
 	if err != nil {
 		return nil, err
@@ -89,20 +77,10 @@ func (r *courseInstanceRepository) List(filters *models.FetchCourseInstanceReque
 
 func (r *courseInstanceRepository) AddStudent(courseInstanceID, studentID database.PID) error {
 	return r.db.Model(&models.CourseInstance{Model: database.Model{ID: courseInstanceID}}).
-		Association("Students").Append(&models.User{Model: database.Model{ID: studentID}})
+		Association("Students").Append(&models.Student{Model: database.Model{ID: studentID}})
 }
 
 func (r *courseInstanceRepository) RemoveStudent(courseInstanceID, studentID database.PID) error {
 	return r.db.Model(&models.CourseInstance{Model: database.Model{ID: courseInstanceID}}).
-		Association("Students").Delete(&models.User{Model: database.Model{ID: studentID}})
-}
-
-func (r *courseInstanceRepository) AddSchedule(courseInstanceID database.PID, schedule *models.ClassSchedule) error {
-	schedule.CourseInstanceID = courseInstanceID
-	return r.db.Create(schedule).Error
-}
-
-func (r *courseInstanceRepository) RemoveSchedule(courseInstanceID, scheduleID database.PID) error {
-	return r.db.Where("course_instance_id = ? AND id = ?", courseInstanceID, scheduleID).
-		Delete(&models.ClassSchedule{}).Error
+		Association("Students").Delete(&models.Student{Model: database.Model{ID: studentID}})
 }

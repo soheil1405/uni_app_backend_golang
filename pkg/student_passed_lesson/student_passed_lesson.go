@@ -11,7 +11,7 @@ import (
 )
 
 func Init(db *gorm.DB, e echo.Group, config *env.Config) {
-	passedLessonRepo := repositories.NewStudentPassedLessonRepository(db)
-	passedLessonUsecase := usecases.NewStudentPassedLessonUsecase(passedLessonRepo, config)
-	handlers.NewStudentPassedLessonHandler(passedLessonUsecase, e)
+	passedCourseRepo := repositories.NewStudentPassedCourseRepository(db)
+	passedCourseUsecase := usecases.NewStudentPassedCourseUsecase(passedCourseRepo, config)
+	handlers.NewStudentPassedCourseHandler(passedCourseUsecase, e)
 }

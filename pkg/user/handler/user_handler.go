@@ -109,10 +109,11 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 
-	if err := h.usecase.RegisterUser(c, &request); err != nil {
+	user, token, err := h.usecase.RegisterUser(c, &request)
+	if err != nil {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-	return helpers.Reply(c, http.StatusCreated, nil, map[string]interface{}{"user": request}, nil)
+	return helpers.Reply(c, http.StatusCreated, nil, map[string]interface{}{"user": user, "token": token}, nil)
 }
 
 func (h *UserHandler) LoginUser(c echo.Context) error {
@@ -123,9 +124,9 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 	if err := c.Bind(&loginRequest); err != nil {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-	user, err := h.usecase.LoginUser(loginRequest.Username, loginRequest.Password)
+	user, token, err := h.usecase.LoginUser(loginRequest.Username, loginRequest.Password)
 	if err != nil {
 		return helpers.Reply(c, http.StatusUnauthorized, err, nil, nil)
 	}
-	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"user": user}, nil)
+	return helpers.Reply(c, http.StatusOK, nil, map[string]interface{}{"user": user, "token": token}, nil)
 }

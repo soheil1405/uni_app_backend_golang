@@ -13,8 +13,6 @@ type FacultyUsecase interface {
 	Delete(id database.PID) error
 	GetByID(id database.PID) (*models.Faculty, error)
 	List(filters *models.FetchFacultyRequest) ([]*models.Faculty, error)
-	AddDepartment(facultyID, departmentID database.PID) error
-	RemoveDepartment(facultyID, departmentID database.PID) error
 	AddTeacher(facultyID, teacherID database.PID) error
 	RemoveTeacher(facultyID, teacherID database.PID) error
 	AddStaff(facultyID, userID database.PID) error
@@ -51,14 +49,6 @@ func (u *facultyUsecase) GetByID(id database.PID) (*models.Faculty, error) {
 
 func (u *facultyUsecase) List(filters *models.FetchFacultyRequest) ([]*models.Faculty, error) {
 	return u.repo.List(filters)
-}
-
-func (u *facultyUsecase) AddDepartment(facultyID, departmentID database.PID) error {
-	return u.repo.AddDepartment(facultyID, departmentID)
-}
-
-func (u *facultyUsecase) RemoveDepartment(facultyID, departmentID database.PID) error {
-	return u.repo.RemoveDepartment(facultyID, departmentID)
 }
 
 func (u *facultyUsecase) AddTeacher(facultyID, teacherID database.PID) error {

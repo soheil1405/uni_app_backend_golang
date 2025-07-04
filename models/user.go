@@ -16,16 +16,23 @@ type Users []*User
 
 type User struct {
 	database.Model
-	Username  string           `gorm:"not null;unique" json:"username,omitempty"`
-	Email     string           `gorm:"not null;unique" json:"email,omitempty"`
-	Password  string           `gorm:"not null" json:"-,omitempty"`
-	UniID     database.PID     `json:"uni_id,omitempty"`
-	Uni       Uni              `json:"uni,omitempty"`
-	FacultyID database.NullPID `json:"faculty_id,omitempty"`
-	Faculty   *Faculty         `json:"faculty,omitempty"`
-	RoleID    database.PID     `json:"role_id,omitempty"`
-	Role      Role             `json:"role,omitempty"`
-	Status    UserStatus       `json:"status,omitempty"`
+	FirstName    string           `json:"first_name,omitempty"`
+	LastName     string           `json:"last_name,omitempty"`
+	Username     string           `gorm:"not null;unique" json:"username,omitempty"`
+	Number       string           `json:"number,omitempty"`
+	PersonalCode string           `json:"personal_code,omitempty"`
+	DegreeLevel  DegreeLevel      `json:"degree_level,omitempty"`
+	MajorID      database.PID     `json:"major_id,omitempty"`
+	NationalCode string     `json:"national_code,omitempty"`
+	Email        string           `gorm:"not null;unique" json:"email,omitempty"`
+	Password     string           `gorm:"not null" json:"-,omitempty"`
+	UniID        database.PID     `json:"uni_id,omitempty"`
+	Uni          Uni              `json:"uni,omitempty"`
+	FacultyID    database.NullPID `json:"faculty_id,omitempty"`
+	Faculty      *Faculty         `json:"faculty,omitempty"`
+	RoleID       database.PID     `json:"role_id,omitempty"`
+	Role         Role             `json:"role,omitempty"`
+	Status       UserStatus       `json:"status,omitempty"`
 }
 
 type FetchUserRequest struct {

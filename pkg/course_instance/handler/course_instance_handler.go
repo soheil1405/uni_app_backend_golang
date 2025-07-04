@@ -33,8 +33,6 @@ func (h *CourseInstanceHandler) initRoutes() {
 	courseInstanceGroup.GET("", h.List)
 	courseInstanceGroup.POST("/:id/students/:student_id", h.AddStudent)
 	courseInstanceGroup.DELETE("/:id/students/:student_id", h.RemoveStudent)
-	courseInstanceGroup.POST("/:id/schedules", h.AddSchedule)
-	courseInstanceGroup.DELETE("/:id/schedules/:schedule_id", h.RemoveSchedule)
 }
 
 func (h *CourseInstanceHandler) Create(c echo.Context) error {
@@ -140,42 +138,6 @@ func (h *CourseInstanceHandler) RemoveStudent(c echo.Context) error {
 	}
 
 	if err := h.usecase.RemoveStudent(database.PID(courseInstanceID), database.PID(studentID)); err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-
-	return c.NoContent(http.StatusNoContent)
-}
-
-func (h *CourseInstanceHandler) AddSchedule(c echo.Context) error {
-	courseInstanceID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid course instance ID")
-	}
-
-	var schedule models.ClassSchedule
-	if err := c.Bind(&schedule); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
-	}
-
-	if err := h.usecase.AddSchedule(database.PID(courseInstanceID), &schedule); err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-
-	return c.JSON(http.StatusCreated, schedule)
-}
-
-func (h *CourseInstanceHandler) RemoveSchedule(c echo.Context) error {
-	courseInstanceID, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid course instance ID")
-	}
-
-	scheduleID, err := strconv.ParseUint(c.Param("schedule_id"), 10, 64)
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid schedule ID")
-	}
-
-	if err := h.usecase.RemoveSchedule(database.PID(courseInstanceID), database.PID(scheduleID)); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 

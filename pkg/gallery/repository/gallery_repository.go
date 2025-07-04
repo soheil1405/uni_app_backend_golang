@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"uni_app/database"
 	"uni_app/models"
 
 	"gorm.io/gorm"
@@ -9,11 +10,11 @@ import (
 
 type GalleryRepository interface {
 	Create(ctx context.Context, gallery *models.Gallery) error
-	GetByID(ctx context.Context, id uint) (*models.Gallery, error)
+	GetByID(ctx context.Context, id database.PID) (*models.Gallery, error)
 	Update(ctx context.Context, gallery *models.Gallery) error
-	Delete(ctx context.Context, id uint) error
-	GetByImageable(ctx context.Context, imageableID uint, imageableType string) ([]*models.Gallery, error)
-	GetMainImage(ctx context.Context, imageableID uint, imageableType string) (*models.Gallery, error)
+	Delete(ctx context.Context, id database.PID) error
+	GetByImageable(ctx context.Context, imageableID database.PID, imageableType string) ([]*models.Gallery, error)
+	GetMainImage(ctx context.Context, imageableID database.PID, imageableType string) (*models.Gallery, error)
 }
 
 type galleryRepository struct {
@@ -28,7 +29,7 @@ func (r *galleryRepository) Create(ctx context.Context, gallery *models.Gallery)
 	return r.db.WithContext(ctx).Create(gallery).Error
 }
 
-func (r *galleryRepository) GetByID(ctx context.Context, id uint) (*models.Gallery, error) {
+func (r *galleryRepository) GetByID(ctx context.Context, id database.PID) (*models.Gallery, error) {
 	var gallery models.Gallery
 	err := r.db.WithContext(ctx).First(&gallery, id).Error
 	if err != nil {
@@ -41,11 +42,11 @@ func (r *galleryRepository) Update(ctx context.Context, gallery *models.Gallery)
 	return r.db.WithContext(ctx).Save(gallery).Error
 }
 
-func (r *galleryRepository) Delete(ctx context.Context, id uint) error {
+func (r *galleryRepository) Delete(ctx context.Context, id database.PID) error {
 	return r.db.WithContext(ctx).Delete(&models.Gallery{}, id).Error
 }
 
-func (r *galleryRepository) GetByImageable(ctx context.Context, OwnerID uint, OwnerType string) ([]*models.Gallery, error) {
+func (r *galleryRepository) GetByImageable(ctx context.Context, OwnerID database.PID, OwnerType string) ([]*models.Gallery, error) {
 	var galleries []*models.Gallery
 	err := r.db.WithContext(ctx).
 		Where("owner_id = ? AND owner_type = ?", OwnerID, OwnerType).
@@ -57,7 +58,7 @@ func (r *galleryRepository) GetByImageable(ctx context.Context, OwnerID uint, Ow
 	return galleries, nil
 }
 
-func (r *galleryRepository) GetMainImage(ctx context.Context, OwnerID uint, OwnerType string) (*models.Gallery, error) {
+func (r *galleryRepository) GetMainImage(ctx context.Context, OwnerID database.PID, OwnerType string) (*models.Gallery, error) {
 	var gallery models.Gallery
 	err := r.db.WithContext(ctx).
 		Where("owner_id = ? AND owner_type = ? AND is_main = ?", OwnerID, OwnerType, true).

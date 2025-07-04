@@ -9,44 +9,44 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type StudentPassedLessonUsecase interface {
-	AddPassedLesson(passedLesson *models.StudentPassedLesson) error
-	GetPassedLessonByID(ctx echo.Context, ID database.PID, useCache bool) (*models.StudentPassedLesson, error)
-	UpdatePassedLesson(passedLesson *models.StudentPassedLesson) error
-	DeletePassedLesson(ID database.PID) error
-	GetAllPassedLessons(ctx echo.Context, request models.FetchStudentPassedLessonRequest) ([]models.StudentPassedLesson, error)
-	GetStudentPassedLessons(studentID database.PID) ([]models.StudentPassedLesson, error)
+type StudentPassedCourseUsecase interface {
+	AddPassedCourse(passedCourse *models.StudentPassedCourse) error
+	GetPassedCourseByID(ctx echo.Context, ID database.PID, useCache bool) (*models.StudentPassedCourse, error)
+	UpdatePassedCourse(passedCourse *models.StudentPassedCourse) error
+	DeletePassedCourse(ID database.PID) error
+	GetAllPassedCourses(ctx echo.Context, request models.FetchStudentPassedCourseRequest) ([]models.StudentPassedCourse, error)
+	GetStudentPassedCourses(studentID database.PID) ([]models.StudentPassedCourse, error)
 }
 
-type studentPassedLessonUsecase struct {
-	repo   repositories.StudentPassedLessonRepository
+type studentPassedCourseUsecase struct {
+	repo   repositories.StudentPassedCourseRepository
 	config *env.Config
 }
 
-func NewStudentPassedLessonUsecase(repo repositories.StudentPassedLessonRepository, config *env.Config) StudentPassedLessonUsecase {
-	return &studentPassedLessonUsecase{repo, config}
+func NewStudentPassedCourseUsecase(repo repositories.StudentPassedCourseRepository, config *env.Config) StudentPassedCourseUsecase {
+	return &studentPassedCourseUsecase{repo, config}
 }
 
-func (u *studentPassedLessonUsecase) AddPassedLesson(passedLesson *models.StudentPassedLesson) error {
-	return u.repo.Create(passedLesson)
+func (u *studentPassedCourseUsecase) AddPassedCourse(passedCourse *models.StudentPassedCourse) error {
+	return u.repo.Create(passedCourse)
 }
 
-func (u *studentPassedLessonUsecase) GetPassedLessonByID(ctx echo.Context, ID database.PID, useCache bool) (*models.StudentPassedLesson, error) {
+func (u *studentPassedCourseUsecase) GetPassedCourseByID(ctx echo.Context, ID database.PID, useCache bool) (*models.StudentPassedCourse, error) {
 	return u.repo.GetByID(ctx, ID, useCache)
 }
 
-func (u *studentPassedLessonUsecase) UpdatePassedLesson(passedLesson *models.StudentPassedLesson) error {
-	return u.repo.Update(passedLesson)
+func (u *studentPassedCourseUsecase) UpdatePassedCourse(passedCourse *models.StudentPassedCourse) error {
+	return u.repo.Update(passedCourse)
 }
 
-func (u *studentPassedLessonUsecase) DeletePassedLesson(ID database.PID) error {
+func (u *studentPassedCourseUsecase) DeletePassedCourse(ID database.PID) error {
 	return u.repo.Delete(ID)
 }
 
-func (u *studentPassedLessonUsecase) GetAllPassedLessons(ctx echo.Context, request models.FetchStudentPassedLessonRequest) ([]models.StudentPassedLesson, error) {
+func (u *studentPassedCourseUsecase) GetAllPassedCourses(ctx echo.Context, request models.FetchStudentPassedCourseRequest) ([]models.StudentPassedCourse, error) {
 	return u.repo.GetAll(ctx, request)
 }
 
-func (u *studentPassedLessonUsecase) GetStudentPassedLessons(studentID database.PID) ([]models.StudentPassedLesson, error) {
+func (u *studentPassedCourseUsecase) GetStudentPassedCourses(studentID database.PID) ([]models.StudentPassedCourse, error) {
 	return u.repo.GetByStudentID(studentID)
 }

@@ -52,27 +52,6 @@ func (r *userRepository) Delete(ID database.PID) error {
 func (r *userRepository) GetAll(ctx echo.Context, request models.FetchUserRequest) ([]models.User, *helpers.PaginateTemplate, error) {
 	var users []models.User
 	query := r.db.Model(&models.User{})
-	if request.DegreeLevel != "" {
-		query = query.Where("degree_level = ?", request.DegreeLevel)
-	}
-	if request.MajorID != 0 {
-		query = query.Where("major_id = ?", request.MajorID)
-	}
-	if request.UniID != 0 {
-		query = query.Where("uni_id = ?", request.UniID)
-	}
-	if request.NationalCode != "" {
-		query = query.Where("national_code = ?", request.NationalCode)
-	}
-	if request.Email != "" {
-		query = query.Where("email = ?", request.Email)
-	}
-	if request.Number != "" {
-		query = query.Where("number = ?", request.Number)
-	}
-	if request.PersonalCode != "" {
-		query = query.Where("personal_code = ?", request.PersonalCode)
-	}
 
 	// Apply pagination
 	paginate := helpers.NewPaginateTemplate(request.Page, request.Limit)

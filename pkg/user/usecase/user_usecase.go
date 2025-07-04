@@ -20,9 +20,9 @@ type UserUsecase interface {
 	UpdateUser(user *models.User) error
 	DeleteUser(ID database.PID) error
 	GetAllUsers(ctx echo.Context, request models.FetchUserRequest) ([]models.User, *helpers.PaginateTemplate, error)
-	RegisterUser(ctx echo.Context, request *models.UserRegisterRequest) error
-	LoginUser(username, password string) (*models.User, error)
-	ValidateToken(token string) (*models.User, error)
+	RegisterUser(ctx echo.Context, request *models.UserRegisterRequest) (user *models.User, token string, err error)
+	LoginUser(username, password string) (user *models.User, token string, err error)
+	ValidateToken(token string) (user *models.User, tokenn string, err error)
 }
 
 type userUsecase struct {
@@ -55,12 +55,10 @@ func (u *userUsecase) GetAllUsers(ctx echo.Context, request models.FetchUserRequ
 	return u.repo.GetAll(ctx, request)
 }
 
-func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegisterRequest) error {
+func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegisterRequest) (user *models.User, token string, err error) {
 	fetchRequest := models.FetchUserRequest{
-		NationalCode: request.NationalCode,
-		Email:        request.Email,
-		Number:       request.Number,
-		PersonalCode: request.PersonalCode,
+		Email:    request.Email,
+		Username: request.UserName,
 		FetchRequest: models.FetchRequest{
 			Limit:  1,
 			Offset: 0,
@@ -68,12 +66,12 @@ func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegiste
 	}
 	existingUser, _, err := u.repo.GetAll(ctx, fetchRequest)
 	if err != nil || len(existingUser) > 0 {
-		return errors.New("username already exists")
+		return nil, "", errors.New("username already exists")
 	}
 
 	nationalCode := request.NationalCode
-	user := &models.User{
-		UserName:     request.UserName,
+	user = &models.User{
+		Username:     request.UserName,
 		Email:        request.Email,
 		Status:       models.USER_STATUS_ACTIVE,
 		FirstName:    request.FirstName,
@@ -83,73 +81,67 @@ func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegiste
 		DegreeLevel:  request.DegreeLevel,
 		MajorID:      request.MajorID,
 		UniID:        request.UniID,
-		NationalCode: &nationalCode,
+		NationalCode: nationalCode,
 	}
 
 	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return err
+		return nil, "", err
 	}
 	user.Password = string(hashedPassword)
 	user.Status = models.USER_STATUS_ACTIVE
 	if err := u.repo.Create(user); err != nil {
-		return errors.New("user already exists")
+		return nil, "", errors.New("user already exists")
 	}
 
 	// Generate JWT token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Id:        user.ID.String(),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	// Sign the token with the secret key
-	tokenString, err := token.SignedString([]byte(u.config.GetString("service.auth.secret")))
+	token, err = jwtToken.SignedString([]byte(u.config.GetString("service.auth.secret")))
 	if err != nil {
-		return err
+		return nil, "", err
 	}
 
-	// Set the token in the user object
-	user.Token.Token = tokenString
-
-	return nil
+	return user, token, nil
 }
 
-func (u *userUsecase) LoginUser(username, password string) (*models.User, error) {
-	user, err := u.repo.GetByUsername(username)
+func (u *userUsecase) LoginUser(username, password string) (user *models.User, token string, err error) {
+	user, err = u.repo.GetByUsername(username)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if user == nil {
-		return nil, errors.New("invalid username or password")
+		return nil, "", errors.New("invalid username or password")
 	}
 
 	// Verify password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return nil, errors.New("invalid username or password")
+		return nil, "", errors.New("invalid username or password")
 	}
 
 	// Generate JWT token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Id:        user.ID.String(),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	// Sign the token with the secret key
-	tokenString, err := token.SignedString([]byte(u.config.GetString("service.auth.secret")))
+	tokenString, err := jwtToken.SignedString([]byte(u.config.GetString("service.auth.secret")))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	// Set the token in the user object
-	user.Token.Token = tokenString
-
-	return user, nil
+	return user, tokenString, nil
 }
 
-func (u *userUsecase) ValidateToken(tokenString string) (*models.User, error) {
+func (u *userUsecase) ValidateToken(tokenString string) (user *models.User, token string, err error) {
 	// Parse the token
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	jwtToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Validate the signing method
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
@@ -158,34 +150,34 @@ func (u *userUsecase) ValidateToken(tokenString string) (*models.User, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	// Check if the token is valid
-	if !token.Valid {
-		return nil, errors.New("invalid token")
+	if !jwtToken.Valid {
+		return nil, "", errors.New("invalid token")
 	}
 
 	// Get the claims
-	claims, ok := token.Claims.(jwt.StandardClaims)
+	claims, ok := jwtToken.Claims.(jwt.StandardClaims)
 	if !ok {
-		return nil, errors.New("invalid token claims")
+		return nil, "", errors.New("invalid token claims")
 	}
 
 	// Get the user ID from the claims
 	userID := database.Parse(claims.Id)
 	if !userID.IsValid() {
-		return nil, errors.New("invalid user ID in token")
+		return nil, "", errors.New("invalid user ID in token")
 	}
 
 	// Get the user from the database
-	user, err := u.repo.GetByID(nil, userID, false)
+	user, err = u.repo.GetByID(nil, userID, false)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if user == nil {
-		return nil, errors.New("user not found")
+		return nil, "", errors.New("user not found")
 	}
 
-	return user, nil
+	return user, tokenString, nil
 }

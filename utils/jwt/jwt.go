@@ -24,7 +24,7 @@ func GenerateToken(auth map[string]string, user *models.User) (tokenKey string, 
 
 	claims := &jwt.StandardClaims{
 		Id:        user.ID.String(),
-		Subject:   user.UserName,
+		Subject:   user.Username,
 		ExpiresAt: expTime.Unix(),
 	}
 

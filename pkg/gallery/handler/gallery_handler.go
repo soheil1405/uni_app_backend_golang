@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
-	"strconv"
 
+	"uni_app/database"
 	"uni_app/models"
 	"uni_app/pkg/gallery/usecase"
 	"uni_app/utils/ctxHelper"
@@ -47,7 +48,7 @@ func (h *GalleryHandler) GetGalleryByID(c echo.Context) error {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 
-	gallery, err := h.galleryUsecase.GetGalleryByID(c.Request().Context(), uint(ID))
+	gallery, err := h.galleryUsecase.GetGalleryByID(c.Request().Context(), ID)
 	if err != nil {
 		return helpers.Reply(c, http.StatusNotFound, err, nil, nil)
 	}
@@ -80,7 +81,7 @@ func (h *GalleryHandler) DeleteGallery(c echo.Context) error {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 
-	if err := h.galleryUsecase.DeleteGallery(c.Request().Context(), uint(ID)); err != nil {
+	if err := h.galleryUsecase.DeleteGallery(c.Request().Context(), ID); err != nil {
 		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
 
@@ -88,9 +89,9 @@ func (h *GalleryHandler) DeleteGallery(c echo.Context) error {
 }
 
 func (h *GalleryHandler) GetGalleriesByImageable(c echo.Context) error {
-	imageableID, err := strconv.ParseUint(c.QueryParam("imageable_id"), 10, 32)
-	if err != nil {
-		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
+	imageableID := database.Parse(c.QueryParam("imageable_id"))
+	if !imageableID.IsValid() {
+		return helpers.Reply(c, http.StatusBadRequest, errors.New("invalid imagable id"), nil, nil)
 	}
 
 	imageableType := c.QueryParam("imageable_type")
@@ -98,7 +99,7 @@ func (h *GalleryHandler) GetGalleriesByImageable(c echo.Context) error {
 		return helpers.Reply(c, http.StatusBadRequest, nil, nil, map[string]string{"error": "Imageable type is required"})
 	}
 
-	galleries, err := h.galleryUsecase.GetGalleriesByImageable(c.Request().Context(), uint(imageableID), imageableType)
+	galleries, err := h.galleryUsecase.GetGalleriesByImageable(c.Request().Context(), imageableID, imageableType)
 	if err != nil {
 		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
@@ -112,7 +113,7 @@ func (h *GalleryHandler) SetMainImage(c echo.Context) error {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
 
-	if err := h.galleryUsecase.SetMainImage(c.Request().Context(), uint(ID)); err != nil {
+	if err := h.galleryUsecase.SetMainImage(c.Request().Context(), ID); err != nil {
 		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)
 	}
 

@@ -2,18 +2,19 @@ package usecase
 
 import (
 	"context"
+	"uni_app/database"
 	"uni_app/models"
 	"uni_app/pkg/gallery/repository"
 )
 
 type GalleryUsecase interface {
 	CreateGallery(ctx context.Context, gallery *models.Gallery) error
-	GetGalleryByID(ctx context.Context, id uint) (*models.Gallery, error)
+	GetGalleryByID(ctx context.Context, id database.PID) (*models.Gallery, error)
 	UpdateGallery(ctx context.Context, gallery *models.Gallery) error
-	DeleteGallery(ctx context.Context, id uint) error
-	GetGalleriesByImageable(ctx context.Context, imageableID uint, imageableType string) ([]*models.Gallery, error)
-	GetMainImage(ctx context.Context, imageableID uint, imageableType string) (*models.Gallery, error)
-	SetMainImage(ctx context.Context, galleryID uint) error
+	DeleteGallery(ctx context.Context, id database.PID) error
+	GetGalleriesByImageable(ctx context.Context, imageableID database.PID, imageableType string) ([]*models.Gallery, error)
+	GetMainImage(ctx context.Context, imageableID database.PID, imageableType string) (*models.Gallery, error)
+	SetMainImage(ctx context.Context, galleryID database.PID) error
 }
 
 type galleryUsecase struct {
@@ -30,7 +31,7 @@ func (u *galleryUsecase) CreateGallery(ctx context.Context, gallery *models.Gall
 	return u.galleryRepo.Create(ctx, gallery)
 }
 
-func (u *galleryUsecase) GetGalleryByID(ctx context.Context, id uint) (*models.Gallery, error) {
+func (u *galleryUsecase) GetGalleryByID(ctx context.Context, id database.PID) (*models.Gallery, error) {
 	return u.galleryRepo.GetByID(ctx, id)
 }
 
@@ -38,19 +39,19 @@ func (u *galleryUsecase) UpdateGallery(ctx context.Context, gallery *models.Gall
 	return u.galleryRepo.Update(ctx, gallery)
 }
 
-func (u *galleryUsecase) DeleteGallery(ctx context.Context, id uint) error {
+func (u *galleryUsecase) DeleteGallery(ctx context.Context, id database.PID) error {
 	return u.galleryRepo.Delete(ctx, id)
 }
 
-func (u *galleryUsecase) GetGalleriesByImageable(ctx context.Context, imageableID uint, imageableType string) ([]*models.Gallery, error) {
+func (u *galleryUsecase) GetGalleriesByImageable(ctx context.Context, imageableID database.PID, imageableType string) ([]*models.Gallery, error) {
 	return u.galleryRepo.GetByImageable(ctx, imageableID, imageableType)
 }
 
-func (u *galleryUsecase) GetMainImage(ctx context.Context, imageableID uint, imageableType string) (*models.Gallery, error) {
+func (u *galleryUsecase) GetMainImage(ctx context.Context, imageableID database.PID, imageableType string) (*models.Gallery, error) {
 	return u.galleryRepo.GetMainImage(ctx, imageableID, imageableType)
 }
 
-func (u *galleryUsecase) SetMainImage(ctx context.Context, galleryID uint) error {
+func (u *galleryUsecase) SetMainImage(ctx context.Context, galleryID database.PID) error {
 	gallery, err := u.galleryRepo.GetByID(ctx, galleryID)
 	if err != nil {
 		return err

@@ -9,106 +9,106 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type StudentPassedLessonHandler struct {
-	usecase usecases.StudentPassedLessonUsecase
+type StudentPassedCourseHandler struct {
+	usecase usecases.StudentPassedCourseUsecase
 }
 
-func NewStudentPassedLessonHandler(usecase usecases.StudentPassedLessonUsecase, e echo.Group) {
-	handler := &StudentPassedLessonHandler{
+func NewStudentPassedCourseHandler(usecase usecases.StudentPassedCourseUsecase, e echo.Group) {
+	handler := &StudentPassedCourseHandler{
 		usecase: usecase,
 	}
 
-	e.POST("/student-passed-lessons", handler.AddPassedLesson)
-	e.GET("/student-passed-lessons/:id", handler.GetPassedLessonByID)
-	e.PUT("/student-passed-lessons/:id", handler.UpdatePassedLesson)
-	e.DELETE("/student-passed-lessons/:id", handler.DeletePassedLesson)
-	e.GET("/student-passed-lessons", handler.GetAllPassedLessons)
-	e.GET("/students/:student_id/passed-lessons", handler.GetStudentPassedLessons)
+	e.POST("/student-passed-course", handler.AddPassedCourse)
+	e.GET("/student-passed-course/:id", handler.GetPassedCourseByID)
+	e.PUT("/student-passed-course/:id", handler.UpdatePassedCourse)
+	e.DELETE("/student-passed-course/:id", handler.DeletePassedCourse)
+	e.GET("/student-passed-course", handler.GetAllPassedCourses)
+	e.GET("/students/:student_id/passed-course", handler.GetStudentPassedCourses)
 }
 
-func (h *StudentPassedLessonHandler) AddPassedLesson(c echo.Context) error {
-	var passedLesson models.StudentPassedLesson
-	if err := c.Bind(&passedLesson); err != nil {
+func (h *StudentPassedCourseHandler) AddPassedCourse(c echo.Context) error {
+	var passedCourse models.StudentPassedCourse
+	if err := c.Bind(&passedCourse); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	if err := h.usecase.AddPassedLesson(&passedLesson); err != nil {
+	if err := h.usecase.AddPassedCourse(&passedCourse); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusCreated, passedLesson)
+	return c.JSON(http.StatusCreated, passedCourse)
 }
 
-func (h *StudentPassedLessonHandler) GetPassedLessonByID(c echo.Context) error {
+func (h *StudentPassedCourseHandler) GetPassedCourseByID(c echo.Context) error {
 	ID, err := helpers.GetIDFromContxt(c)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	passedLesson, err := h.usecase.GetPassedLessonByID(c, ID, false)
+	passedCourse, err := h.usecase.GetPassedCourseByID(c, ID, false)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, passedLesson)
+	return c.JSON(http.StatusOK, passedCourse)
 }
 
-func (h *StudentPassedLessonHandler) UpdatePassedLesson(c echo.Context) error {
+func (h *StudentPassedCourseHandler) UpdatePassedCourse(c echo.Context) error {
 	ID, err := helpers.GetIDFromContxt(c)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	var passedLesson models.StudentPassedLesson
-	if err := c.Bind(&passedLesson); err != nil {
+	var passedLCourse models.StudentPassedCourse
+	if err := c.Bind(&passedLCourse); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	passedLesson.ID = ID
-	if err := h.usecase.UpdatePassedLesson(&passedLesson); err != nil {
+	passedLCourse.ID = ID
+	if err := h.usecase.UpdatePassedCourse(&passedLCourse); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, passedLesson)
+	return c.JSON(http.StatusOK, passedLCourse)
 }
 
-func (h *StudentPassedLessonHandler) DeletePassedLesson(c echo.Context) error {
+func (h *StudentPassedCourseHandler) DeletePassedCourse(c echo.Context) error {
 	ID, err := helpers.GetIDFromContxt(c)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	if err := h.usecase.DeletePassedLesson(ID); err != nil {
+	if err := h.usecase.DeletePassedCourse(ID); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
 	return c.NoContent(http.StatusNoContent)
 }
 
-func (h *StudentPassedLessonHandler) GetAllPassedLessons(c echo.Context) error {
-	var request models.FetchStudentPassedLessonRequest
+func (h *StudentPassedCourseHandler) GetAllPassedCourses(c echo.Context) error {
+	var request models.FetchStudentPassedCourseRequest
 	if err := c.Bind(&request); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	passedLessons, err := h.usecase.GetAllPassedLessons(c, request)
+	passedCourses, err := h.usecase.GetAllPassedCourses(c, request)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, passedLessons)
+	return c.JSON(http.StatusOK, passedCourses)
 }
 
-func (h *StudentPassedLessonHandler) GetStudentPassedLessons(c echo.Context) error {
+func (h *StudentPassedCourseHandler) GetStudentPassedCourses(c echo.Context) error {
 	studentID, err := helpers.GetIDFromContxt(c)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
-	passedLessons, err := h.usecase.GetStudentPassedLessons(studentID)
+	passedCourses, err := h.usecase.GetStudentPassedCourses(studentID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, passedLessons)
+	return c.JSON(http.StatusOK, passedCourses)
 }

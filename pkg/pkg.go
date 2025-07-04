@@ -4,11 +4,8 @@ import (
 	"fmt"
 	"uni_app/models"
 	"uni_app/pkg/address"
-	"uni_app/pkg/auth"
 	"uni_app/pkg/city"
 	"uni_app/pkg/comment/comment"
-	daneshkadeh "uni_app/pkg/daneshkadeh"
-	"uni_app/pkg/lesson"
 	"uni_app/pkg/major"
 	"uni_app/pkg/major_chart"
 	"uni_app/pkg/notification"
@@ -20,7 +17,6 @@ import (
 	"uni_app/pkg/student"
 	"uni_app/pkg/student_passed_lesson"
 	"uni_app/pkg/uni"
-	"uni_app/pkg/uni_major"
 	"uni_app/pkg/user"
 	"uni_app/services/env"
 
@@ -31,10 +27,7 @@ import (
 func InitPkgs(db *gorm.DB, e echo.Group, cfg *env.Config) {
 	migrateModels(db, cfg)
 	address.Init(db, e, cfg)
-	auth.Init(db, e, cfg)
 	city.Init(db, e, cfg)
-	daneshkadeh.Init(db, e, cfg)
-	lesson.Init(db, e, cfg)
 	major.Init(db, e, cfg)
 	major_chart.Init(db, e, cfg)
 	place.Init(db, e, cfg)
@@ -45,7 +38,6 @@ func InitPkgs(db *gorm.DB, e echo.Group, cfg *env.Config) {
 	student.Init(db, e, cfg)
 	student_passed_lesson.Init(db, e, cfg)
 	uni.Init(db, e, cfg)
-	uni_major.Init(db, e, cfg)
 	user.Init(db, e, cfg)
 	notification.InitNotification(e, db)
 	comment.Init(db, e, cfg)
@@ -58,15 +50,12 @@ func migrateModels(db *gorm.DB, config *env.Config) {
 	if migration := config.GetBool("migration"); migration {
 		fmt.Println("Migrating database...")
 		if err = db.Debug().AutoMigrate(
-			&models.UserRole{},
 			&models.Role{},
-			&models.DaneshKadeh{},
 			&models.Place{},
 			&models.PlaceType{},
 			&models.Student{},
 			&models.Token{},
 			&models.Uni{},
-			&models.UniMajor{},
 			&models.User{},
 			&models.Major{},
 			&models.MajorsChart{},
@@ -77,10 +66,8 @@ func migrateModels(db *gorm.DB, config *env.Config) {
 			&models.ContactWay{},
 			&models.City{},
 			&models.Address{},
-			&models.Lesson{},
 			&models.Major{},
 			&models.MajorsChart{},
-			&models.StudentPassedLesson{},
 			&models.Rating{},
 			&models.Notification{},
 			&models.NotificationTemplate{},

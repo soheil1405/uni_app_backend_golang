@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"log"
 	"uni_app/database"
-	handler "uni_app/pkg/auth/handler"
-	"uni_app/pkg/auth/middleware"
-	repositories "uni_app/pkg/auth/repository"
-	"uni_app/pkg/auth/usecase"
+	"uni_app/pkg"
+
 	"uni_app/services/env"
 
 	"github.com/labstack/echo/v4"
@@ -32,21 +30,22 @@ func main() {
 		log.Fatal("Failed to initialize database:", err)
 	}
 
-	// Initialize repositories
-	authRepo := repositories.NewAuthRepository(db)
+	// // Initialize repositories
+	// authRepo := repositories.NewAuthRepository(db)
 
-	// Initialize usecases
-	authUsecase := usecase.NewAuthUsecase(authRepo, config)
+	// // Initialize usecases
+	// authUsecase := usecase.NewAuthUsecase(authRepo, config)
 
-	// Initialize middleware
-	_ = middleware.NewAuthMiddleware(authRepo, config)
+	// // Initialize middleware
+	// _ = middleware.NewAuthMiddleware(authRepo, config)
 
 	// Initialize Echo
 	e := echo.New()
+	apiGroup := e.Group("/api")
+	pkg.InitPkgs(db, apiGroup, config)
 
 	// Initialize handlers
-	apiGroup := e.Group("/api")
-	handler.NewAuthHandler(authUsecase, *apiGroup)
+	// handler.NewAuthHandler(authUsecase, *apiGroup)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

@@ -80,12 +80,12 @@ func (h *StudentHandler) Delete(c echo.Context) error {
 }
 
 func (h *StudentHandler) GetByID(c echo.Context) error {
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-	if err != nil {
+	id := database.Parse(c.Param("id"))
+	if !id.IsValid() {
 		return c.JSON(http.StatusBadRequest, "Invalid ID")
 	}
 
-	student, err := h.usecase.GetByID(database.PID(id))
+	student, err := h.usecase.GetByID(c, id, false)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

@@ -17,7 +17,7 @@ type StudentUsecase interface {
 	Create(student *models.Student) error
 	Update(student *models.Student) error
 	Delete(id database.PID) error
-	GetByID(id database.PID) (*models.Student, error)
+	GetByID(ctx echo.Context, id database.PID, usecache bool) (*models.Student, error)
 	List(filters *models.FetchStudentRequest) ([]*models.Student, error)
 	GetAllStudents(ctx echo.Context, request models.FetchStudentRequest) ([]models.Student, *helpers.PaginateTemplate, error)
 	RegisterStudent(student *models.Student) error
@@ -55,8 +55,8 @@ func (u *studentUsecase) Delete(id database.PID) error {
 	return u.repo.Delete(id)
 }
 
-func (u *studentUsecase) GetByID(id database.PID) (*models.Student, error) {
-	return u.repo.GetByID(id)
+func (u *studentUsecase) GetByID(ctx echo.Context, id database.PID, usecache bool) (*models.Student, error) {
+	return u.repo.GetByID(ctx, id, usecache)
 }
 
 func (u *studentUsecase) List(filters *models.FetchStudentRequest) ([]*models.Student, error) {

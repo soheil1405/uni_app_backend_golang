@@ -65,7 +65,7 @@ func (h *SocialMediaLinkHandler) UpdateLink(c echo.Context) error {
 	if err != nil {
 		return helpers.Reply(c, http.StatusBadRequest, err, nil, nil)
 	}
-	link.ID = uint(ID)
+	link.ID = ID
 
 	if err := h.socialMediaLinkUsecase.UpdateLink(c.Request().Context(), &link); err != nil {
 		return helpers.Reply(c, http.StatusInternalServerError, err, nil, nil)

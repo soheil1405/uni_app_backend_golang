@@ -97,18 +97,6 @@ func (r *studentRepository) List(filters *models.FetchStudentRequest) ([]*models
 	var students []*models.Student
 	query := r.db.Model(&models.Student{})
 
-	if filters.Name != "" {
-		query = query.Where("name LIKE ?", "%"+filters.Name+"%")
-	}
-
-	if filters.Email != "" {
-		query = query.Where("email LIKE ?", "%"+filters.Email+"%")
-	}
-
-	if filters.Phone != "" {
-		query = query.Where("phone LIKE ?", "%"+filters.Phone+"%")
-	}
-
 	err := query.Preload("CourseInstances").
 		Preload("CourseInstances.Course").
 		Preload("CourseInstances.ClassSchedules").
