@@ -10,20 +10,21 @@ import (
 // Article represents a blog post or article in the system
 type Article struct {
 	database.Model
-	Title       string     `json:"title" gorm:"size:255;not null"`
-	Content     string     `json:"content" gorm:"type:text;not null"`
-	Summary     string     `json:"summary" gorm:"size:500"`
-	Slug        string     `json:"slug" gorm:"size:255;uniqueIndex"`
-	AuthorID    uint       `json:"author_id" gorm:"not null"`
-	Author      User       `json:"author" gorm:"foreignKey:AuthorID"`
-	Status      string     `json:"status" gorm:"size:20;default:'draft'"` // draft, published, archived
-	PublishedAt time.Time  `json:"published_at"`
-	Views       int        `json:"views" gorm:"default:0"`
-	Likes       int        `json:"likes" gorm:"default:0"`
-	Tags        []Tag      `json:"tags" gorm:"many2many:article_tags;"`
-	Categories  []Category `json:"categories" gorm:"many2many:article_categories;"`
-	Comments    []Comment  `json:"comments" gorm:"polymorphic:Owner;"`
-	IsActive    bool       `json:"is_active" gorm:"default:true"`
+	PolymorphicModel
+	Title       string     `json:"title,omitempty" gorm:"size:255;not null"`
+	Content     string     `json:"content,omitempty" gorm:"type:text;not null"`
+	Summary     string     `json:"summary,omitempty" gorm:"size:500"`
+	Slug        string     `json:"slug,omitempty" gorm:"size:255;uniqueIndex"`
+	AuthorID    uint       `json:"author_id,omitempty" gorm:"not null"`
+	Author      User       `json:"author,omitempty" gorm:"foreignKey:AuthorID"`
+	Status      string     `json:"status,omitempty" gorm:"size:20;default:'draft'"` // draft, published, archived
+	PublishedAt time.Time  `json:"published_at,omitempty"`
+	Views       int        `json:"views,omitempty" gorm:"default:0"`
+	Likes       int        `json:"likes,omitempty" gorm:"default:0"`
+	Tags        []Tag      `json:"tags,omitempty" gorm:"many2many:article_tags;"`
+	Categories  []Category `json:"categories,omitempty" gorm:"many2many:article_categories;"`
+	Comments    []Comment  `json:"comments,omitempty" gorm:"polymorphic:Owner;"`
+	IsActive    bool       `json:"is_active,omitempty" gorm:"default:true"`
 }
 
 // FetchArticleRequest represents the parameters for fetching articles

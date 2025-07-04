@@ -13,11 +13,13 @@ type Roles []Role
 
 type Role struct {
 	database.Model
-	Name        string          `gorm:"not null" json:"name"`
-	Priority    int             `gorm:"not null;unique;" json:"priority"`
+	Name        string          `gorm:"not null" json:"name,omitempty"`
+	Priority    int             `gorm:"not null;unique;" json:"priority,omitempty"`
 	Description string          `json:"description,omitempty"`
 	Meta        json.RawMessage `gorm:"type:json" json:"meta,omitempty"`
-	UserRoles   []*UserRole     `json:"user_roles,omitempty"`
+	UniID       database.PID    `json:"uni_id,omitempty"`
+	Uni         Uni             `json:"uni,omitempty"`
+	Users       Users           `json:"users,omitempty"`
 }
 
 func (role *Role) BeforeCreate(tx *gorm.DB) (err error) {

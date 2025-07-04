@@ -1,26 +1,18 @@
 package models
 
 import (
-	"time"
 	"uni_app/database"
 )
 
 // Rating represents a polymorphic rating system that can be used to rate any entity
 type Rating struct {
-	ID        database.PID  `json:"id" gorm:"primaryKey"`
-	StudentID database.PID  `json:"student_id" gorm:"not null"`
-	UserID    database.PID  `json:"user_id" gorm:"not null"` // The user who wrote the comment
-	Rating    float64       `json:"rating" gorm:"not null"`
-	Comment   string        `json:"comment"`
-	OwnerID   database.PID  `json:"owner_id" gorm:"not null"`
-	OwnerType string        `json:"owner_type" gorm:"not null"`
-	ParentID  *database.PID `json:"parent_id" gorm:"default:null"` // For replies to comments
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
-	Student   *Student      `json:"student,omitempty" gorm:"foreignKey:StudentID"`
-	User      *User         `json:"user,omitempty" gorm:"foreignKey:UserID"`
-	Parent    *Rating       `json:"parent,omitempty" gorm:"foreignKey:ParentID"`
-	Replies   []Rating      `json:"replies,omitempty" gorm:"foreignKey:ParentID"`
+	database.Model
+	PolymorphicModel
+	StudentID database.PID `json:"student_id" gorm:"not null"`
+	Student   *Student     `json:"student,omitempty" gorm:"foreignKey:StudentID"`
+	UserID    database.PID `json:"user_id" gorm:"not null"`
+	User      *User        `json:"user,omitempty" gorm:"foreignKey:UserID"`
+	Rate      int          `json:"rate" gorm:"not null"`
 }
 
 // FetchRatingRequest represents the request parameters for fetching ratings

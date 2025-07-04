@@ -27,16 +27,17 @@ const (
 // Attention represents an attention/alert that needs to be shown to users or students
 type Attention struct {
 	database.Model
-	Type          AttentionType   `json:"type" gorm:"type:varchar(20);not null"`
-	Title         string          `json:"title" gorm:"type:varchar(255);not null"`
-	Message       string          `json:"message" gorm:"type:text;not null"`
-	Data          map[string]any  `json:"data" gorm:"type:jsonb"`
-	Status        AttentionStatus `json:"status" gorm:"type:varchar(20);default:'active'"`
-	RecipientID   database.PID    `json:"recipient_id" gorm:"not null"`
-	RecipientType string          `json:"recipient_type" gorm:"type:varchar(20);not null"` // user or student
-	ReadAt        *time.Time      `json:"read_at"`
-	ArchivedAt    *time.Time      `json:"archived_at"`
-	IsActive      bool            `json:"is_active" gorm:"default:true"`
+	PolymorphicModel
+	Type          AttentionType   `json:"type,omitempty" gorm:"type:varchar(20);not null"`
+	Title         string          `json:"title,omitempty" gorm:"type:varchar(255);not null"`
+	Message       string          `json:"message,omitempty" gorm:"type:text;not null"`
+	Data          map[string]any  `json:"data,omitempty" gorm:"type:jsonb"`
+	Status        AttentionStatus `json:"status,omitempty" gorm:"type:varchar(20);default:'active'"`
+	RecipientID   database.PID    `json:"recipient_id,omitempty" gorm:"not null"`
+	RecipientType string          `json:"recipient_type,omitempty" gorm:"type:varchar(20);not null"` // user or student
+	ReadAt        *time.Time      `json:"read_at,omitempty"`
+	ArchivedAt    *time.Time      `json:"archived_at,omitempty"`
+	IsActive      bool            `json:"is_active,omitempty" gorm:"default:true"`
 }
 
 // FetchAttentionRequest represents the request parameters for fetching attentions

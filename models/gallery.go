@@ -6,8 +6,7 @@ import (
 
 type Gallery struct {
 	database.Model
-	OwnerID     uint   `json:"owner_id"`
-	OwnerType   string `json:"owner_type"` // "University", "Faculty", "Place"
+	PolymorphicModel
 	ImageURL    string `json:"image_url"`
 	Title       string `json:"title"`
 	Description string `json:"description"`

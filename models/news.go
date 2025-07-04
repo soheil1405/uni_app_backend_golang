@@ -24,14 +24,13 @@ const (
 // News represents a news item that can be owned by different entities
 type News struct {
 	database.Model
+	PolymorphicModel
 	Title       string         `json:"title" gorm:"type:varchar(255);not null"`
 	Content     string         `json:"content" gorm:"type:text;not null"`
 	Summary     string         `json:"summary" gorm:"type:varchar(500)"`
 	Slug        string         `json:"slug" gorm:"type:varchar(255);uniqueIndex"`
 	Status      NewsStatus     `json:"status" gorm:"type:varchar(20);default:'draft'"`
 	PublishedAt *time.Time     `json:"published_at"`
-	OwnerID     database.PID   `json:"owner_id" gorm:"not null"`
-	OwnerType   string         `json:"owner_type" gorm:"type:varchar(20);not null"` // uni, daneshkadeh, place
 	AuthorID    database.PID   `json:"author_id" gorm:"not null"`
 	Author      *User          `json:"author,omitempty" gorm:"foreignKey:AuthorID"`
 	Tags        []Tag          `json:"tags,omitempty" gorm:"many2many:news_tags;"`

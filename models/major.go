@@ -7,11 +7,15 @@ type MajorType string
 // رشته تحصیلی
 type Major struct {
 	database.Model
-	DegreeLevel DegreeLevel `json:"degree_level,omitempty"`
-	Name        string      `gorm:"not null" json:"name,omitempty"`
-	Code        string      `gorm:"unique;not null" json:"code,omitempty"`
-	Description string      `json:"description,omitempty"`
-	Students    []Student   `gorm:"foreignKey:MajorID;constraint:OnDelete:CASCADE;" json:"students,omitempty"`
+	UniID       database.PID `json:"uni_id,omitempty"`
+	Uni         Uni          `json:"uni,omitempty"`
+	FacultyID   database.PID `json:"faculty_id,omitempty"`
+	Faculty     Faculty      `json:"faculty,omitempty"`
+	DegreeLevel DegreeLevel  `json:"degree_level,omitempty"`
+	Name        string       `gorm:"not null" json:"name,omitempty"`
+	Code        string       `gorm:"unique;not null" json:"code,omitempty"`
+	Description string       `json:"description,omitempty"`
+	Students    []Student    `gorm:"foreignKey:MajorID;constraint:OnDelete:CASCADE;" json:"students,omitempty"`
 }
 
 type FetchMajorRequest struct {

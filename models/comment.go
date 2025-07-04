@@ -7,15 +7,14 @@ import (
 // Comment represents a comment that can be attached to any entity
 type Comment struct {
 	database.Model
-	Content   string        `json:"content" gorm:"type:text;not null"`
-	UserID    database.PID  `json:"user_id" gorm:"not null"`
-	User      *User         `json:"user,omitempty" gorm:"foreignKey:UserID"`
-	OwnerID   database.PID  `json:"owner_id" gorm:"not null"`
-	OwnerType string        `json:"owner_type" gorm:"not null"`
-	ParentID  *database.PID `json:"parent_id" gorm:"default:null"` // For replies to comments
-	Parent    *Comment      `json:"parent,omitempty" gorm:"foreignKey:ParentID"`
-	Replies   []Comment     `json:"replies,omitempty" gorm:"foreignKey:ParentID"`
-	IsActive  bool          `json:"is_active" gorm:"default:true"`
+	PolymorphicModel
+	Content  string        `json:"content" gorm:"type:text;not null"`
+	UserID   database.PID  `json:"user_id" gorm:"not null"`
+	User     *User         `json:"user,omitempty" gorm:"foreignKey:UserID"`
+	ParentID *database.PID `json:"parent_id" gorm:"default:null"` // For replies to comments
+	Parent   *Comment      `json:"parent,omitempty" gorm:"foreignKey:ParentID"`
+	Replies  []Comment     `json:"replies,omitempty" gorm:"foreignKey:ParentID"`
+	IsActive bool          `json:"is_active" gorm:"default:true"`
 }
 
 // FetchCommentRequest represents the request parameters for fetching comments

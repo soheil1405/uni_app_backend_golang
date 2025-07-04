@@ -11,9 +11,9 @@ type ContactWays []*ContactWay
 
 type ContactWay struct {
 	database.Model
+	PolymorphicModel
 	Type    string `json:"type,omitempty"`
 	Content string `json:"content,omitempty"`
-	PolymorphicModel
 }
 
 func ContactWayAcceptIncludes() []string {

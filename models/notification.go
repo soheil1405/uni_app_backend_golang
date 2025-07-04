@@ -26,6 +26,7 @@ const (
 // Notification represents a notification that can be sent to users or students
 type Notification struct {
 	database.Model
+	PolymorphicModel
 	Type          NotificationType   `json:"type" gorm:"type:varchar(20);not null"`
 	Title         string             `json:"title" gorm:"type:varchar(255);not null"`
 	Body          string             `json:"body" gorm:"type:text;not null"`

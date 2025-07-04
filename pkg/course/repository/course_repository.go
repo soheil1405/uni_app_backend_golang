@@ -59,14 +59,6 @@ func (r *courseRepository) List(filters *models.FetchCourseRequest) ([]*models.C
 		query = query.Where("name LIKE ?", "%"+filters.Name+"%")
 	}
 
-	if filters.Code != "" {
-		query = query.Where("code LIKE ?", "%"+filters.Code+"%")
-	}
-
-	if filters.Credits > 0 {
-		query = query.Where("credits = ?", filters.Credits)
-	}
-
 	err := query.Preload("CourseInstances").
 		Preload("CourseInstances.Teacher").
 		Preload("CourseInstances.ClassSchedules").

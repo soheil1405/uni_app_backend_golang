@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"time"
 	"uni_app/database"
 )
 
@@ -16,13 +15,17 @@ const (
 type Users []*User
 
 type User struct {
-	ID        string    `gorm:"primaryKey" json:"id"`
-	Username  string    `gorm:"not null;unique" json:"username"`
-	Email     string    `gorm:"not null;unique" json:"email"`
-	Password  string    `gorm:"not null" json:"-"`
-	Role      string    `gorm:"not null" json:"role"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	database.Model
+	Username  string           `gorm:"not null;unique" json:"username,omitempty"`
+	Email     string           `gorm:"not null;unique" json:"email,omitempty"`
+	Password  string           `gorm:"not null" json:"-,omitempty"`
+	UniID     database.PID     `json:"uni_id,omitempty"`
+	Uni       Uni              `json:"uni,omitempty"`
+	FacultyID database.NullPID `json:"faculty_id,omitempty"`
+	Faculty   *Faculty         `json:"faculty,omitempty"`
+	RoleID    database.PID     `json:"role_id,omitempty"`
+	Role      Role             `json:"role,omitempty"`
+	Status    UserStatus       `json:"status,omitempty"`
 }
 
 type FetchUserRequest struct {

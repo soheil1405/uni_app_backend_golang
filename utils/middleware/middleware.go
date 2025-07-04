@@ -7,9 +7,7 @@ import (
 	"time"
 	"uni_app/database"
 	"uni_app/models"
-	_authRepository "uni_app/pkg/auth/repository"
-	_authUc "uni_app/pkg/auth/usecase"
-	_routeRepository "uni_app/pkg/route/repository"
+
 	_studentRepository "uni_app/pkg/student/repository"
 	_userRepository "uni_app/pkg/user/repository"
 	"uni_app/services/env"
@@ -25,19 +23,14 @@ import (
 type GoMiddleware struct {
 	userRepo          _userRepository.UserRepository
 	studentRepository _studentRepository.StudentRepository
-	authUcecase       _authUc.AuthUsecase
 	config            *env.Config
 }
 
 // InitMiddleware ...
 func InitMiddleware(e *echo.Group, db *gorm.DB, config *env.Config) *GoMiddleware {
-	authRepo := _authRepository.NewAuthRepository(db)
-	routeRepo := _routeRepository.NewRouteRepository(db)
-	authUC := _authUc.NewAuthUsecase(authRepo, routeRepo)
 	return &GoMiddleware{
 		userRepo:          _userRepository.NewUserRepository(db),
 		studentRepository: _studentRepository.NewStudentRepository(db),
-		authUcecase:       authUC,
 		config:            config,
 	}
 }
