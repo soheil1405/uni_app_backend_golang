@@ -8,7 +8,10 @@ import (
 type UniType string
 
 const (
-	UniTypePezeshki UniType = "pezeshki"
+	UniTypePezeshki  UniType = "pezeshki"
+	UniTypeAzad      UniType = "azad"
+	UniTypeDolati    UniType = "dolati"
+	UniTypePayamNoor UniType = "payam_noor"
 )
 
 type Unis []*Uni

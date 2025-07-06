@@ -14,7 +14,6 @@ type Major struct {
 	Faculty     Faculty      `json:"faculty,omitempty"`
 	DegreeLevel DegreeLevel  `json:"degree_level,omitempty"`
 	Name        string       `gorm:"not null" json:"name,omitempty"`
-	Code        string       `gorm:"unique;not null" json:"code,omitempty"`
 	Description string       `json:"description,omitempty"`
 	Students    []Student    `gorm:"foreignKey:MajorID;constraint:OnDelete:CASCADE;" json:"students,omitempty"`
 }

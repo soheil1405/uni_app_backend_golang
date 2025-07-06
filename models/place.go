@@ -15,8 +15,7 @@ type Place struct {
 	City        *City        `gorm:"foreignKey:CityID" json:"city,omitempty"`
 	PlaceTypeID database.PID `gorm:"not null" json:"place_type_id,omitempty"`
 	PlaceType   *PlaceType   `gorm:"foreignKey:PlaceTypeID" json:"place_type,omitempty"`
-	AddressID   database.PID `gorm:"not null" json:"address_id,omitempty"`
-	Address     *Address     `gorm:"foreignKey:AddressID" json:"address,omitempty"`
+	Address     *Address     `gorm:"polymorphic:Owner;auto_preload:false;" json:"address,omitempty"`
 	Ratings     []Rating     `json:"ratings,omitempty" gorm:"polymorphic:Owner;polymorphicValue:place"`
 }
 

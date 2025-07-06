@@ -22,6 +22,7 @@ type Course struct {
 	IsOptional      bool              `gorm:"not null" json:"is_optional,omitempty"`
 	IsTechnical     bool              `gorm:"not null" json:"is_technical,omitempty"`
 	Prerequisites   []Course          `gorm:"many2many:course_prerequisites;" json:"prerequisites,omitempty"`
+	SameNeeded      []Course          `gorm:"many2many:course_sameneeded;" json:"course_sameneeded,omitempty"`
 	Description     string            `json:"description,omitempty"`
 	CourseInstances []*CourseInstance `json:"course_instances,omitempty"`
 }

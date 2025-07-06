@@ -33,7 +33,7 @@ type Faculty struct {
 	Courses     []*Course     `json:"courses,omitempty" gorm:"many2many:faculty_courses;"`
 	Floors      []*Floor      `json:"floors,omitempty"`
 	Students    Student       `json:"students,omitempty"`
-	Users       Users         `json:"staff,omitempty" gorm:"many2many:faculty_staff;"`
+	Users       Users         `json:"users,omitempty" gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
 	Ratings     []*Rating     `json:"ratings,omitempty" gorm:"polymorphic:Owner;polymorphicValue:faculties"`
 	Majors      []*Major      `json:"majors,omitempty"`
 }

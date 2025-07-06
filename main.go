@@ -55,9 +55,10 @@ func main() {
 	// }
 
 	pkg.InitPkgs(db, *e, config)
-
-	for _, route := range echo.Routes() {
-		fmt.Printf("%s %s\n", route.Method, route.Path)
+	if env.GetBool("service.show_routes_in_bootstrap") {
+		for _, route := range echo.Routes() {
+			fmt.Printf("%s %s\n", route.Method, route.Path)
+		}
 	}
 
 	echo.Start(":" + env.GetString("port"))

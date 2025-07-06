@@ -52,6 +52,7 @@
         }
     },
     "service":{
+        "show_routes_in_bootstrap":false,
         "auth": {
             "active": true,
             "alg": "HS256",
@@ -60,7 +61,7 @@
             "audience": "aud",
             "issuer": "issuer",
             "subject": "subject"
-        }
+    }
     },
     "database":{
         "host": "localhost",
@@ -68,6 +69,7 @@
         "user": "soheil",
         "pass": "postgres",
         "name": "local",
+        "debug":false,
         "sslmode": "disable"
     },
     "api_version" :"/api/v1",

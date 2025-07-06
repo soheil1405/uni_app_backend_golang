@@ -15,6 +15,7 @@ type Database struct {
 	Password string `json:"password"`
 	DBName   string `json:"dbname"`
 	SSLMode  string `json:"sslmode"`
+	Debug    bool   `json:"debug"`
 }
 
 func Connection(dbCfg *Database) (*gorm.DB, error) {
@@ -27,7 +28,9 @@ func Connection(dbCfg *Database) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	db = db.Debug()
+	if dbCfg.Debug {
+		db = db.Debug()
+	}
 	fmt.Println("Connected to database :", dsn)
 	return db, nil
 }

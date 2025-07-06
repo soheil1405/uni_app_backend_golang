@@ -7,7 +7,8 @@ type MajorsCharts []*MajorsChart
 // چارت رشته تحصیلی
 type MajorsChart struct {
 	database.Model
-	Name            string       `gorm:"not null" json:"name,omitempty"`
+	CourseID        database.PID `json:"course_id,omitempty"`
+	Course          Course       `json:"course,omitempty"`
 	MajorID         database.PID `json:"major_id,omitempty"`
 	Major           Major        `json:"major,omitempty"`
 	TotalCountRatio float64      `gorm:"not null" json:"total_count_ratio,omitempty"`

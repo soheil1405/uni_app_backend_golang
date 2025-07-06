@@ -10,8 +10,6 @@ type Rating struct {
 	PolymorphicModel
 	StudentID database.PID `json:"student_id" gorm:"not null"`
 	Student   *Student     `json:"student,omitempty" gorm:"foreignKey:StudentID"`
-	UserID    database.PID `json:"user_id" gorm:"not null"`
-	User      *User        `json:"user,omitempty" gorm:"foreignKey:UserID"`
 	Rate      int          `json:"rate" gorm:"not null"`
 }
 
