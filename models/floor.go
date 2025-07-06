@@ -6,6 +6,7 @@ import (
 
 type Floor struct {
 	database.Model
+	Active      bool         `json:"active"`
 	FacultyID   database.PID `gorm:"not null" json:"faculty_id"`
 	Faculty     *Faculty     `json:"faculty,omitempty"`
 	Number      int          `gorm:"not null" json:"number"`

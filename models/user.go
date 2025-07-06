@@ -5,13 +5,6 @@ import (
 	"uni_app/database"
 )
 
-type UserStatus string
-
-const (
-	USER_STATUS_ACTIVE   UserStatus = "active"
-	USER_STATUS_INACTIVE UserStatus = "inactive"
-)
-
 type Users []*User
 
 type User struct {
@@ -23,7 +16,7 @@ type User struct {
 	PersonalCode string           `json:"personal_code,omitempty"`
 	DegreeLevel  DegreeLevel      `json:"degree_level,omitempty"`
 	MajorID      database.PID     `json:"major_id,omitempty"`
-	NationalCode string     `json:"national_code,omitempty"`
+	NationalCode string           `json:"national_code,omitempty"`
 	Email        string           `gorm:"not null;unique" json:"email,omitempty"`
 	Password     string           `gorm:"not null" json:"-,omitempty"`
 	UniID        database.PID     `json:"uni_id,omitempty"`
@@ -32,7 +25,7 @@ type User struct {
 	Faculty      *Faculty         `json:"faculty,omitempty"`
 	RoleID       database.PID     `json:"role_id,omitempty"`
 	Role         Role             `json:"role,omitempty"`
-	Status       UserStatus       `json:"status,omitempty"`
+	Active       bool             `json:"active"`
 }
 
 type FetchUserRequest struct {

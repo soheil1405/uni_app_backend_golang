@@ -22,6 +22,7 @@ type FetchFacultyRequest struct {
 
 type Faculty struct {
 	database.Model
+	Active      bool          `json:"active"`
 	Name        string        `gorm:"not null" json:"name,omitempty"`
 	Description string        `json:"description,omitempty"`
 	UniID       database.PID  `gorm:"not null" json:"uni_id,omitempty"`

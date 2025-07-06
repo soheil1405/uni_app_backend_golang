@@ -7,8 +7,9 @@ type Phones []*Phone
 type Phone struct {
 	database.Model
 	PolymorphicModel
-	Title string `json:"title,omitempty"`
-	Phone string `json:"phone,omitempty"`
+	Active bool   `json:"active"`
+	Title  string `json:"title,omitempty"`
+	Phone  string `json:"phone,omitempty"`
 }
 
 func PhoneAcceptIncludes() []string {

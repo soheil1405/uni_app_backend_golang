@@ -21,10 +21,11 @@ type Article struct {
 	PublishedAt time.Time  `json:"published_at,omitempty"`
 	Views       int        `json:"views,omitempty" gorm:"default:0"`
 	Likes       int        `json:"likes,omitempty" gorm:"default:0"`
+	Active      bool       `json:"active"`
 	Tags        []Tag      `json:"tags,omitempty" gorm:"many2many:article_tags;"`
 	Categories  []Category `json:"categories,omitempty" gorm:"many2many:article_categories;"`
 	Comments    []Comment  `json:"comments,omitempty" gorm:"polymorphic:Owner;"`
-	IsActive    bool       `json:"is_active,omitempty" gorm:"default:true"`
+	IsActive    bool       `json:"is_active" gorm:"default:true"`
 }
 
 // FetchArticleRequest represents the parameters for fetching articles

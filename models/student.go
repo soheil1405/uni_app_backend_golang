@@ -6,9 +6,9 @@ type Students []*Student
 type StudentStatus int
 
 const (
-	StudentStatusActive StudentStatus = iota
+	StudentStatusPending StudentStatus = iota
+	StudentStatusActive
 	StudentStatusInactive
-	StudentStatusPending
 )
 
 type Student struct {

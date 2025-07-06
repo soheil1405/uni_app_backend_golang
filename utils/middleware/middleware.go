@@ -117,7 +117,7 @@ func (m *GoMiddleware) SetContext(next echo.HandlerFunc) echo.HandlerFunc {
 				return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrorUnAuthorized, nil, nil)
 			}
 
-			if user.Status != models.USER_STATUS_ACTIVE {
+			if user.Active != true {
 				return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrUserIsNotActive, nil, nil)
 			}
 

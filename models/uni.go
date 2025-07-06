@@ -14,16 +14,18 @@ const (
 type Unis []*Uni
 type Uni struct {
 	database.Model
+	Active          bool          `json:"active"`
 	Name            string        `json:"name"`
 	UniType         *UniType      `json:"uni_type,omitempty"`
 	EstablishedYear *time.Time    `json:"established_year,omitempty"`
 	CityID          database.PID  `json:"city_id,omitempty"`
-	City            *City         `gorm:"foreignKey:CityID;constraint:OnDelete:SET NULL;" json:"city,omitempty"`
-	Address         Address       `gorm:"polymorphic:Owner;" json:"addresses,omitempty"`
-	Phones          []*Phone      `gorm:"polymorphic:Owner;" json:"phones,omitempty"`
-	ContactWays     []*ContactWay `gorm:"polymorphic:Owner;" json:"contact_ways,omitempty"`
-	Students        []*Student    `gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;" json:"students,omitempty"`
-	Faculties       []*Faculty    `gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;" json:"daneshkadeha,omitempty"`
+	City            *City         `json:"city,omitempty" gorm:"foreignKey:CityID;constraint:OnDelete:SET NULL;"`
+	Address         Address       `json:"addresses,omitempty" gorm:"polymorphic:Owner;"`
+	Dimains         []*Domain     `json:"domains,omitempty"  gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
+	Phones          []*Phone      `json:"phones,omitempty"  gorm:"polymorphic:Owner;"`
+	ContactWays     []*ContactWay `json:"contact_ways,omitempty"  gorm:"polymorphic:Owner;"`
+	Students        []*Student    `json:"students,omitempty"  gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
+	Faculties       []*Faculty    `json:"daneshkadeha,omitempty"  gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
 	Ratings         []*Rating     `json:"ratings,omitempty" gorm:"polymorphic:Owner;polymorphicValue:unis"`
 	Teachers        []*Teacher    `json:"teachers,omitempty" gorm:"many2many:uni_teachers;"`
 	Users           Users         `json:"users,omitempty" gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
@@ -37,6 +39,7 @@ type FetchUniRequest struct {
 
 func UniAcceptIncludes() []string {
 	return []string{
+		"Dimains",
 		"UniType",
 		"ContactWays",
 		"Phones",

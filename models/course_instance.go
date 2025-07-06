@@ -13,6 +13,7 @@ type FetchCourseInstanceRequest struct {
 
 type CourseInstance struct {
 	database.Model
+	Active         bool         `json:"active"`
 	UniID          database.PID `json:"uni_id,omitempty"`
 	Uni            Uni          `json:"uni,omitempty"`
 	CourseID       database.PID `gorm:"not null" json:"course_id,omitempty"`

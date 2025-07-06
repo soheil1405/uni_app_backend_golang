@@ -19,6 +19,7 @@ type Role struct {
 	Meta        json.RawMessage `gorm:"type:json" json:"meta,omitempty"`
 	UniID       database.PID    `json:"uni_id,omitempty"`
 	Uni         Uni             `json:"uni,omitempty"`
+	Active      bool            `json:"active"`
 	Users       Users           `json:"users,omitempty"`
 }
 

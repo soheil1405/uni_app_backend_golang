@@ -7,10 +7,10 @@ import (
 type SocialMediaLink struct {
 	database.Model
 	PolymorphicModel
-	Platform string `json:"platform"` // e.g., "instagram", "twitter", "linkedin", "telegram", "website"
+	Platform string `json:"platform"`
 	URL      string `json:"url"`
-	Title    string `json:"title"`     // Optional title for the link
-	IsActive bool   `json:"is_active"` // To enable/disable links
+	Title    string `json:"title"` 
+	Active   bool   `json:"active"`
 }
 
 // TableName specifies the table name for the SocialMediaLink model

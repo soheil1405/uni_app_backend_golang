@@ -26,5 +26,6 @@ type Room struct {
 	Floor           Floor             `json:"floor,omitempty"`
 	Name            string            `gorm:"not null" json:"name,omitempty"`
 	Capacity        int               `gorm:"not null" json:"capacity,omitempty"`
+	Active          bool              `json:"active"`
 	CourseInstances []*CourseInstance `json:"class_instances,omitempty"`
 }

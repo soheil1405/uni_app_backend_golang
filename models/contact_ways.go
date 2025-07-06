@@ -12,6 +12,7 @@ type ContactWays []*ContactWay
 type ContactWay struct {
 	database.Model
 	PolymorphicModel
+	Active  bool   `json:"active"`
 	Type    string `json:"type,omitempty"`
 	Content string `json:"content,omitempty"`
 }

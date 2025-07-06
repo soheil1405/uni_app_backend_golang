@@ -11,6 +11,7 @@ type FetchCourseRequest struct {
 
 type Course struct {
 	database.Model
+	Active          bool              `json:"active"`
 	Name            string            `gorm:"not null" json:"name,omitempty"`
 	UnitCount       int               `json:"unit_count,omitempty"`
 	UniID           database.PID      `json:"uni_id,omitempty"`

@@ -23,9 +23,10 @@ type FetchTeacherRequest struct {
 
 type Teacher struct {
 	database.Model
-	Name            string            `gorm:"not null" json:"name"`
-	Email           string            `gorm:"not null" json:"email"`
-	Phone           string            `gorm:"not null" json:"phone"`
+	Active          bool              `json:"active"`
+	Name            string            `gorm:"not null" json:"name,omitempty"`
+	Email           string            `gorm:"not null" json:"email,omitempty"`
+	Phone           string            `gorm:"not null" json:"phone,omitempty"`
 	Unis            Unis              `json:"teachers,omitempty" gorm:"many2many:uni_teachers;"`
 	DegreeLevel     DegreeLevel       `json:"degree_level,omitempty"`
 	CourseInstances []*CourseInstance `json:"course_instances,omitempty" gorm:"foreignKey:TeacherID;constraint:OnDelete:CASCADE;"`

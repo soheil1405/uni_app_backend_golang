@@ -14,6 +14,7 @@ type Address struct {
 	PostalCode  *int         `json:"postal_code,omitempty"`
 	Phones      Phones       `json:"phones,omitempty" gorm:"polymorphic:Owner;"`
 	CityID      database.PID `json:"city_id,omitempty"`
+	Active      bool         `json:"active"`
 	City        City         `json:"city,omitempty" gorm:"foreignKey:CityID"`
 	Lat         float64      `json:"lat,omitempty"`
 	Lng         float64      `json:"lng,omitempty"`

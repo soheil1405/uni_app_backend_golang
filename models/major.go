@@ -7,6 +7,7 @@ type MajorType string
 // رشته تحصیلی
 type Major struct {
 	database.Model
+	Active      bool         `json:"active"`
 	UniID       database.PID `json:"uni_id,omitempty"`
 	Uni         Uni          `json:"uni,omitempty"`
 	FacultyID   database.PID `json:"faculty_id,omitempty"`

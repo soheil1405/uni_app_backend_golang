@@ -73,7 +73,7 @@ func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegiste
 	user = &models.User{
 		Username:     request.UserName,
 		Email:        request.Email,
-		Status:       models.USER_STATUS_ACTIVE,
+		Active:       true,
 		FirstName:    request.FirstName,
 		LastName:     request.LastName,
 		Number:       request.Number,
@@ -90,7 +90,7 @@ func (u *userUsecase) RegisterUser(ctx echo.Context, request *models.UserRegiste
 		return nil, "", err
 	}
 	user.Password = string(hashedPassword)
-	user.Status = models.USER_STATUS_ACTIVE
+	user.Active = true
 	if err := u.repo.Create(user); err != nil {
 		return nil, "", errors.New("user already exists")
 	}
