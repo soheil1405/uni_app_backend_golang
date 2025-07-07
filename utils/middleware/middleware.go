@@ -9,6 +9,7 @@ import (
 	"uni_app/models"
 
 	_studentRepository "uni_app/pkg/student/repository"
+	_uniRepository "uni_app/pkg/uni/repository"
 	_userRepository "uni_app/pkg/user/repository"
 	"uni_app/services/env"
 	"uni_app/utils/helpers"
@@ -21,6 +22,7 @@ import (
 
 // GoMiddleware ...
 type GoMiddleware struct {
+	uniRepo           _uniRepository.UniRepository
 	userRepo          _userRepository.UserRepository
 	studentRepository _studentRepository.StudentRepository
 	config            *env.Config
@@ -31,6 +33,7 @@ func InitMiddleware(e *echo.Group, db *gorm.DB, config *env.Config) *GoMiddlewar
 	return &GoMiddleware{
 		userRepo:          _userRepository.NewUserRepository(db),
 		studentRepository: _studentRepository.NewStudentRepository(db),
+		uniRepo:           _uniRepository.NewUniRepository(db),
 		config:            config,
 	}
 }
@@ -96,19 +99,21 @@ func (m *GoMiddleware) SetContext(next echo.HandlerFunc) echo.HandlerFunc {
 			student  *models.Student
 			clientID database.PID
 			ok       bool
-			// uniID    = database.Parse(ctx.QueryParam("uni_id"))
 			useCache = !cachSkipper(ctx)
 			claims   jwt.StandardClaims
-			// mainRole *models.Role
 		)
 
-		// if !uniID.IsValid() {
-		// 	return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrorBadRequest, nil, nil)
-		// }
+		domain := helpers.GetDomain(ctx)
+		if domain == "" {
+			return helpers.Reply(ctx, http.StatusBadRequest, helpers.ErrorBadRequest, nil, nil)
+		}
+
+		uni, err := m.uniRepo.GetByDoimain(ctx, domain)
+		if err != nil || uni == nil {
+			return helpers.Reply(ctx, http.StatusBadRequest, helpers.ErrorUniNotFound, nil, nil)
+		}
 
 		if token, ok = ctx.Get("user").(*jwt.Token); ok {
-			helpers.SetToContext(ctx, helpers.HeadersTokenKey, token.Raw)
-
 			if err = helpers.JSONTo(token.Claims, &claims); err != nil {
 				return next(ctx)
 			}
@@ -117,20 +122,16 @@ func (m *GoMiddleware) SetContext(next echo.HandlerFunc) echo.HandlerFunc {
 				return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrorUnAuthorized, nil, nil)
 			}
 
-			if user.Active != true {
+			if !user.Active || !user.Role.ID.IsValid() {
 				return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrUserIsNotActive, nil, nil)
 			}
 
-			// mainRole = &user.Role
-			// if mainRole == nil || !mainRole.ID.IsValid() {
-			// 	return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrorInvalidUserRoles, nil, nil)
-			// }
-
-			// helpers.SetToContext(ctx, helpers.HeadersMainRole, mainRole)
-			// helpers.SetToContext(ctx, helpers.HeadersUserRole, user.Role)
 			helpers.SetToContext(ctx, helpers.HeadersUser, user)
 			helpers.SetToContext(ctx, helpers.HeadersUserID, user.ID)
 		} else if token, ok = ctx.Get("student").(*jwt.Token); ok {
+			if err = helpers.JSONTo(token.Claims, &claims); err != nil {
+				return next(ctx)
+			}
 			if student, err = m.studentRepository.GetByID(ctx, database.Parse(claims.Id), useCache); err != nil {
 				return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrorBadRequest, nil, nil)
 			}
@@ -139,15 +140,12 @@ func (m *GoMiddleware) SetContext(next echo.HandlerFunc) echo.HandlerFunc {
 				return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrUserIsNotActive, nil, nil)
 			}
 
-			// mainRole = student.Roles.GetMainRole()
-			// if mainRole == nil || !mainRole.ID.IsValid() {
-			// 	return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrorInvalidUserRoles, nil, nil)
-			// }
-
-			// helpers.SetToContext(ctx, helpers.HeadersMainRole, mainRole)
-			// helpers.SetToContext(ctx, helpers.HeadersUserRole, student.Roles)
 			helpers.SetToContext(ctx, helpers.HeadersStudent, student)
 			helpers.SetToContext(ctx, helpers.HeadersStudentID, student.ID)
+		} else if token, ok = ctx.Get("teacher").(*jwt.Token); ok {
+			if err = helpers.JSONTo(token.Claims, &claims); err != nil {
+				return next(ctx)
+			}
 		} else {
 			return helpers.Reply(ctx, http.StatusUnauthorized, helpers.ErrUnAuthorizedInValidToken, nil, nil)
 		}
@@ -230,6 +228,16 @@ func (m *GoMiddleware) ForceStudent(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if !helpers.ContextStudentID(c).IsValid() {
 			return helpers.Reply(c, http.StatusUnauthorized, helpers.ErrInvalidStudentID, nil, nil)
+		}
+
+		return next(c)
+	}
+}
+
+func (m *GoMiddleware) ForceTeacher(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if !helpers.ContextTeacherID(c).IsValid() {
+			return helpers.Reply(c, http.StatusUnauthorized, helpers.ErrInvalidTeacherID, nil, nil)
 		}
 
 		return next(c)

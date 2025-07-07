@@ -37,7 +37,7 @@ type News struct {
 	Views       int            `json:"views" gorm:"default:0"`
 	Likes       int            `json:"likes" gorm:"default:0"`
 	Comments    []Comment      `json:"comments,omitempty" gorm:"polymorphic:Owner;"`
-	IsActive    bool           `json:"is_active" gorm:"default:true"`
+	Active      bool           `json:"active" gorm:"default:true"`
 	IsNotified  bool           `json:"is_notified" gorm:"default:false"`
 	NotifyAt    *time.Time     `json:"notify_at"`
 	Meta        map[string]any `json:"meta" gorm:"type:jsonb"`

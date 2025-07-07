@@ -8,9 +8,11 @@ import (
 	"uni_app/pkg"
 	"uni_app/services/env"
 	"uni_app/utils/helpers"
+	"uni_app/utils/middleware"
 
-	// mw "github.com/labstack/echo/v4/middleware"
+	mw "github.com/labstack/echo/v4/middleware"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -35,24 +37,23 @@ func main() {
 	echo := echo.New()
 	apiVersion := env.GetString("api_version")
 	e := echo.Group(apiVersion)
-	// فعال کردن CORS
-	// e.Use(mw.CORSWithConfig(mw.CORSConfig{
-	// 	AllowOrigins:     []string{"http://localhost:5173"}, // دامنه فرانت‌اند
-	// 	AllowHeaders:     []string{"Content-Type", "Authorization"},
-	// 	AllowCredentials: true,
-	// }))
+	e.Use(mw.CORSWithConfig(mw.CORSConfig{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
 
-	// if auth := env.GetBool("service.auth.active"); auth {
-	// 	jwtSecret := env.GetString("service.auth.secret")
-	// 	middle := middleware.InitMiddleware(e, db, config)
-	// 	e.Use(mw.JWTWithConfig(mw.JWTConfig{
-	// 		SigningKey: []byte(jwtSecret),
-	// 		Claims:     &jwt.StandardClaims{},
-	// 		Skipper:    middleware.RegisterSkipper,
-	// 	}),
-	// 		middle.SkipSetContext(middleware.RegisterSkipper), // Skip context middleware too
-	// 	)
-	// }
+	if auth := env.GetBool("service.auth.active"); auth {
+		jwtSecret := env.GetString("service.auth.secret")
+		middle := middleware.InitMiddleware(e, db, config)
+		e.Use(mw.JWTWithConfig(mw.JWTConfig{
+			SigningKey: []byte(jwtSecret),
+			Claims:     &jwt.StandardClaims{},
+			Skipper:    middleware.RegisterSkipper,
+		}),
+			middle.SkipSetContext(middleware.RegisterSkipper),
+		)
+	}
 
 	pkg.InitPkgs(db, *e, config)
 	if env.GetBool("service.show_routes_in_bootstrap") {

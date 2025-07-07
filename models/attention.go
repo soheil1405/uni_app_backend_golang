@@ -37,7 +37,7 @@ type Attention struct {
 	RecipientType string          `json:"recipient_type,omitempty" gorm:"type:varchar(20);not null"` // user or student
 	ReadAt        *time.Time      `json:"read_at,omitempty"`
 	ArchivedAt    *time.Time      `json:"archived_at,omitempty"`
-	IsActive      bool            `json:"is_active" gorm:"default:true"`
+	Active        bool            `json:"active" gorm:"default:true"`
 }
 
 // FetchAttentionRequest represents the request parameters for fetching attentions

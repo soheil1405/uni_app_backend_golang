@@ -24,11 +24,11 @@ type Uni struct {
 	CityID          database.PID  `json:"city_id,omitempty"`
 	City            *City         `json:"city,omitempty" gorm:"foreignKey:CityID;constraint:OnDelete:SET NULL;"`
 	Address         Address       `json:"addresses,omitempty" gorm:"polymorphic:Owner;"`
-	Dimains         []*Domain     `json:"domains,omitempty"  gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
+	Domains         []*Domain     `json:"domains,omitempty"  gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
 	Phones          []*Phone      `json:"phones,omitempty"  gorm:"polymorphic:Owner;"`
 	ContactWays     []*ContactWay `json:"contact_ways,omitempty"  gorm:"polymorphic:Owner;"`
 	Students        []*Student    `json:"students,omitempty"  gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
-	Faculties       []*Faculty    `json:"daneshkadeha,omitempty"  gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
+	Faculties       []*Faculty    `json:"faculties,omitempty"  gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
 	Ratings         []*Rating     `json:"ratings,omitempty" gorm:"polymorphic:Owner;polymorphicValue:unis"`
 	Teachers        []*Teacher    `json:"teachers,omitempty" gorm:"many2many:uni_teachers;"`
 	Users           Users         `json:"users,omitempty" gorm:"foreignKey:UniID;constraint:OnDelete:CASCADE;"`
@@ -42,14 +42,14 @@ type FetchUniRequest struct {
 
 func UniAcceptIncludes() []string {
 	return []string{
-		"Dimains",
+		"Domains",
 		"UniType",
 		"ContactWays",
 		"Phones",
 		"City",
 		"Addresses",
 		"Students",
-		"DaneshKadeha",
+		"Faculties",
 		"UserRoles",
 		"Ratings",
 	}

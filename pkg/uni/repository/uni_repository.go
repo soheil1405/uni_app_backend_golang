@@ -12,6 +12,7 @@ import (
 type UniRepository interface {
 	Create(uni *models.Uni) error
 	GetByID(ctx echo.Context, ID database.PID, useCache bool) (*models.Uni, error)
+	GetByDoimain(ctx echo.Context, domain string) (*models.Uni, error)
 	Update(uni *models.Uni) error
 	Delete(ID database.PID) error
 	GetAll(ctx echo.Context, request models.FetchUniRequest) ([]models.Uni, *helpers.PaginateTemplate, error)
@@ -37,6 +38,16 @@ func (r *uniRepository) GetByID(ctx echo.Context, ID database.PID, useCache bool
 	return &uni, nil
 }
 
+func (r *uniRepository) GetByDoimain(ctx echo.Context, domain string) (*models.Uni, error) {
+	var uni models.Uni
+	if err := r.db.
+		Table("unis").
+		Joins("JOIN domains d ON d.uni_id = unis.id AND d.domain = ?", domain).
+		First(&uni).Error; err != nil {
+		return nil, err
+	}
+	return &uni, nil
+}
 func (r *uniRepository) Update(uni *models.Uni) error {
 	return r.db.Save(uni).Error
 }

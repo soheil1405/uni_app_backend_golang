@@ -61,6 +61,9 @@ const (
 	HeadersStudent = "x-student"
 	// HeadersStudentID ...
 	HeadersStudentID = "x-student-id"
+	HeadersTeacher   = "x-teacher"
+	// HeadersTeacherID ...
+	HeadersTeacherID = "x-teacher-id"
 	// HeadersRoles ...
 	HeadersUserRole = "x-user-role"
 	// HeadersMainRole ...
@@ -682,6 +685,13 @@ func ContextStudentID(ctx echo.Context) (studentID database.PID) {
 	}
 }
 
+func ContextTeacherID(ctx echo.Context) (teacherID database.PID) {
+	if TeacherID, err := database.ParsePID(GetFromContext(ctx, HeadersTeacherID)); err != nil {
+		return database.NilPID
+	} else {
+		return TeacherID
+	}
+}
 func ContextPlatform(ctx echo.Context) (platform string) {
 	if platform := cast.ToString(GetFromContext(ctx, HeadersPlatform)); platform == "" {
 		return ""

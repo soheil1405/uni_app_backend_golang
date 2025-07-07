@@ -37,7 +37,7 @@ type Notification struct {
 	SentAt        *time.Time         `json:"sent_at"`
 	DeliveredAt   *time.Time         `json:"delivered_at"`
 	Error         string             `json:"error" gorm:"type:text"`
-	IsActive      bool               `json:"is_active" gorm:"default:true"`
+	Active        bool               `json:"active" gorm:"default:true"`
 }
 
 // FetchNotificationRequest represents the request parameters for fetching notifications
@@ -60,7 +60,7 @@ type NotificationTemplate struct {
 	Title     string           `json:"title" gorm:"type:varchar(255);not null"`
 	Body      string           `json:"body" gorm:"type:text;not null"`
 	Variables []string         `json:"variables" gorm:"type:text[]"`
-	IsActive  bool             `json:"is_active" gorm:"default:true"`
+	Active    bool             `json:"active" gorm:"default:true"`
 }
 
 // NotificationPreference represents user/student notification preferences
@@ -71,5 +71,5 @@ type NotificationPreference struct {
 	PushEnabled  bool         `json:"push_enabled" gorm:"default:true"`
 	SMSEnabled   bool         `json:"sms_enabled" gorm:"default:true"`
 	EmailEnabled bool         `json:"email_enabled" gorm:"default:true"`
-	IsActive     bool         `json:"is_active" gorm:"default:true"`
+	Active       bool         `json:"active" gorm:"default:true"`
 }

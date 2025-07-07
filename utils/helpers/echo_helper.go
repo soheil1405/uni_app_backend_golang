@@ -120,3 +120,12 @@ func Reply(ctx echo.Context, httpStatus int, err error, content map[string]inter
 
 	return ctx.JSON(httpStatus, template)
 }
+
+func GetDomain(ctx echo.Context) string {
+	host := ctx.Request().Host
+	domain := host
+	if strings.Contains(host, ":") {
+		domain = strings.Split(host, ":")[0]
+	}
+	return domain
+}

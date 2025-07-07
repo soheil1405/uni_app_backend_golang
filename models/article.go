@@ -25,7 +25,6 @@ type Article struct {
 	Tags        []Tag      `json:"tags,omitempty" gorm:"many2many:article_tags;"`
 	Categories  []Category `json:"categories,omitempty" gorm:"many2many:article_categories;"`
 	Comments    []Comment  `json:"comments,omitempty" gorm:"polymorphic:Owner;"`
-	IsActive    bool       `json:"is_active" gorm:"default:true"`
 }
 
 // FetchArticleRequest represents the parameters for fetching articles

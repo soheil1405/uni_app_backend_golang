@@ -53,7 +53,7 @@ func (r *socialMediaLinkRepository) Delete(ctx context.Context, id uint) error {
 func (r *socialMediaLinkRepository) GetByLinkable(ctx context.Context, linkableID uint, linkableType string) ([]*models.SocialMediaLink, error) {
 	var links []*models.SocialMediaLink
 	err := r.db.WithContext(ctx).
-		Where("linkable_id = ? AND linkable_type = ? AND is_active = ?", linkableID, linkableType, true).
+		Where("linkable_id = ? AND linkable_type = ? AND active = ?", linkableID, linkableType, true).
 		Order("`order` ASC").
 		Find(&links).Error
 	if err != nil {
@@ -65,7 +65,7 @@ func (r *socialMediaLinkRepository) GetByLinkable(ctx context.Context, linkableI
 func (r *socialMediaLinkRepository) GetByPlatform(ctx context.Context, linkableID uint, linkableType string, platform string) (*models.SocialMediaLink, error) {
 	var link models.SocialMediaLink
 	err := r.db.WithContext(ctx).
-		Where("linkable_id = ? AND linkable_type = ? AND platform = ? AND is_active = ?",
+		Where("linkable_id = ? AND linkable_type = ? AND platform = ? AND active = ?",
 			linkableID, linkableType, platform, true).
 		First(&link).Error
 	if err != nil {
@@ -80,7 +80,7 @@ func (r *socialMediaLinkRepository) GetByPlatform(ctx context.Context, linkableI
 func (r *socialMediaLinkRepository) GetActiveLinks(ctx context.Context) ([]*models.SocialMediaLink, error) {
 	var links []*models.SocialMediaLink
 	err := r.db.WithContext(ctx).
-		Where("is_active = ?", true).
+		Where("active = ?", true).
 		Order("`order` ASC").
 		Find(&links).Error
 	if err != nil {
@@ -92,7 +92,7 @@ func (r *socialMediaLinkRepository) GetActiveLinks(ctx context.Context) ([]*mode
 func (r *socialMediaLinkRepository) GetLinksByPlatform(ctx context.Context, platform string) ([]*models.SocialMediaLink, error) {
 	var links []*models.SocialMediaLink
 	err := r.db.WithContext(ctx).
-		Where("platform = ? AND is_active = ?", platform, true).
+		Where("platform = ? AND active = ?", platform, true).
 		Order("`order` ASC").
 		Find(&links).Error
 	if err != nil {

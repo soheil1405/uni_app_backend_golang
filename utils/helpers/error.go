@@ -20,6 +20,7 @@ var (
 	ErrUnAuthorizedInValidToken = generateErr("invalid token")
 	ErrUnAuthorizedTokenExpired = generateErr("token has been expired")
 	ErrorBadRequest             = generateErr("bad request")
+	ErrorUniNotFound            = generateErr("uni not found")
 	ErrorWrongPassword          = generateErr("wrong passwrod")
 	ErrorAccessDenied           = generateErr("access denied")
 	ErrorInvalidUserPass        = generateErr("invalid username or password")
@@ -27,6 +28,7 @@ var (
 	ErrUserIsNotActive          = generateErr("user is not active")
 	ErrInvalidUserID            = generateErr("invalid user id")
 	ErrInvalidStudentID         = generateErr("invalid student id")
+	ErrInvalidTeacherID         = generateErr("invalid teacher id")
 )
 
 func generateErr(errMsg string) error {
